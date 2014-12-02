@@ -130,7 +130,7 @@ public class VacationAction {
             identityService.setAuthenticatedUserId(vacation.getUserId().toString());
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("entity", vacation);
-            if(vacation.getDays() > 3){
+            if(vacation.getDays() <= 3){
             	variables.put("manager", "manager");
             }else{
             	variables.put("director", "director");
@@ -315,14 +315,18 @@ public class VacationAction {
 			commnetList.add(vo);
 		}
 		Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
-		
+		vacation.setTask(task);
 		model.addAttribute("vacation", vacation);
 		model.addAttribute("commentList", commnetList);
     	return "vacation/audit_vacation";
     }
     
     @RequestMapping("/complate/{taskId}")
-    public String complate(@RequestParam("content") String content, @PathVariable("taskId") String taskId, HttpSession session) throws Exception{
+    public String complate(
+    		@RequestParam("content") String content,
+    		@RequestParam("completeFlag") Boolean completeFlag,
+    		@PathVariable("taskId") String taskId, 
+    		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
 		// 根据任务查询流程实例
@@ -331,8 +335,12 @@ public class VacationAction {
 		this.identityService.setAuthenticatedUserId(user.getId().toString());
 		// 添加评论
 		this.taskService.addComment(taskId, pi.getId(), content);
+		Map<String, Object> variables = new HashMap<String, Object>();
+//		Boolean flag = "true".equals(completeFlag);
+		variables.put("isPass", completeFlag);
+		logger.info("variables key:isPass, value:"+completeFlag+"---flag:"+completeFlag);
 		// 完成任务
-		this.taskService.complete(taskId);
+		this.taskService.complete(taskId, variables);
     	return "redirect:/vacationAction/doTaskList_page";
     }
 }

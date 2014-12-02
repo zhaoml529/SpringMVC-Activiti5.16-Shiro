@@ -5,13 +5,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>请假申请</title>
-  
+<script type="text/javascript">
+function complete( flag ) {
+	$("#completeFlag").val(flag);
+	$("#audit").submit();
+}
+</script>
 </head>
 
 <body>
-<form action="<c:url value="/vacationAction/doSave"/>" method="post">
+<form id="audit" action="<c:url value="/vacationAction/complate/${vacation.task.id }"/>" method="post">
 	<input type="hidden" name="userId" value="${user.id }" />
-
+	<input type="hidden" id="completeFlag" name="completeFlag" value="" />
 	<div id="main">
         <div class="where">
             <ul>
@@ -32,11 +37,11 @@
                       <tbody>
                         <tr>
                           <td width="15%" class="title1">开始日期：</td>
-                          <td class="left"><input name="beginDate" value="${vacation.beginDate }" id="beginDate" type="text" class="input_text2" size="30" readonly/></td>
+                          <td class="left"><input name="beginDate" value="<fmt:formatDate value="${vacation.beginDate}" type="date" />" id="beginDate" type="text" class="input_text2" size="30" readonly/></td>
                         </tr>
                         <tr>
                           <td width="15%" class="title1">结束日期：</td>
-                          <td class="left"><input name="endDate" value="${vacation.endDate }" id="endDate" type="text" class="input_text2" size="30" readonly/></td>
+                          <td class="left"><input name="endDate" value="<fmt:formatDate value="${vacation.endDate}" type="date" />" id="endDate" type="text" class="input_text2" size="30" readonly/></td>
                         </tr>
                         <tr>
                           <td width="15%" class="title1">请假天数：</td>
@@ -56,7 +61,7 @@
                         <tr>
                           <td width="15%" class="title1">原因：</td>
                           	<td class="left">
-								<textarea cols="33" rows="5" name="reason"></textarea>
+								<textarea cols="33" rows="5" name="reason" readonly="readonly">${vacation.reason }</textarea>
 							</td>
                         </tr>
                         <tr>
@@ -87,7 +92,10 @@
                 </div>
             </div>
             
-            <div class="fun_area" style="text-align:center;"><input type="submit" value="确 定" class="input_button1"/></div>
+            <div class="fun_area" style="text-align:center;">
+            	<input type="button" onclick="complete(true);" value="同 意" class="input_button1"/>
+            	<input type="button" onclick="complete(false);" value="不同意" class="input_button1"/>
+            </div>
 
       </div>
 </div>

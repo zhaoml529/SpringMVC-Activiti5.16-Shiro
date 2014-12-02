@@ -88,7 +88,7 @@
 					  </c:if>
 					  <c:if test="${not empty task.assignee }">
 						<%-- 此处用tkey记录当前节点的名称 --%>
-						<a class="handle" tkey='${task.taskDefinitionKey }' tname='${task.name }' href="#">办理</a>
+						<a class="handle" href="${ctx }/vacationAction/toApproval/${task.id}">办理</a>
 					  </c:if>
                   </td>
                 </tr>
