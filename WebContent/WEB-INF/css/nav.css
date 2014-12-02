@@ -1,0 +1,26 @@
+@charset "utf-8";
+
+body{background:#eaf0f0 url(../images/admin_content_bg.gif) repeat-x;}
+
+
+/* nav begin */
+.admin_memu{padding:11px 0;}
+
+#nav{margin:0 9px;}
+#nav li{margin-bottom:10px;}
+#nav li a.parent:link,#nav li a.parent:visited{display:block;line-height:22px;height:22px;border:1px #b6bdd0 solid;padding:2px;color:#fff;text-decoration:none;text-align:left;}
+#nav li a h5{font-size:14px;padding-left:12px;background:url(../images/admin_menu_parent_bg.gif) repeat-x;}
+
+#nav li ul.child_area li{margin-bottom:0px;border:1px #b6bdd0 solid;border-top:0;}
+#nav li ul.child_area li h6{text-align:left;padding-left:30px;font-size:12px;background:url(../images/icon_arrow29.gif) 13px 6px no-repeat;}
+#nav li ul.child_area li.last h6{text-align:left;padding-left:30px;font-size:12px;background:url(../images/icon_arrow30.gif) 13px 5px no-repeat;}
+#nav li ul.child_area li a:link,#nav li ul.child_area li a:visited{display:block;line-height:25px;width:100%;color:#454545;}
+#nav li ul.child_area li a:hover{color:#197cce;background:#fff;text-decoration:none;}
+
+#nav li ul.child_area li ul li{border:0;}
+#nav li ul.child_area li ul li h4{text-align:left;padding-left:42px;font-size:12px;background:url(../images/icon_arrow17.gif) 30px 9px no-repeat;}
+/* nav end */
+
+
+
+

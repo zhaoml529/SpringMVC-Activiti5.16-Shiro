@@ -1,0 +1,149 @@
+package com.zml.oa.entity;
+
+import java.io.Serializable;
+
+import javax.persistence.Transient;
+
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
+
+
+public class BaseVO implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6165121688276341503L;
+
+	// 单据类型
+	public final static String VACATION = "vacation";	
+	public final static String SALARY = "salary";	
+	public final static String EXPENSE = "expense";
+	
+	// 待办任务标识
+	public final static String CANDIDATE = "candidate";
+	
+	// 受理任务标识
+	public final static String ASSIGNEE = "assignee";
+	
+	// 申请人id
+	private Integer user_id;
+	
+	// 申请的标题
+	private String title;
+	
+	// 申请人名称
+	private String user_name;
+	
+	// 单据类型
+	private String businessType;
+	
+    // 流程任务
+    private Task task;
+
+    // 运行中的流程实例
+    private ProcessInstance processInstance;
+
+    // 历史的流程实例
+    private HistoricProcessInstance historicProcessInstance;
+
+    // 流程定义
+    private ProcessDefinition processDefinition;
+
+    @Transient
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	@Transient
+	public Integer getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(Integer user_id) {
+		this.user_id = user_id;
+	}
+
+	@Transient
+	public String getUser_name() {
+		return user_name;
+	}
+
+	public void setUser_name(String user_name) {
+		this.user_name = user_name;
+	}
+
+	@Transient
+	public String getBusinessType() {
+		return businessType;
+	}
+
+	public void setBusinessType(String businessType) {
+		this.businessType = businessType;
+	}
+
+	@Transient
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
+	}
+
+	@Transient
+	public ProcessInstance getProcessInstance() {
+		return processInstance;
+	}
+
+	public void setProcessInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
+	}
+
+	@Transient
+	public HistoricProcessInstance getHistoricProcessInstance() {
+		return historicProcessInstance;
+	}
+
+	public void setHistoricProcessInstance(
+			HistoricProcessInstance historicProcessInstance) {
+		this.historicProcessInstance = historicProcessInstance;
+	}
+
+	@Transient
+	public ProcessDefinition getProcessDefinition() {
+		return processDefinition;
+	}
+
+	public void setProcessDefinition(ProcessDefinition processDefinition) {
+		this.processDefinition = processDefinition;
+	}
+
+	@Transient
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Transient
+	public static String getVacation() {
+		return VACATION;
+	}
+
+	@Transient
+	public static String getSalary() {
+		return SALARY;
+	}
+
+	@Transient
+	public static String getExpense() {
+		return EXPENSE;
+	}
+	
+	
+}

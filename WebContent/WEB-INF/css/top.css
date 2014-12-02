@@ -1,0 +1,22 @@
+@charset "utf-8";
+
+
+body{background:url(../images/header_bg.gif) center top no-repeat;}
+
+
+
+/* header begin ------------------------------------------------------*/
+#header{position:relative;height:69px;}
+#header .logo{position:absolute;top:15px;left:10px;width:232px;height:43px;text-align:left;background:url(/images/admin_logo_bg.gif) no-repeat;}
+
+#header .admin_nav{position:absolute;top:42px;left:335px;width:680px;height:35px;}
+#header .admin_nav ul{overflow:hidden;}
+#header .admin_nav ul li{float:left;border-left:1px #fff solid;margin-left:-1px;padding:0 15px;}
+#header .admin_nav ul li a:link,#header .admin_nav ul li a:visited{color:#f1f1f1;}
+#header .admin_nav ul li a:hover{color:#fff;}
+
+
+#header .welcome{position:absolute;top:18px;left:350px;width:300px;height:30px;text-align:left;color:#fff;}
+/* header end ------------------------------------------------------*/
+
+

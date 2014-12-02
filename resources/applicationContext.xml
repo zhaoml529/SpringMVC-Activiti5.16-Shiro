@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans  
+                           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+                           http://www.springframework.org/schema/tx  
+                           http://www.springframework.org/schema/tx/spring-tx-3.2.xsd 
+                           http://www.springframework.org/schema/aop  
+                           http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+                           http://www.springframework.org/schema/context
+						   http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                           "> 
+                           
+    <!-- 在applicationContext.xml中只加载除表现层之外的所有bean，因此下面一行中不需要加载@Controller -->                       
+    <!-- 扫描注解Bean 不包括@Controller(表现层) 保证@Required、@Autowired的属性被注入-->
+    <context:component-scan base-package="com.zml.oa">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    
+    <!-- 引入配置文件 --> 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
+        <property name="locations"> 
+            <list> 
+                <value>classpath:jdbc.properties</value> 
+            </list> 
+        </property> 
+    </bean>
+	<!-- 数据源 -->
+	<bean id="dataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource" >
+		<!-- 数据源别名 -->
+		<property name="alias" value="proxoolDataSource"/>
+		<property name="driver" value="${connection.driverClassName}" />
+		<property name="driverUrl" value="${connection.url}" />
+		<property name="user" value="${connection.username}" />
+		<property name="password" value="${connection.password}" />
+		<!--最大连接数(默认5个),超过了这个连接数,再有请求时,就排在队列中等候,最大的等待请求数由maximum-new-connections决定 -->
+		<property name="maximumConnectionCount" value="${proxool.maximum.connection.count}"/>
+		<!--最小连接数(默认2个)-->  
+		<property name="minimumConnectionCount" value="${proxool.minimum.connection.count}" />
+		<property name="statistics" value="${proxool.statistics}" />
+		<property name="simultaneousBuildThrottle" value="${proxool.simultaneous.build.throttle}"/>
+		
+		
+	</bean>  
+	
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"> 
+        <property name="dataSource" ref="dataSource" /> 
+		<property name="packagesToScan" value="com.zml.oa.entity"/>
+        <property name="hibernateProperties"> 
+         	<props>
+		         <prop key="hibernate.show_sql">true</prop>
+		         <prop key="hibernate.format_sql">true</prop>
+		         <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+		 	 <prop key="hibernate.hbm2ddl.auto">update</prop> 
+  			</props>
+        </property> 
+    </bean>   
+	 
+	<!-- 给Dao注入sessionFactory -->    
+  	<bean id="baseDao" class="com.zml.oa.dao.impl.BaseDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+  	
+  
+    <!-- 事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 对标注@Transactional注解的Bean进行处理，以织入事务管理切面 -->
+	<!-- 为@Transactional注解事务开启事务支持 -->
+    <tx:annotation-driven transaction-manager="transactionManager" /> 
+    
+    
+    <!-- Activiti的bean -->
+	<!-- 流程引擎的配置bean -->
+	<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+		<property name="dataSource" ref="dataSource" />
+		<property name="databaseSchemaUpdate" value="true"/>
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="deploymentResources" value="classpath*:/bpmn/*.bpmn" />
+	</bean>
+	<!-- 流程引擎的bean -->
+	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+		<property name="processEngineConfiguration" ref="processEngineConfiguration" />
+	</bean>
+	<!-- 服务组件的bean -->
+	<bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+	<bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+	<bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+	<bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+	<bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
+	<bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService" />
+	
+</beans>

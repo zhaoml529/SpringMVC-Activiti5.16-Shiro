@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans	   
+							http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+							http://www.springframework.org/schema/context
+							http://www.springframework.org/schema/context/spring-context-3.2.xsd
+							http://www.springframework.org/schema/mvc
+							http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+							">
+	 <!-- springMVC.XML 表现层配置文件，只应加装表现层Bean -->
+	 
+	 <!-- 对包进行扫描，实现注释驱动Bean定义，同时将bean自动注入容器中使用。即解决了@Controller标识的类的bean的注入和使用。  -->
+	 <!-- <context:annotation-config/> -->
+ 
+	<mvc:annotation-driven />
+	
+	<!--开启controller注解支持,把标记了@Controller注解的类转换为bean -->    
+	<!-- 使用了 context:component-scan 标签 上面的 context:annotation-config 就不需要配置了 -->
+	<!-- 注：如果base-package=cn.zml 则注解事务不起作用 TODO 读源码 -->
+	<!-- 因为此处只应该加载表现层组件，如果此处还加载dao层或service层的bean会将之前容器加载的替换掉 -->
+	<!-- 而且此处不会进行AOP织入，所以会造成AOP失效问题（如事务不起作用） -->
+	<context:component-scan base-package="com.zml.oa.action">
+	    <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<!-- 当访问主页时自动转发到/userAction/login_view控制器。 -->
+	<mvc:view-controller path="/" view-name="forward:/userAction/login_view"/>
+	
+	<!-- restful -->
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
+	
+	<!-- 视图处理器 -->
+	<bean id="jspViewResolver"  
+	    class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
+	        <property name="prefix" value="/WEB-INF/jsp/" />  
+	        <property name="suffix" value=".jsp" />  
+	        <property name="contentType" value="text/html;charset=utf-8" />
+	        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" /> 
+	</bean>
+
+	<!-- 对静态资源文件的访问 -->  
+	<!-- 所有的页面引用到css/**的资源都从css/*里面进行查找 -->
+    <mvc:resources mapping="/js/**" location="/WEB-INF/js/" cache-period="31556926"/>  
+    <mvc:resources mapping="/css/**" location="/WEB-INF/css/" cache-period="31556926"/>
+	<mvc:resources mapping="/images/**" location="/WEB-INF/images/" cache-period="31556926"/>
+   
+	<!-- 全局异常配置 -->  
+     <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
+         <property name="exceptionMappings">  
+             <props>  
+                 <prop key="java.lang.Exception">ErrorPage/Exception</prop>  
+                 <prop key="java.lang.Throwable">ErrorPage/Exception</prop>  
+             </props>  
+         </property>  
+         <property name="statusCodes">  
+             <props>  
+                 <prop key="ErrorPage/Exception">500</prop>  
+                 <prop key="ErrorPage/Exception">404</prop>  
+             </props>  
+         </property>  
+         <!-- 设置日志输出级别，不定义则默认不输出警告等错误日志信息 -->  
+         <property name="warnLogCategory" value="WARN"></property>  
+         <!-- 默认错误页面，当找不到上面mappings中指定的异常对应视图时，使用本默认配置 -->  
+         <property name="defaultErrorView" value="errors/error"></property>  
+         <!-- 默认HTTP状态码 -->  
+         <property name="defaultStatusCode" value="500"></property>  
+     </bean>  
+
+	<!-- 分页拦截器 -->
+    <mvc:interceptors>
+    	<mvc:interceptor>
+	    	<mvc:mapping path="/**" />
+	    	<bean class="com.zml.oa.interceptor.PaginationInterceptor" />
+    	</mvc:interceptor>
+    </mvc:interceptors>
+
+
+	<!-- 上传配置 -->
+	<!--  
+		org.springframework.web.multipart.commons.CommonsMultipartResolver这个是
+		spring的默认配置，但是kindEditor的request被拦截导致无法上传图片。
+		重写CommonsMultipartResolver中的isMultipart方法解决问题。
+		com.hdc.interceptors.DefaultMultipartResolver
+	-->
+	<bean id="multipartResolver"
+		class="com.zml.oa.interceptor.DefaultMultipartResolver">
+	 	<property name="maxInMemorySize">
+			<value>104857600</value><!-- 最大10M -->
+		</property>
+		<property name="uploadTempDir">
+			<value>UploadFile</value>
+		</property>
+		<property name="defaultEncoding">
+			<value>UTF-8</value>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,24 @@
+@charset "utf-8";
+
+
+/* turn_page begin */
+.turn_page{background:#;margin:10px 0;padding:5px;font-size:12px;overflow:hidden;zoom:1;}
+
+.turn_page ul li{float:left;display:inline;border:1px #ddd solid;line-height:22px;font-family:Verdana;text-align:center;}
+.turn_page ul li.page{padding:0 5px;background:#d9e6f0;color:#000080;margin-right:2px;}
+.turn_page ul li.goto{border:0;margin-left:2px;}
+.turn_page ul li.goto input.number{border:1px #ddd solid;width:30px;height:16px;padding:3px;margin-bottom:1px;>margin-top:-1px;}
+.turn_page ul li.goto input.page_button{border:0;width:28px;height:24px;cursor:pointer;background:url(../image/page_button.gif);color:#fff;font-weight:bold;margin-bottom:1px;>margin-bottom:2px;}
+
+.turn_page a:link,.turn_page a:visited{display:block;line-height:22px;width:23px;color:#023a69;}
+.turn_page a:hover{background:#f4f7fa;text-decoration:none;}
+
+.turn_page a.on:link,.turn_page a.on:visited{font-weight:bold;color:#000;font-size:14px;background:#e5ecf2;}
+.turn_page a.on:hover{}
+
+.turn_page a.previous:link,.turn_page a.previous:visited{padding:0 3px 0 18px;width:55px;background:url(../images/icon_previous.gif) 3px 4px no-repeat;}
+.turn_page a.previous:hover{text-decoration:underline;}
+
+.turn_page a.next:link,.turn_page a.next:visited{padding:0 16px 0 3px;width:55px;background:url(../images/icon_next2.gif) 56px 4px no-repeat;}
+.turn_page a.next:hover{text-decoration:underline;}
+/* turn_page end */
