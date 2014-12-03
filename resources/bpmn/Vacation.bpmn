@@ -4,11 +4,11 @@
     <startEvent id="startevent1" name="Start" activiti:initiator="applyUserId"></startEvent>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow2" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
-    <userTask id="managerAudit" name="经理审批" activiti:candidateGroups="${manager}"></userTask>
+    <userTask id="managerAudit" name="经理审批" activiti:candidateGroups="${auditUser}"></userTask>
     <sequenceFlow id="flow3" name="小于等于3天" sourceRef="exclusivegateway1" targetRef="managerAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${entity.days <= 3}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="directorAudit" name="总监审批" activiti:candidateGroups="${director}"></userTask>
+    <userTask id="directorAudit" name="总监审批" activiti:candidateGroups="${auditUser}"></userTask>
     <sequenceFlow id="flow4" name="大于3天" sourceRef="exclusivegateway1" targetRef="directorAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${entity.days > 3}]]></conditionExpression>
     </sequenceFlow>
@@ -20,7 +20,7 @@
     <sequenceFlow id="flow6" sourceRef="managerAudit" targetRef="exclusivegateway2"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow7" sourceRef="directorAudit" targetRef="exclusivegateway3"></sequenceFlow>
-    <userTask id="hrAudit" name="人力资源审批" activiti:candidateGroups="${hr}"></userTask>
+    <userTask id="hrAudit" name="人力资源审批" activiti:candidateGroups="${auditUser}"></userTask>
     <sequenceFlow id="flow8" name="同意" sourceRef="exclusivegateway2" targetRef="hrAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isPass}]]></conditionExpression>
     </sequenceFlow>

@@ -131,9 +131,9 @@ public class VacationAction {
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("entity", vacation);
             if(vacation.getDays() <= 3){
-            	variables.put("manager", "manager");
+            	variables.put("auditUser", "manager");
             }else{
-            	variables.put("director", "director");
+            	variables.put("auditUser", "director");
             }
             processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.vacation", businessKey, variables);
             String processInstanceId = processInstance.getId();
@@ -212,7 +212,8 @@ public class VacationAction {
                 continue;
             }
             Vacation vacation = this.vacationService.findById(new Integer(businessKey));
-            vacation.setUser_name(user.getName());
+            String user_name = this.userService.getUserById(vacation.getUserId()).getName();
+            vacation.setUser_name(user_name);
             vacation.setBusinessType(BaseVO.CANDIDATE);
             vacation.setTask(task);
             vacation.setProcessInstance(processInstance);
@@ -326,6 +327,7 @@ public class VacationAction {
     		@RequestParam("content") String content,
     		@RequestParam("completeFlag") Boolean completeFlag,
     		@PathVariable("taskId") String taskId, 
+    		RedirectAttributes redirectAttributes,
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -338,9 +340,11 @@ public class VacationAction {
 		Map<String, Object> variables = new HashMap<String, Object>();
 //		Boolean flag = "true".equals(completeFlag);
 		variables.put("isPass", completeFlag);
+		variables.put("auditUser", "hr");
 		logger.info("variables key:isPass, value:"+completeFlag+"---flag:"+completeFlag);
 		// 完成任务
 		this.taskService.complete(taskId, variables);
+		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
     	return "redirect:/vacationAction/doTaskList_page";
     }
 }

@@ -34,7 +34,8 @@
 	<div id="main">
 		<div id="dialog-message" title="Download complete">
 		  <p>
-		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;">${message}</span>
+		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
+		    ${message}
 		  </p>
 		</div>
       <div class="sort_switch">
