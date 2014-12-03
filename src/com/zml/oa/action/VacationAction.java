@@ -138,7 +138,7 @@ public class VacationAction {
             }
             processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.vacation", businessKey, variables);
             String processInstanceId = processInstance.getId();
-            vacation.setProcessInstanceId(processInstanceId);
+//            vacation.setProcessInstanceId(processInstanceId);
             redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
             logger.info("processInstanceId: "+processInstanceId);
         } catch (ActivitiException e) {
@@ -187,10 +187,10 @@ public class VacationAction {
 		 // 根据当前用户组查询
 //        TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
 		TaskQuery todoQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
-        TaskQuery claimQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
+//        TaskQuery claimQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
 		Integer todoSum = todoQuery.list().size();
-		Integer claimSum = claimQuery.list().size();
-        logger.info("UserID: "+userId +" totalSum: "+ todoSum+claimSum);
+//		Integer claimSum = claimQuery.list().size();
+        logger.info("UserID: "+userId +" totalSum: "+ todoSum);
         //计算分页
         Pagination pagination = PaginationThreadUtils.get();
         if (pagination == null) {
@@ -207,16 +207,16 @@ public class VacationAction {
 		
 		List<Task> todoTask = todoQuery.listPage(firstResult, maxResult);
 		//计算分页2
-		pagination.setTotalSum(claimSum);
-		pagination.processTotalPage();
-		firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
-		maxResult = pagination.getPageNum();
-		
-		List<Task> claimTask = claimQuery.listPage(firstResult, maxResult);
+//		pagination.setTotalSum(claimSum);
+//		pagination.processTotalPage();
+//		firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
+//		maxResult = pagination.getPageNum();
+//		
+//		List<Task> claimTask = claimQuery.listPage(firstResult, maxResult);
 		
 		//合并
 		tasks.addAll(todoTask);
-		tasks.addAll(claimTask);
+//		tasks.addAll(claimTask);
 		
         List<Vacation> vacationList = new ArrayList<Vacation>();
      // 根据流程的业务ID查询实体并关联
@@ -321,6 +321,7 @@ public class VacationAction {
     	String processInstanceId = task.getProcessInstanceId();
 		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 		// 查询一个任务所在流程的全部评论
+		logger.info("processInstanceId: "+processInstanceId+"--- pi.getId(): "+pi.getId());
 		List<Comment> comments = this.taskService.getProcessInstanceComments(pi.getId());
 		List<CommentVO> commnetList = new ArrayList<CommentVO>();
 		for(Comment comment : comments){
@@ -333,9 +334,7 @@ public class VacationAction {
 		}
 		Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
 		vacation.setTask(task);
-		
-		ProcessDefinition processDefinition = vacation.getProcessDefinition();
-		String taskDefinitionKey = processDefinition.getKey();
+		String taskDefinitionKey = task.getTaskDefinitionKey();
 		logger.info("taskDefinitionKey: "+taskDefinitionKey);
 		String result = null;
 		if("modifyApply".equals(taskDefinitionKey)){
@@ -370,7 +369,8 @@ public class VacationAction {
 		// 根据任务查询流程实例
     	String processInstanceId = task.getProcessInstanceId();
     	ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-		this.identityService.setAuthenticatedUserId(user.getId().toString());
+		//评论人的id  一定要写，不然查看的时候会报错，没有用户
+    	this.identityService.setAuthenticatedUserId(user.getId().toString());
 		// 添加评论
 		this.taskService.addComment(taskId, pi.getId(), content);
 		Map<String, Object> variables = new HashMap<String, Object>();
@@ -387,6 +387,66 @@ public class VacationAction {
 		// 完成任务
 		this.taskService.complete(taskId, variables);
 		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
+    	return "redirect:/vacationAction/doTaskList_page";
+    }
+    
+    /**
+     * 调整请假申请
+     * @param vacation
+     * @param results
+     * @param taskId
+     * @param session
+     * @param reApply
+     * @param model
+     * @return
+     * @throws Exception 
+     */
+	@RequestMapping(value = "/modifyVacation/{taskId}", method = RequestMethod.POST)
+	public String modifyVacation(
+			@ModelAttribute("vacation") @Valid Vacation vacation,
+			BindingResult results,
+			@PathVariable("taskId") String taskId,
+			@RequestParam("reApply") Boolean reApply,
+			RedirectAttributes redirectAttributes,
+			HttpSession session,
+			Model model
+			) throws Exception {
+		
+		if(results.hasErrors()){
+        	model.addAttribute("vacation", vacation);
+        	return "vacation/modify_vacation";
+        }
+		
+		User user = UserUtil.getUserFromSession(session);
+        
+        // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
+        if (user == null || user.getId() == null) {
+        	model.addAttribute("msg", "登录超时，请重新登录!");
+            return "login";
+        }
+        Map<String, Object> variables = new HashMap<String, Object>();
+        if(reApply){
+        	//修改请假申请
+	        vacation.setUserId(user.getId());
+	        vacation.setUser_name(user.getName());
+	        vacation.setTitle(user.getName()+" 的请假申请！");
+	        vacation.setBusinessType(BaseVO.VACATION);
+	        vacation.setApplyDate(new Date());
+	        this.vacationService.update(vacation);
+	        variables.put("entity", vacation);
+	        if(vacation.getDays() <= 3){
+            	variables.put("auditGroup", "manager");
+            }else{
+            	variables.put("auditGroup", "director");
+            }
+//	        this.identityService.setAuthenticatedUserId(user.getId().toString());
+	        redirectAttributes.addFlashAttribute("message", "任务办理完成，请假申请已重新提交！");
+        }else{
+        	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的请假申请！");
+        }
+		variables.put("reApply", reApply);
+    	this.taskService.complete(taskId, variables);
+		
     	return "redirect:/vacationAction/doTaskList_page";
     }
 }
