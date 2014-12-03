@@ -18,28 +18,35 @@
 			showAnim: 'slideDown',
 			dateFormat: 'yy-mm-dd'
 		});
-	  });
+    });
+	$(function() {
+		var message = "${message}";
+		var error = "${error}";
+		if(message != ""){
+			$( "#dialog-complete" ).dialog({
+			      modal: true,
+			      buttons: {
+			        Ok: function() {
+			          $( this ).dialog( "close" );
+			        }
+			      }
+		    });
+		}
+		if(error != ""){
+			$( "#dialog-error" ).dialog({
+			      modal: true,
+			      buttons: {
+			        Ok: function() {
+			          $( this ).dialog( "close" );
+			        }
+			      }
+		    });
+		}
+	});
+	
 </script>
 </head>
 <body>
-	<c:if test="${not empty message}">
-		<div id="message" class="alert alert-success">${message}</div>
-		<!-- 自动隐藏提示信息 -->
-		<script type="text/javascript">
-		setTimeout(function() {
-			$('#message').hide('slow');
-		}, 5000);
-		</script>
-	</c:if>
-	<c:if test="${not empty error}">
-		<div id="error" class="alert alert-error">${error}</div>
-		<!-- 自动隐藏提示信息 -->
-		<script type="text/javascript">
-		setTimeout(function() {
-			$('#error').hide('slow');
-		}, 5000);
-		</script>
-	</c:if>
 	<form:form action="${ctx }/vacationAction/doAdd" modelAttribute="vacation" method="POST">
         <div id="main">
         <div class="where">
@@ -47,7 +54,18 @@
             	<form:errors path="*" cssStyle="font-color:red"/>
             </ul>
         </div>
-        
+        <div id="dialog-complete" title="complete">
+		  <p>
+		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 5px 0;"></span>
+		    ${message}
+		  </p>
+		</div>
+		<div id="dialog-error" title="error">
+		  <p>
+		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 5px 0;"></span>
+		    ${message}
+		  </p>
+		</div>
       <div class="sort_switch">
           <ul id="TabsNav">
           	  <li class="selected"><a href="#">请假申请</a></li>
