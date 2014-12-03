@@ -333,9 +333,19 @@ public class VacationAction {
 		}
 		Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
 		vacation.setTask(task);
+		
+		ProcessDefinition processDefinition = vacation.getProcessDefinition();
+		String taskDefinitionKey = processDefinition.getKey();
+		logger.info("taskDefinitionKey: "+taskDefinitionKey);
+		String result = null;
+		if("modifyApply".equals(taskDefinitionKey)){
+			result = "vacation/modify_vacation";
+		}else{
+			result = "vacation/audit_vacation";
+		}
 		model.addAttribute("vacation", vacation);
 		model.addAttribute("commentList", commnetList);
-    	return "vacation/audit_vacation";
+    	return result;
     }
     
     /**
