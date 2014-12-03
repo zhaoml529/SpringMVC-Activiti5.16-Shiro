@@ -31,6 +31,7 @@
 				<tr>
 					<th>假种</th>
 					<th>申请人</th>
+					<th>标题</th>
 					<th>申请时间</th>
 					<th>开始时间</th>
 					<th>结束时间</th>
@@ -51,6 +52,7 @@
                   	</c:choose>
                   </td>
                   <td>${vacation.user_name }</td>
+                  <td>${vacation.title }</td>
                   <td>${vacation.applyDate }</td>
                   <td>${vacation.beginDate }</td>
                   <td>${vacation.endDate }</td>

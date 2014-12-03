@@ -118,8 +118,9 @@ public class VacationAction {
             return "login";
         }
         vacation.setUserId(user.getId());
+        vacation.setUser_name(user.getName());
         vacation.setTitle(user.getName()+" 的请假申请");
-        vacation.setBusinessType("请假申请");
+        vacation.setBusinessType(BaseVO.VACATION);
         vacation.setApplyDate(new Date());
         this.vacationService.add(vacation);
       //待测试--添加完成后vacation.getId() 是否有值？
@@ -131,9 +132,9 @@ public class VacationAction {
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("entity", vacation);
             if(vacation.getDays() <= 3){
-            	variables.put("auditUser", "manager");
+            	variables.put("auditGroup", "manager");
             }else{
-            	variables.put("auditUser", "director");
+            	variables.put("auditGroup", "director");
             }
             processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.vacation", businessKey, variables);
             String processInstanceId = processInstance.getId();
@@ -182,11 +183,14 @@ public class VacationAction {
 		String userId = UserUtil.getUserFromSession(session).getId().toString();
 		
 		User user = this.userService.getUserById(new Integer(userId));
-		 // 根据当前人的ID查询
+		List<Task> tasks = new ArrayList<Task>();
+		 // 根据当前用户组查询
 //        TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
-		TaskQuery taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
-        Integer totalSum = taskQuery.list().size();
-        logger.info("UserID: "+userId +" totalSum: "+ totalSum);
+		TaskQuery todoQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
+        TaskQuery claimQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
+		Integer todoSum = todoQuery.list().size();
+		Integer claimSum = claimQuery.list().size();
+        logger.info("UserID: "+userId +" totalSum: "+ todoSum+claimSum);
         //计算分页
         Pagination pagination = PaginationThreadUtils.get();
         if (pagination == null) {
@@ -195,13 +199,25 @@ public class VacationAction {
 			pagination.setCurrentPage(1);
 		}
 		if (pagination.getTotalSum() == 0) {
-			pagination.setTotalSum(totalSum);
+			pagination.setTotalSum(todoSum);
 		}
 		pagination.processTotalPage();
 		int firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
 		int maxResult = pagination.getPageNum();
 		
-		List<Task> tasks = taskQuery.listPage(firstResult, maxResult);
+		List<Task> todoTask = todoQuery.listPage(firstResult, maxResult);
+		//计算分页2
+		pagination.setTotalSum(claimSum);
+		pagination.processTotalPage();
+		firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
+		maxResult = pagination.getPageNum();
+		
+		List<Task> claimTask = claimQuery.listPage(firstResult, maxResult);
+		
+		//合并
+		tasks.addAll(todoTask);
+		tasks.addAll(claimTask);
+		
         List<Vacation> vacationList = new ArrayList<Vacation>();
      // 根据流程的业务ID查询实体并关联
         for (Task task : tasks) {
@@ -211,10 +227,11 @@ public class VacationAction {
             if (businessKey == null) {
                 continue;
             }
-            Vacation vacation = this.vacationService.findById(new Integer(businessKey));
-            String user_name = this.userService.getUserById(vacation.getUserId()).getName();
-            vacation.setUser_name(user_name);
-            vacation.setBusinessType(BaseVO.CANDIDATE);
+//            Vacation vacation = this.vacationService.findById(new Integer(businessKey));
+//            String user_name = this.userService.getUserById(vacation.getUserId()).getName();
+            
+            //获取当前流程下的key为entity的variable
+            Vacation vacation = (Vacation) this.runtimeService.getVariable(processInstance.getId(), "entity");
             vacation.setTask(task);
             vacation.setProcessInstance(processInstance);
             vacation.setProcessDefinition(getProcessDefinition(processInstance.getProcessDefinitionId()));
@@ -276,9 +293,8 @@ public class VacationAction {
 	            if (businessKey == null) {
 	                continue;
 	            }
-	            Vacation vacation = this.vacationService.findById(new Integer(businessKey));
-	            vacation.setUser_name(user.getName());
-	            vacation.setBusinessType(BaseVO.CANDIDATE);
+//	            Vacation vacation = this.vacationService.findById(new Integer(businessKey));
+	            Vacation vacation = (Vacation) this.runtimeService.getVariable(processInstance.getId(), "entity");
 	            vacation.setTask(task);
 	            vacation.setProcessInstance(processInstance);
 	            vacation.setProcessDefinition(getProcessDefinition(processInstance.getProcessDefinitionId()));
@@ -322,6 +338,16 @@ public class VacationAction {
     	return "vacation/audit_vacation";
     }
     
+    /**
+     * 完成任务
+     * @param content
+     * @param completeFlag
+     * @param taskId
+     * @param redirectAttributes
+     * @param session
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("/complate/{taskId}")
     public String complate(
     		@RequestParam("content") String content,
@@ -338,9 +364,15 @@ public class VacationAction {
 		// 添加评论
 		this.taskService.addComment(taskId, pi.getId(), content);
 		Map<String, Object> variables = new HashMap<String, Object>();
-//		Boolean flag = "true".equals(completeFlag);
 		variables.put("isPass", completeFlag);
-		variables.put("auditUser", "hr");
+		if(completeFlag){
+			variables.put("auditGroup", "hr");
+		}else{
+			//获取当前流程下的key为entity的variable
+            Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
+            vacation.setTitle(vacation.getUser_name()+" 的请假申请失败！");
+			variables.put("entity", vacation);
+		}
 		logger.info("variables key:isPass, value:"+completeFlag+"---flag:"+completeFlag);
 		// 完成任务
 		this.taskService.complete(taskId, variables);

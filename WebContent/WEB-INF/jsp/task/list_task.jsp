@@ -51,6 +51,7 @@
 	  			<tr>
 					<th>假种</th>
 					<th>申请人</th>
+					<th>标题</th>
 					<th>申请时间</th>
 					<th>开始时间</th>
 					<th>结束时间</th>
@@ -74,6 +75,7 @@
                   	</c:choose>
                   </td>
                   <td>${vacation.user_name}</td>
+                  <td>${vacation.title}</td>
                   <td><fmt:formatDate value="${vacation.applyDate}" type="date" /></td>
                   <td><fmt:formatDate value="${vacation.beginDate}" type="date" /></td>
                   <td><fmt:formatDate value="${vacation.endDate}" type="date" /></td>
@@ -95,7 +97,7 @@
                 </tr>
                 </c:forEach>
                 <tr>
-              		<td class="fun_area" colspan="9" align="center">${page }</td>
+              		<td class="fun_area" colspan="10" align="center">${page }</td>
               	</tr>
               </tbody>
           </table>
