@@ -12,8 +12,8 @@
     <sequenceFlow id="flow4" name="大于3天" sourceRef="exclusivegateway1" targetRef="directorAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${entity.days > 3}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="usertask4" name="调整申请" activiti:assignee="${applyUserId}"></userTask>
-    <sequenceFlow id="flow5" name="重新申请" sourceRef="usertask4" targetRef="exclusivegateway1">
+    <userTask id="modifyApply" name="调整申请" activiti:assignee="${applyUserId}"></userTask>
+    <sequenceFlow id="flow5" name="重新申请" sourceRef="modifyApply" targetRef="exclusivegateway1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reApply}]]></conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
@@ -27,22 +27,22 @@
     <sequenceFlow id="flow9" name="同意" sourceRef="exclusivegateway3" targetRef="hrAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isPass}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow10" name="不同意" sourceRef="exclusivegateway3" targetRef="usertask4">
+    <sequenceFlow id="flow10" name="不同意" sourceRef="exclusivegateway3" targetRef="modifyApply">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!isPass}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow11" name="不同意" sourceRef="exclusivegateway2" targetRef="usertask4">
+    <sequenceFlow id="flow11" name="不同意" sourceRef="exclusivegateway2" targetRef="modifyApply">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!isPass}]]></conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow13" sourceRef="hrAudit" targetRef="exclusivegateway4"></sequenceFlow>
-    <sequenceFlow id="flow14" name="不同意" sourceRef="exclusivegateway4" targetRef="usertask4">
+    <sequenceFlow id="flow14" name="不同意" sourceRef="exclusivegateway4" targetRef="modifyApply">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!isPass}]]></conditionExpression>
     </sequenceFlow>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow15" name="同意" sourceRef="exclusivegateway4" targetRef="endevent1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isPass}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow16" name="结束申请" sourceRef="usertask4" targetRef="endevent1">
+    <sequenceFlow id="flow16" name="结束申请" sourceRef="modifyApply" targetRef="endevent1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!reApply}]]></conditionExpression>
     </sequenceFlow>
   </process>
@@ -60,7 +60,7 @@
       <bpmndi:BPMNShape bpmnElement="directorAudit" id="BPMNShape_directorAudit">
         <omgdc:Bounds height="55.0" width="105.0" x="275.0" y="211.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+      <bpmndi:BPMNShape bpmnElement="modifyApply" id="BPMNShape_modifyApply">
         <omgdc:Bounds height="55.0" width="105.0" x="280.0" y="320.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
