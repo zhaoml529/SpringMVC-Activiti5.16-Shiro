@@ -28,6 +28,16 @@ public class BaseVO implements Serializable{
 	// 受理任务标识
 	public final static String ASSIGNEE = "assignee";
 	
+	//审批中
+	public static final String PENDING = "PENDING";
+	//待审批
+	public static final String WAITING_FOR_APPROVAL = "WAITING_FOR_APPROVAL";
+	//审批成功
+	public static final String APPROVAL_SUCCESS = "APPROVAL_SUCCESS";
+	//审批失败
+	public static final String APPROVAL_FAILED = "APPROVAL_FAILED";
+	
+	
 	// 申请人id
 	private Integer user_id;
 	

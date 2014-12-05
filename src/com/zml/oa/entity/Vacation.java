@@ -78,6 +78,10 @@ public class Vacation extends BaseVO implements Serializable{
 	@Column(name = "USER_ID")
 	private Integer userId;
 	
+	//审批状态
+	@Column(name = "STATUS")
+	private String status;
+	
 	public Vacation(){
 		
 	}
@@ -156,6 +160,14 @@ public class Vacation extends BaseVO implements Serializable{
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

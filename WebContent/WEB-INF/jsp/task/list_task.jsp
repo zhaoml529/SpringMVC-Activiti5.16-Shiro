@@ -10,7 +10,7 @@
 <title>代办任务列表</title>
 <script>
 	$(function() {
-		var taskType = "${businessType}";
+		var taskType = "${taskType}";
 		$("#" + taskType).attr("class", "selected");
 	});
 	
@@ -40,8 +40,8 @@
 		</div>
       <div class="sort_switch">
           <ul id="TabsNav">
-          	  <li class="" id="candidate"><a href="${ctx}/vacationAction/todoTaskList_page">待办的任务</a></li>
-          	  <li class="" id="assignee"><a href="${ctx}/vacationAction/doTaskList_page">受理的任务</a></li>
+          	  <li class="" id="candidate"><a href="${ctx}/processAction/todoTaskList_page">待办的任务</a></li>
+          	  <li class="" id="assignee"><a href="${ctx}/processAction/doTaskList_page">受理的任务</a></li>
           </ul>
       </div>
       
@@ -49,12 +49,9 @@
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
               <thead>
 	  			<tr>
-					<th>假种</th>
+					<th>单据类型</th>
 					<th>申请人</th>
 					<th>标题</th>
-					<th>申请时间</th>
-					<th>开始时间</th>
-					<th>结束时间</th>
 					<th>当前节点</th>
 					<th>任务创建时间</th>
 					<th>流程状态</th>
@@ -62,23 +59,20 @@
 				</tr>
               </thead>
               <tbody id="">
-              	<c:forEach items="${vacationList}" var="vacation">
-              	<c:set var="task" value="${vacation.task }" />
-				<c:set var="pi" value="${vacation.processInstance }" />
-				<c:set var="pd" value="${vacation.processDefinition }" />
+              	<c:forEach items="${tasklist }" var="base">
+              	<c:set var="task" value="${base.task }" />
+				<c:set var="pi" value="${base.processInstance }" />
+				<c:set var="pd" value="${base.processDefinition }" />
                 <tr>
                   <td>
                   	<c:choose>
-                  		<c:when test="${vacation.vacationType == 0}">年假</c:when>
-                  		<c:when test="${vacation.vacationType == 1}">病假</c:when>
-                  		<c:when test="${vacation.vacationType == 2}">事假</c:when>
+                  		<c:when test="${base.businessType == 'vacation'}">请假申请</c:when>
+                  		<c:when test="${base.businessType == 'salary'}">薪资调整</c:when>
+                  		<c:when test="${base.businessType == 'expense'}">报销申请</c:when>
                   	</c:choose>
                   </td>
-                  <td>${vacation.user_name}</td>
-                  <td>${vacation.title}</td>
-                  <td><fmt:formatDate value="${vacation.applyDate}" type="date" /></td>
-                  <td><fmt:formatDate value="${vacation.beginDate}" type="date" /></td>
-                  <td><fmt:formatDate value="${vacation.endDate}" type="date" /></td>
+                  <td>${base.user_name}</td>
+                  <td>${base.title}</td>
                   <td>
                   	  <a class="trace" href='#' pid="${pi.id }" pdid="${pi.processDefinitionId}" title="点击查看流程图">${task.name }</a>
                   </td>
@@ -87,7 +81,7 @@
                   <td> 
                   
                   	  <c:if test="${empty task.assignee }">
-							<a class="claim" href="${ctx }/vacationAction/claim/${task.id}">签收</a>
+							<a class="claim" href="${ctx }/processAction/claim/${task.id}">签收</a>
 					  </c:if>
 					  <c:if test="${not empty task.assignee }">
 						<%-- 此处用tkey记录当前节点的名称 --%>
@@ -97,7 +91,7 @@
                 </tr>
                 </c:forEach>
                 <tr>
-              		<td class="fun_area" colspan="10" align="center">${page }</td>
+              		<td class="fun_area" colspan="7" align="center">${page }</td>
               	</tr>
               </tbody>
           </table>

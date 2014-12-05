@@ -120,10 +120,10 @@ public class VacationAction {
         vacation.setUserId(user.getId());
         vacation.setUser_name(user.getName());
         vacation.setTitle(user.getName()+" 的请假申请");
-        vacation.setBusinessType(BaseVO.VACATION);
+        vacation.setBusinessType(BaseVO.VACATION); 			//单据类型：请假申请
+        vacation.setStatus(BaseVO.PENDING);					//审批中
         vacation.setApplyDate(new Date());
         this.vacationService.add(vacation);
-      //待测试--添加完成后vacation.getId() 是否有值？
         String businessKey = vacation.getId().toString();
         ProcessInstance processInstance = null;
         try {
@@ -158,154 +158,7 @@ public class VacationAction {
 		return "redirect:/vacationAction/toAdd";
 	}
 	
-	/**
-	 * 签收任务
-	 * @return
-	 */
-	@RequestMapping("/claim/{taskId}")
-	public String claim(@PathVariable("taskId") String taskId, HttpSession session, RedirectAttributes redirectAttributes) throws Exception{
-		String userId = UserUtil.getUserFromSession(session).getId().toString();
-        taskService.claim(taskId, userId);
-        redirectAttributes.addFlashAttribute("message", "任务已签收");
-        return "redirect:/vacationAction/todoTaskList_page";
-	}
 	
-	/**
-	 * 查询待办任务
-	 * @param session
-	 * @param redirectAttributes
-	 * @param model
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping(value = "/todoTaskList_page", method = RequestMethod.GET)
-	public String todoTaskList_page(HttpSession session, Model model) throws Exception{
-		String userId = UserUtil.getUserFromSession(session).getId().toString();
-		
-		User user = this.userService.getUserById(new Integer(userId));
-		List<Task> tasks = new ArrayList<Task>();
-		 // 根据当前用户组查询
-//        TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
-		TaskQuery todoQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
-//        TaskQuery claimQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
-		Integer todoSum = todoQuery.list().size();
-//		Integer claimSum = claimQuery.list().size();
-        logger.info("UserID: "+userId +" totalSum: "+ todoSum);
-        //计算分页
-        Pagination pagination = PaginationThreadUtils.get();
-        if (pagination == null) {
-			pagination = new Pagination();
-			PaginationThreadUtils.set(pagination);
-			pagination.setCurrentPage(1);
-		}
-		if (pagination.getTotalSum() == 0) {
-			pagination.setTotalSum(todoSum);
-		}
-		pagination.processTotalPage();
-		int firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
-		int maxResult = pagination.getPageNum();
-		
-		List<Task> todoTask = todoQuery.listPage(firstResult, maxResult);
-		//计算分页2
-//		pagination.setTotalSum(claimSum);
-//		pagination.processTotalPage();
-//		firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
-//		maxResult = pagination.getPageNum();
-//		
-//		List<Task> claimTask = claimQuery.listPage(firstResult, maxResult);
-		
-		//合并
-		tasks.addAll(todoTask);
-//		tasks.addAll(claimTask);
-		
-        List<Vacation> vacationList = new ArrayList<Vacation>();
-     // 根据流程的业务ID查询实体并关联
-        for (Task task : tasks) {
-        	String processInstanceId = task.getProcessInstanceId();
-            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).active().singleResult();
-            String businessKey = processInstance.getBusinessKey();
-            if (businessKey == null) {
-                continue;
-            }
-//            Vacation vacation = this.vacationService.findById(new Integer(businessKey));
-//            String user_name = this.userService.getUserById(vacation.getUserId()).getName();
-            
-            //获取当前流程下的key为entity的variable
-            Vacation vacation = (Vacation) this.runtimeService.getVariable(processInstance.getId(), "entity");
-            vacation.setTask(task);
-            vacation.setProcessInstance(processInstance);
-            vacation.setProcessDefinition(getProcessDefinition(processInstance.getProcessDefinitionId()));
-            vacationList.add(vacation);
-        }
-		model.addAttribute("vacationList", vacationList);
-		model.addAttribute("businessType", BaseVO.CANDIDATE);
-		model.addAttribute("page", pagination.getPageStr());
-		return "task/list_task";
-	}
-	
-    /**
-     * 查询流程定义对象
-     *
-     * @param processDefinitionId 流程定义ID
-     * @return
-     */
-    protected ProcessDefinition getProcessDefinition(String processDefinitionId) {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
-        logger.info(processDefinition.getVersion());
-        return processDefinition;
-    }
-    
-    /**
-     * 查询受理任务列表
-     * @param session
-     * @param model
-     * @return
-     * @throws NumberFormatException
-     * @throws Exception
-     */
-    @RequestMapping(value="/doTaskList_page", method = RequestMethod.GET)
-    public String doTaskList_page(HttpSession session, Model model) throws NumberFormatException, Exception{
-    	User user = UserUtil.getUserFromSession(session);
-    	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
-    	
-    	Integer totalSum = taskQuery.list().size();
-        //计算分页
-        Pagination pagination = PaginationThreadUtils.get();
-        if (pagination == null) {
-			pagination = new Pagination();
-			PaginationThreadUtils.set(pagination);
-			pagination.setCurrentPage(1);
-		}
-		if (pagination.getTotalSum() == 0) {
-			pagination.setTotalSum(totalSum);
-		}
-		pagination.processTotalPage();
-		int firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
-		int maxResult = pagination.getPageNum();
-		
-		List<Task> tasks = taskQuery.listPage(firstResult, maxResult);
-		List<Vacation> vacationList = new ArrayList<Vacation>();
-	     // 根据流程的业务ID查询实体并关联
-	        for (Task task : tasks) {
-	        	String processInstanceId = task.getProcessInstanceId();
-	            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).active().singleResult();
-	            String businessKey = processInstance.getBusinessKey();
-	            if (businessKey == null) {
-	                continue;
-	            }
-//	            Vacation vacation = this.vacationService.findById(new Integer(businessKey));
-	            Vacation vacation = (Vacation) this.runtimeService.getVariable(processInstance.getId(), "entity");
-	            vacation.setTask(task);
-	            vacation.setProcessInstance(processInstance);
-	            vacation.setProcessDefinition(getProcessDefinition(processInstance.getProcessDefinitionId()));
-	            vacationList.add(vacation);
-	        }
-			model.addAttribute("vacationList", vacationList);
-			model.addAttribute("businessType", BaseVO.ASSIGNEE);
-			model.addAttribute("page", pagination.getPageStr());
-    	return "task/list_task"; 
-    }
-    
     /**
      * 审批请假流程
      * @param taskId
@@ -373,21 +226,24 @@ public class VacationAction {
     	this.identityService.setAuthenticatedUserId(user.getId().toString());
 		// 添加评论
 		this.taskService.addComment(taskId, pi.getId(), content);
+		//获取当前流程下的variable
+        Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
+		
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("isPass", completeFlag);
 		if(completeFlag){
 			variables.put("auditGroup", "hr");
+			vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
 		}else{
-			//获取当前流程下的key为entity的variable
-            Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
-            vacation.setTitle(vacation.getUser_name()+" 的请假申请失败！");
+            vacation.setTitle(vacation.getUser_name()+" 的请假申请失败,需修改后重新提交！");
+            vacation.setStatus(BaseVO.APPROVAL_FAILED);
 			variables.put("entity", vacation);
 		}
-		logger.info("variables key:isPass, value:"+completeFlag+"---flag:"+completeFlag);
+		this.vacationService.update(vacation);
 		// 完成任务
 		this.taskService.complete(taskId, variables);
 		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
-    	return "redirect:/vacationAction/doTaskList_page";
+    	return "redirect:/processAction/doTaskList_page";
     }
     
     /**
@@ -431,6 +287,7 @@ public class VacationAction {
 	        vacation.setUser_name(user.getName());
 	        vacation.setTitle(user.getName()+" 的请假申请！");
 	        vacation.setBusinessType(BaseVO.VACATION);
+	        vacation.setStatus(BaseVO.PENDING);
 	        vacation.setApplyDate(new Date());
 	        this.vacationService.update(vacation);
 	        variables.put("entity", vacation);
@@ -439,7 +296,6 @@ public class VacationAction {
             }else{
             	variables.put("auditGroup", "director");
             }
-//	        this.identityService.setAuthenticatedUserId(user.getId().toString());
 	        redirectAttributes.addFlashAttribute("message", "任务办理完成，请假申请已重新提交！");
         }else{
         	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的请假申请！");
@@ -447,6 +303,6 @@ public class VacationAction {
 		variables.put("reApply", reApply);
     	this.taskService.complete(taskId, variables);
 		
-    	return "redirect:/vacationAction/doTaskList_page";
+    	return "redirect:/processAction/doTaskList_page";
     }
 }
