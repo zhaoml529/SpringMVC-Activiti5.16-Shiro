@@ -26,18 +26,16 @@
       </div>
       
       <div class="sort_content">
+      	<form action="${ctx }/vacationAction/toList_page" method="post">
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
 			<thead>
 				<tr>
 					<th>假种</th>
-					<th>申请人</th>
-					<th>标题</th>
 					<th>申请时间</th>
-					<th>开始时间</th>
-					<th>结束时间</th>
-					<th>当前节点</th>
-					<th>任务创建时间</th>
-					<th>流程状态</th>
+					<th>请假开始时间</th>
+					<th>请假结束时间</th>
+					<th>天数</th>
+					<th>审批状态</th>
 					<th>操作</th>
 				</tr>
 			</thead>
@@ -51,29 +49,26 @@
                   		<c:when test="${vacationType == 2 }">事假</c:when>
                   	</c:choose>
                   </td>
-                  <td>${vacation.user_name }</td>
-                  <td>${vacation.title }</td>
-                  <td>${vacation.applyDate }</td>
-                  <td>${vacation.beginDate }</td>
-                  <td>${vacation.endDate }</td>
-                  <td>
-						<a class="trace" href='#' pid="${pi.id }" pdid="${pi.processDefinitionId}" title="点击查看流程图">${task.name }</a>
+                  <td><fmt:formatDate value="${vacation.applyDate }" type="date" /></td>
+                  <td><fmt:formatDate value="${vacation.beginDate }" type="date" /></td>
+                  <td><fmt:formatDate value="${vacation.endDate }" type="date" /></td>
+				  <td>${vacation.days }</td>
+				  <td>
+				  	  <c:choose>
+							<c:when test="${'WAITING_FOR_APPROVAL' eq vacation.status }">待审批</c:when>
+							<c:when test="${'PENDING' eq vacation.status }">审批中</c:when>
+							<c:when test="${'APPROVAL_SUCCESS' eq vacation.status }"><span style="color:green;">通过</span></c:when>
+							<c:when test="${'APPROVAL_FAILED' eq vacation.status }"><span style="color:red;">不通过</span></c:when>
+						</c:choose>
 				  </td>
-				  <td>${task.createTime }</td>
-					<td>${pi.suspended ? "已挂起" : "正常" }；<b title='流程版本号'>V: ${vacation.processDefinition.version }</b></td>
-					<td>
-						<c:if test="${empty task.assignee }">
-							<a class="claim" href="${ctx }/oa/leave/task/claim/${task.id}">签收</a>
-						</c:if>
-						<c:if test="${not empty task.assignee }">
-							<%-- 此处用tkey记录当前节点的名称 --%>
-							<a class="handle" tkey='${task.taskDefinitionKey }' tname='${task.name }' href="${ctx }/toApproval/${task.id}">办理</a>
-						</c:if>
-					</td>
+				  <td>
+				  	  <a href="${ctx }/vacationAction/details/${vacation.id }">详细</a>
+				  </td>
                 </tr>
               </c:forEach>
               </tbody>
           </table>
+          </form>
       </div>
 
       

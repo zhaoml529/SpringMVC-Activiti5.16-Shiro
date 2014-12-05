@@ -62,7 +62,7 @@ public class ProcessAction {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/todoTaskList_page", method = RequestMethod.GET)
+	@RequestMapping(value = "/todoTaskList_page", method = {RequestMethod.POST, RequestMethod.GET})
 	public String todoTaskList_page(HttpSession session, Model model) throws Exception{
 		String userId = UserUtil.getUserFromSession(session).getId().toString();
 		User user = this.userService.getUserById(new Integer(userId));
@@ -100,7 +100,7 @@ public class ProcessAction {
      * @throws NumberFormatException
      * @throws Exception
      */
-    @RequestMapping(value="/doTaskList_page", method = RequestMethod.GET)
+    @RequestMapping(value="/doTaskList_page", method = {RequestMethod.POST, RequestMethod.GET})
     public String doTaskList_page(HttpSession session, Model model) throws NumberFormatException, Exception{
     	User user = UserUtil.getUserFromSession(session);
     	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());

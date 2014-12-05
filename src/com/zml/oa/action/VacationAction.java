@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -65,6 +66,9 @@ public class VacationAction {
     protected IdentityService identityService;
     
     @Autowired
+    protected HistoryService historyService;
+    
+    @Autowired
     protected TaskService taskService;
     
     @Autowired
@@ -73,23 +77,54 @@ public class VacationAction {
 	@Autowired
 	private IUserService userService;
 	
+	/**
+	 * 查询某人的所有请假申请
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/toList_page")
-	public String toList(Model model) throws Exception{
-		List<Vacation> list = this.vacationService.toList();
+	public String toList(HttpSession session, Model model) throws Exception{
+		User user = UserUtil.getUserFromSession(session);
+		List<Vacation> list = this.vacationService.toList(user.getId());
+//		for(Vacation v : list){
+//			if(BaseVO.APPROVAL_SUCCESS.equals(v.getStatus())){
+//				Vacation vacation = (Vacation)this.historyService.createHistoricVariableInstanceQuery()
+//					.processInstanceId(v.getProcessInstanceId()).variableName("entity");
+//				
+//			}
+//		}
 		Pagination pagination = PaginationThreadUtils.get();
-		pagination.processTotalPage();
 		model.addAttribute("page", pagination.getPageStr());
 		model.addAttribute("vacationList", list);
 		return "vacation/list_vacation";
 	}
 	
+	/**
+	 * 跳转添加页面
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/toAdd", method = RequestMethod.GET)
 	public ModelAndView toAdd(Model model){
 		if(!model.containsAttribute("vacation")) {
             model.addAttribute("vacation", new Vacation());
         }
-		
 		return new ModelAndView("vacation/add_vacation").addObject(model);
+	}
+	
+	/**
+	 * 详细信息
+	 * @param id
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/details/{id}", method = RequestMethod.GET)
+	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
+		Vacation vacation = this.vacationService.findById(id);
+		model.addAttribute("vacation", vacation);
+		return "/vacation/details_vacation";
 	}
 	
     /**
@@ -97,7 +132,6 @@ public class VacationAction {
      *
      * @param leave
      */
-//	@RequestMapping("/doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
 	public String doAdd(
 			@ModelAttribute("vacation") @Valid Vacation vacation,BindingResult results, 
@@ -138,7 +172,8 @@ public class VacationAction {
             }
             processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.vacation", businessKey, variables);
             String processInstanceId = processInstance.getId();
-//            vacation.setProcessInstanceId(processInstanceId);
+            vacation.setProcessInstanceId(processInstanceId);
+            this.vacationService.update(vacation);
             redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
             logger.info("processInstanceId: "+processInstanceId);
         } catch (ActivitiException e) {
@@ -157,7 +192,6 @@ public class VacationAction {
         }
 		return "redirect:/vacationAction/toAdd";
 	}
-	
 	
     /**
      * 审批请假流程

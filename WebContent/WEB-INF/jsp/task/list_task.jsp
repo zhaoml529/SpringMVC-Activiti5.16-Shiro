@@ -12,6 +12,12 @@
 	$(function() {
 		var taskType = "${taskType}";
 		$("#" + taskType).attr("class", "selected");
+		if(taskType == "candidate"){
+			$("#taskForm").attr("action","${ctx}/processAction/todoTaskList_page")
+		}else{
+			$("#taskForm").attr("action","${ctx}/processAction/doTaskList_page")
+		}
+		
 	});
 	
 	$(function() {
@@ -46,6 +52,7 @@
       </div>
       
       <div class="sort_content">
+      	<form id="taskForm" method="post">
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
               <thead>
 	  			<tr>
@@ -95,11 +102,9 @@
               	</tr>
               </tbody>
           </table>
+          </form>
       </div>
-
-      
 	</div>
-    
 </body>
 
 </html>

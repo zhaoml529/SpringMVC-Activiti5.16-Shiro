@@ -30,8 +30,8 @@ public class VacationServiceImpl extends BaseServiceImpl<Vacation> implements IV
 	}
 
 	@Override
-	public List<Vacation> toList() throws Exception {
-		List<Vacation> list = findByPage("Vacation", new String[]{}, new String[]{});
+	public List<Vacation> toList(Integer userId) throws Exception {
+		List<Vacation> list = findByPage("Vacation", new String[]{"userId"}, new String[]{userId.toString()});
 		return list;
 	}
 

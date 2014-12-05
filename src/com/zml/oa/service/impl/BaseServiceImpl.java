@@ -158,12 +158,14 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 		
 		int firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
 		int maxResult = pagination.getPageNum();
-		/* 校验分页情况 */
+		//校验分页情况
 		if (firstResult >= pagination.getTotalSum() || firstResult < 0) {
 			firstResult = 0;
 			pagination.setCurrentPage(1);
 		}
-
+		//分页处理
+		pagination.processTotalPage();
+		PaginationThreadUtils.set(pagination);
 		StringBuffer sb = new StringBuffer();  
         sb.append("select a from ").append(tableSimpleName).append( " a where ");  
         if(columns.length==values.length){  

@@ -32,7 +32,7 @@
       </div>
       
       <div class="sort_content">
-      	<form action=" <c:url value='/userAction/userList_page'/>" method="post">
+      	<form action=" <c:url value='/userAction/toList_page'/>" method="post">
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
               <thead>
                 <tr>

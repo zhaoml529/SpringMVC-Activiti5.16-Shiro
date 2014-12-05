@@ -13,7 +13,7 @@ public interface IVacationService extends IBaseService<Vacation> {
 	
 	public Serializable doDelete() throws Exception;
 	
-	public List<Vacation> toList() throws Exception;
+	public List<Vacation> toList(Integer userId) throws Exception;
 	
 	public Vacation findById(Integer id) throws Exception;
 }

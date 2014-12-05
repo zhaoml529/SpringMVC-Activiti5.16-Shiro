@@ -52,11 +52,10 @@ public class UserAction {
 	private IGroupService groupService;
 	
 	@RequestMapping("/toList_page")
-//	@RequestMapping(value = "/userList_page", method = RequestMethod.POST)
 	public String userList_page(HttpServletRequest request, Model model) throws Exception{
 		List<User> listUser = this.userService.getUserList_page();
 		Pagination pagination = PaginationThreadUtils.get();
-		pagination.processTotalPage();
+//		pagination.processTotalPage();
 		model.addAttribute("page", pagination.getPageStr());
 		model.addAttribute("listUser", listUser);
 		return "user/list_user";
