@@ -1,6 +1,7 @@
 /applicationContext.xml
 /bpmn/
 /com/
+/deploy/
 /jdbc.properties
 /log4j.properties
 /springMVC.xml

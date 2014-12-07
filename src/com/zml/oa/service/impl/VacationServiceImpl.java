@@ -40,4 +40,9 @@ public class VacationServiceImpl extends BaseServiceImpl<Vacation> implements IV
 		return getUnique("Vacation", new String[]{"id"}, new String[]{id.toString()});
 	}
 
+	@Override
+	public List<Vacation> findByStatus(Integer userId, String status) throws Exception {
+		List<Vacation> list = findByPage("Vacation", new String[]{"userId","status"}, new String[]{userId.toString(), status});
+		return list;
+	}
 }

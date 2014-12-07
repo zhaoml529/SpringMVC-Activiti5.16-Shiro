@@ -16,4 +16,6 @@ public interface IVacationService extends IBaseService<Vacation> {
 	public List<Vacation> toList(Integer userId) throws Exception;
 	
 	public Vacation findById(Integer id) throws Exception;
+	
+	public List<Vacation> findByStatus(Integer userId, String status) throws Exception; 
 }

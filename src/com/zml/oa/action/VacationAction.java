@@ -154,11 +154,12 @@ public class VacationAction {
         vacation.setUserId(user.getId());
         vacation.setUser_name(user.getName());
         vacation.setTitle(user.getName()+" 的请假申请");
-        vacation.setBusinessType(BaseVO.VACATION); 			//单据类型：请假申请
+        vacation.setBusinessType(BaseVO.VACATION); 			//业务类型：请假申请
         vacation.setStatus(BaseVO.PENDING);					//审批中
         vacation.setApplyDate(new Date());
         this.vacationService.add(vacation);
         String businessKey = vacation.getId().toString();
+        vacation.setBusinessKey(businessKey);
         ProcessInstance processInstance = null;
         try {
             // 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
@@ -262,7 +263,8 @@ public class VacationAction {
 		this.taskService.addComment(taskId, pi.getId(), content);
 		//获取当前流程下的variable
         Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
-		
+//		String procId = this.vacationService.findById(vacation.getId()).getProcessInstanceId();
+		vacation.setProcessInstanceId(processInstanceId);
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("isPass", completeFlag);
 		if(completeFlag){
@@ -323,6 +325,7 @@ public class VacationAction {
 	        vacation.setBusinessType(BaseVO.VACATION);
 	        vacation.setStatus(BaseVO.PENDING);
 	        vacation.setApplyDate(new Date());
+	        vacation.setBusinessKey(vacation.getId().toString());
 	        this.vacationService.update(vacation);
 	        variables.put("entity", vacation);
 	        if(vacation.getDays() <= 3){

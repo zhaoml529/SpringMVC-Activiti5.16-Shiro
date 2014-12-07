@@ -18,7 +18,7 @@
 		<ul id="nav">
         	<li><a href="#" onclick="clickNav(this);return false;" class="parent" id="1"><h5><strong>用户功能</strong></h5></a>
             	<ul id="opt_1" class="child_area">
-					<li class="last"><a href="${ctx}/process-listProcessInstance.action?processType=vacation" target="mainFrame"><h6>申请查看</h6></a></li>
+					<li class="last"><a href="${ctx}/processAction/process/getRuningProcessInstance/vacation" target="mainFrame"><h6>申请查看</h6></a></li>
 					<li class="last"><a href="${ctx}/processAction/todoTaskList_page" target="mainFrame"><h6>我的任务</h6></a></li>
 					<li class="last"><a href="${ctx}/vacationAction/toAdd" target="mainFrame"><h6>请假</h6></a></li>
 					<li class="last"><a href="finance/expenseAccount.jsp" target="mainFrame"><h6>报捎</h6></a></li>

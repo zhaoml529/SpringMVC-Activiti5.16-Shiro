@@ -17,7 +17,7 @@ public class BaseVO implements Serializable{
 	 */
 	private static final long serialVersionUID = 6165121688276341503L;
 
-	// 单据类型
+	// 业务类型
 	public final static String VACATION = "vacation";	
 	public final static String SALARY = "salary";	
 	public final static String EXPENSE = "expense";
@@ -47,8 +47,11 @@ public class BaseVO implements Serializable{
 	// 申请人名称
 	private String user_name;
 	
-	// 单据类型
+	// 业务类型
 	private String businessType;
+	
+	//对应业务的id
+	private String businessKey;
 	
     // 流程任务
     private Task task;
@@ -153,6 +156,15 @@ public class BaseVO implements Serializable{
 	@Transient
 	public static String getExpense() {
 		return EXPENSE;
+	}
+
+	@Transient
+	public String getBusinessKey() {
+		return businessKey;
+	}
+
+	public void setBusinessKey(String businessKey) {
+		this.businessKey = businessKey;
 	}
 	
 	
