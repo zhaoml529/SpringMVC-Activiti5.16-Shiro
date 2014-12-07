@@ -1,6 +1,7 @@
 package com.zml.oa.service.activiti;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.history.HistoricFormProperty;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -20,6 +22,7 @@ import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -28,15 +31,18 @@ import org.activiti.spring.ProcessEngineFactoryBean;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.zml.oa.entity.BaseVO;
+import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
+import com.zml.oa.service.IExpenseService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
 
@@ -46,6 +52,7 @@ import com.zml.oa.service.IVacationService;
  *
  */
 @Component
+@Transactional
 public class ProcessService {
 
 	private static final Logger logger = Logger.getLogger(ProcessService.class);
@@ -79,6 +86,9 @@ public class ProcessService {
     
 	@Autowired
 	private IVacationService vacationService;
+	
+	@Autowired
+	private IExpenseService expenseService;
     
     
     /**
@@ -87,6 +97,7 @@ public class ProcessService {
      * @param model
      * @return
      */
+	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> findTodoTask(User user, Model model){
     	// 根据当前用户组查询
 //      TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
@@ -104,6 +115,7 @@ public class ProcessService {
      * @param model
      * @return
      */
+	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> findDoTask(User user, Model model){
     	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
     	Integer totalSum = taskQuery.list().size();
@@ -119,6 +131,7 @@ public class ProcessService {
      * @param tasks
      * @return
      */
+	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     protected List<BaseVO> getBaseVOList(List<Task> tasks) {
     	List<BaseVO> taskList = new ArrayList<BaseVO>();
         for (Task task : tasks) {
@@ -140,6 +153,7 @@ public class ProcessService {
      * @param processDefinitionId 流程定义ID
      * @return
      */
+	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     protected ProcessDefinition getProcessDefinition(String processDefinitionId) {
         ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
         logger.info(processDefinition.getVersion());
@@ -151,6 +165,7 @@ public class ProcessService {
      * @param user
      * @param taskId
      */
+	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public void doClaim(User user, String taskId){
     	this.identityService.setAuthenticatedUserId(user.getId().toString());
         this.taskService.claim(taskId, user.getId().toString());
@@ -185,6 +200,7 @@ public class ProcessService {
      * @param processInstanceId
      * @return
      */
+    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public InputStream getDiagram(String processInstanceId){
     	ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processInstance.getProcessDefinitionId());
@@ -209,6 +225,7 @@ public class ProcessService {
      * @param processInstanceId
      * @return
      */
+    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public InputStream getDiagram_noTrace(String resourceType, String processInstanceId){
     	
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
@@ -230,7 +247,7 @@ public class ProcessService {
      *
      * @return
      */
-    @RequestMapping(value = "/process/finished")
+    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public String findFinishedProcessInstaces(Model model) {
         List<BaseVO> results = new ArrayList<BaseVO>();
         HistoricProcessInstanceQuery historQuery = historyService.createHistoricProcessInstanceQuery().finished();
@@ -278,10 +295,11 @@ public class ProcessService {
      * @return
      * @throws Exception
      */
+    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> listRuningVacation(User user) throws Exception{
     	List<Vacation> listVacation = this.vacationService.findByStatus(user.getId(), BaseVO.PENDING);
 		List<BaseVO> result = new ArrayList<BaseVO>();
-		if(listVacation != null || listVacation.size() != 0 ){
+		if(listVacation != null ){
 			for (Vacation vac : listVacation) {
 				// 查询流程实例
 				ProcessInstance pi = this.runtimeService
@@ -302,4 +320,53 @@ public class ProcessService {
 		}
 		return result;
     }
+    
+    /**
+     * 查看正在运行的报销流程
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
+    public List<BaseVO> listRuningExpense(User user) throws Exception{
+    	List<ExpenseAccount> listVacation = this.expenseService.findByStatus(user.getId(), BaseVO.PENDING);
+		List<BaseVO> result = new ArrayList<BaseVO>();
+		if(listVacation != null ){
+			for (ExpenseAccount expense : listVacation) {
+				// 查询流程实例
+				ProcessInstance pi = this.runtimeService
+						.createProcessInstanceQuery()
+						.processInstanceId(expense.getProcessInstanceId())
+						.singleResult();
+				Task task = this.taskService.createTaskQuery().processInstanceId(expense.getProcessInstanceId()).singleResult();
+				if (pi != null) {
+					// 查询流程参数
+					BaseVO base = (BaseVO) this.runtimeService.getVariable(pi.getId(), "entity");
+					base.setTask(task);
+		            base.setProcessInstance(pi);
+		            base.setProcessDefinition(getProcessDefinition(pi.getProcessDefinitionId()));
+					
+					result.add(base);
+				}
+			}
+		}
+		return result;
+    }
+    
+    
+    /**
+     * 检查付款金额
+     * @param exe
+     */
+    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
+    public void bankTransfer(Execution exe) {
+		ExpenseAccount expense = (ExpenseAccount)this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
+		if (expense.getMoney().compareTo(new BigDecimal(1000)) == 1 ) {
+			System.out.println("现金支付失败");
+			throw new BpmnError("to much");
+		} else {
+			//具体业务
+			System.out.println("银行转帐成功");
+		}
+	}
 }

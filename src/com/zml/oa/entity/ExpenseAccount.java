@@ -10,6 +10,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * 报销记录
@@ -18,7 +22,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "T_EXPENSE_ACCOUNT")
-public class ExpenseAccount implements Serializable{
+public class ExpenseAccount extends BaseVO implements Serializable{
 
 	/**
 	 * 
@@ -32,19 +36,36 @@ public class ExpenseAccount implements Serializable{
 	
 	// 申请人
 	@Column(name = "USER_ID")
-	private String userId;
+	private Integer userId;
 	
 	// 报销金额
 	@Column(name = "MONEY")
 	private BigDecimal money;
 	
-	// 日期
-	@Column(name = "DATE")
-	private Date date;
+	// 发生日期
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@Column(name = "OCCUR_DATE")
+	private Date occurDate;
 	
+	// 申请日期
+	@Temporal(TemporalType.DATE)
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@Column(name = "APPLY_DATE")
+	private Date applyDate;
+	
+	//流程id
 	@Column(name = "PROC_INST_ID")
 	private String processInstanceId;
 
+	// 备注
+	@Column(name = "REMARK")
+	private String remark;
+	
+	//审批状态
+	@Column(name = "STATUS")
+	private String status;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -53,11 +74,11 @@ public class ExpenseAccount implements Serializable{
 		this.id = id;
 	}
 
-	public String getUserId() {
+	public Integer getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
@@ -69,12 +90,20 @@ public class ExpenseAccount implements Serializable{
 		this.money = money;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getOccurDate() {
+		return occurDate;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setOccurDate(Date occurDate) {
+		this.occurDate = occurDate;
+	}
+
+	public Date getApplyDate() {
+		return applyDate;
+	}
+
+	public void setApplyDate(Date applyDate) {
+		this.applyDate = applyDate;
 	}
 
 	public String getProcessInstanceId() {
@@ -84,6 +113,25 @@ public class ExpenseAccount implements Serializable{
 	public void setProcessInstanceId(String processInstanceId) {
 		this.processInstanceId = processInstanceId;
 	}
-	
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	
 }

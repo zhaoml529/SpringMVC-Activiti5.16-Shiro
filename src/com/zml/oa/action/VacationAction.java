@@ -15,11 +15,9 @@ import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -142,7 +140,7 @@ public class VacationAction {
         
         if(results.hasErrors()){
         	model.addAttribute("vacation", vacation);
-        	return "vacation/add";
+        	return "vacation/add_vacation";
         }
         
         
@@ -163,7 +161,7 @@ public class VacationAction {
         ProcessInstance processInstance = null;
         try {
             // 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
-            identityService.setAuthenticatedUserId(vacation.getUserId().toString());
+            identityService.setAuthenticatedUserId(user.getId().toString());
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("entity", vacation);
             if(vacation.getDays() <= 3){

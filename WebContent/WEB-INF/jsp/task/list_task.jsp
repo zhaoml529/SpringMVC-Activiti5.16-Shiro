@@ -98,11 +98,20 @@
                   <td> 
                   
                   	  <c:if test="${empty task.assignee }">
-							<a class="claim" href="${ctx }/processAction/claim/${task.id}">签收</a>
+                  	  		<a class="claim" href="${ctx }/processAction/claim/${task.id}">签收</a>
 					  </c:if>
 					  <c:if test="${not empty task.assignee }">
-						<%-- 此处用tkey记录当前节点的名称 --%>
-						<a class="handle" href="${ctx }/vacationAction/toApproval/${task.id}">办理</a>
+					  	<c:choose>
+					  		<c:when test="${'vacation' eq base.businessType }">
+					  			<a class="handle" href="${ctx }/vacationAction/toApproval/${task.id}">办理</a>
+					  		</c:when>
+					  		<c:when test="${'expense' eq base.businessType }">
+					  			<a class="handle" href="${ctx }/expenseAction/toApproval/${task.id}">办理</a>
+					  		</c:when>
+					  		<c:when test="${'salary' eq base.businessType }">
+					  			<a class="handle" href="${ctx }/salaryAction/toApproval/${task.id}">办理</a>
+					  		</c:when>
+					  	</c:choose>
 					  </c:if>
                   </td>
                 </tr>
