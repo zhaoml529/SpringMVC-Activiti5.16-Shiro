@@ -361,8 +361,11 @@ public class ProcessService {
     @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public void bankTransfer(Execution exe) {
 		ExpenseAccount expense = (ExpenseAccount)this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
+		// 具体业务会与第三方支付系统产生交互，这样就有可能产生请求发送失败，
+		// 用边界错误事件来处理，如果银行转账失败，流程则会到达现金支付的用户任务
+		
 		if (expense.getMoney().compareTo(new BigDecimal(1000)) == 1 ) {
-			System.out.println("现金支付失败");
+			System.out.println("银行转账失败");
 			throw new BpmnError("to much");
 		} else {
 			//具体业务
