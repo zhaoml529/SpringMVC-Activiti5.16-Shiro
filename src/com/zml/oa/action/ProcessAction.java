@@ -178,11 +178,11 @@ public class ProcessAction {
     		model.addAttribute("businessType", BaseVO.VACATION);
     	}else if(BaseVO.SALARY.equals(businessType)){
     		//调薪
-    		baseVO = this.processService.listRuningExpense(user);
+//    		baseVO = this.processService.listRuningExpense(user);
     		model.addAttribute("businessType", BaseVO.SALARY);
     	}else if(BaseVO.EXPENSE.equals(businessType)){
     		//报销
-    		
+    		baseVO = this.processService.listRuningExpense(user);
     		model.addAttribute("businessType", BaseVO.EXPENSE);
     	}
     	model.addAttribute("baseList", baseVO);
