@@ -22,7 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Entity
 @Table(name = "T_SALARY_ADJUST")
-public class SalaryAdjust implements Serializable{
+public class SalaryAdjust extends BaseVO implements Serializable{
 
 	/**
 	 * 
@@ -36,17 +36,17 @@ public class SalaryAdjust implements Serializable{
 	
 	// 用户id
 	@Column(name = "USER_ID")
-	private String userId;
+	private Integer userId;
 	
-	//调整金额
+	// 调整金额
 	@Column(name = "ADJUST_MONEY", scale= 2)
 	private BigDecimal adjustMoney;
 	
-	// 日期
+	// 申请日期
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
-	@Column(name = "DATE")
-	private Date date;
+	@Column(name = "APPLY_DATE")
+	private Date applyDate;
 	
 	// 描述
 	@Column(name = "DSCP")
@@ -55,6 +55,10 @@ public class SalaryAdjust implements Serializable{
 	// 流程实例id
 	@Column(name = "PROC_INST_ID")
 	private String processInstanceId;
+	
+	//审批状态
+	@Column(name = "STATUS")
+	private String status;
 
 	public Integer getId() {
 		return id;
@@ -64,11 +68,11 @@ public class SalaryAdjust implements Serializable{
 		this.id = id;
 	}
 
-	public String getUserId() {
+	public Integer getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
@@ -80,12 +84,12 @@ public class SalaryAdjust implements Serializable{
 		this.adjustMoney = adjustMoney;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getApplyDate() {
+		return applyDate;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setApplyDate(Date applyDate) {
+		this.applyDate = applyDate;
 	}
 
 	public String getDscp() {
@@ -102,6 +106,14 @@ public class SalaryAdjust implements Serializable{
 
 	public void setProcessInstanceId(String processInstanceId) {
 		this.processInstanceId = processInstanceId;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

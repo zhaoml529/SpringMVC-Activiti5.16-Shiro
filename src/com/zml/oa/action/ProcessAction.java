@@ -8,13 +8,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.spring.ProcessEngineFactoryBean;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,10 +20,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
+import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.User;
+import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
-import com.zml.oa.service.IVacationService;
-import com.zml.oa.service.activiti.ProcessService;
 import com.zml.oa.service.activiti.WorkflowTraceService;
 import com.zml.oa.util.UserUtil;
 
@@ -51,7 +44,7 @@ public class ProcessAction {
     protected WorkflowTraceService traceService;
 
 	@Autowired
-	private ProcessService processService;
+	private IProcessService processService;
 	
     
     /**
@@ -102,15 +95,31 @@ public class ProcessAction {
         return "redirect:/processAction/todoTaskList_page";
 	}
     
+	/**
+	 * 获取评论
+	 * @param processInstanceId
+	 * @param model
+	 * @return
+	 * @throws NumberFormatException
+	 * @throws Exception
+	 */
+	@RequestMapping("/process/comments/{processInstanceId}")
+	public List<CommentVO> getCommnets(@PathVariable("processInstanceId") String processInstanceId, Model model) throws NumberFormatException, Exception{
+		List<CommentVO> comments = this.processService.getComments(processInstanceId);
+		model.addAttribute("commentList", comments);
+		return comments;
+	}
+	
+	
     
     /**
      * 显示流程图,带流程跟踪
      * @param processInstanceId
      * @param response
-     * @throws IOException
+     * @throws Exception 
      */
     @RequestMapping(value = "/process/showDiagram/{processInstanceId}", method = RequestMethod.GET)
-	public void showDiagram(@PathVariable("processInstanceId") String processInstanceId, HttpServletResponse response) throws IOException {
+	public void showDiagram(@PathVariable("processInstanceId") String processInstanceId, HttpServletResponse response) throws Exception {
 	        InputStream imageStream = this.processService.getDiagram(processInstanceId);
 	        // 输出资源内容到相应对象
 	        byte[] b = new byte[1024];
@@ -167,7 +176,14 @@ public class ProcessAction {
         return null;
     }
     
-    
+    /**
+     * 读取运行中的流程
+     * @param businessType
+     * @param session
+     * @param model
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value="/process/getRuningProcessInstance/{businessType}")
     public String getRuningProcessInstance(@PathVariable("businessType") String businessType,HttpSession session , Model model) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
@@ -178,7 +194,7 @@ public class ProcessAction {
     		model.addAttribute("businessType", BaseVO.VACATION);
     	}else if(BaseVO.SALARY.equals(businessType)){
     		//调薪
-//    		baseVO = this.processService.listRuningExpense(user);
+    		baseVO = this.processService.listRuningSalaryAdjust(user);
     		model.addAttribute("businessType", BaseVO.SALARY);
     	}else if(BaseVO.EXPENSE.equals(businessType)){
     		//报销

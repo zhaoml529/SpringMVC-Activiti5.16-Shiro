@@ -37,6 +37,7 @@ import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
 import com.zml.oa.service.IExpenseService;
 import com.zml.oa.service.IUserService;
+import com.zml.oa.service.activiti.ProcessServiceImp;
 import com.zml.oa.util.UserUtil;
 
 /**
@@ -68,6 +69,9 @@ public class ExpenseAction {
 	@Autowired
 	private IUserService userService;
 	
+	@Autowired
+	private ProcessServiceImp processService;
+	
 	
 	/**
 	 * 跳转添加页面
@@ -97,10 +101,15 @@ public class ExpenseAction {
 	}
 	
 	/**
-     * 添加并启动报销流程
-     *
-     * @param leave
-     */
+	 * 添加并启动报销流程
+	 * @param expense
+	 * @param results
+	 * @param redirectAttributes
+	 * @param session
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
 	public String doAdd(
 			@ModelAttribute("expense") @Valid ExpenseAccount expense,BindingResult results, 
@@ -175,21 +184,11 @@ public class ExpenseAction {
 		// 根据任务查询流程实例
     	String processInstanceId = task.getProcessInstanceId();
 		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-		// 查询一个任务所在流程的全部评论
-		List<Comment> comments = this.taskService.getProcessInstanceComments(pi.getId());
-		List<CommentVO> commnetList = new ArrayList<CommentVO>();
-		for(Comment comment : comments){
-			User user = this.userService.getUserById(new Integer(comment.getUserId()));
-			CommentVO vo = new CommentVO();
-			vo.setContent(comment.getFullMessage());
-			vo.setTime(comment.getTime());
-			vo.setUserName(user.getName());
-			commnetList.add(vo);
-		}
 		ExpenseAccount expense = (ExpenseAccount) this.runtimeService.getVariable(pi.getId(), "entity");
 		expense.setTask(task);
+		List<CommentVO> commentList = this.processService.getComments(pi.getId());
+		model.addAttribute("commentList", commentList);
 		model.addAttribute("expense", expense);
-		model.addAttribute("commentList", commnetList);
     	return "expense/audit_expense";
     }
     

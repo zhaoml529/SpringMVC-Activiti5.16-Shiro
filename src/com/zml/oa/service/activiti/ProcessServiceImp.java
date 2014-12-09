@@ -3,6 +3,7 @@ package com.zml.oa.service.activiti;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -34,15 +36,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.zml.oa.entity.BaseVO;
+import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.ExpenseAccount;
+import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IExpenseService;
+import com.zml.oa.service.IProcessService;
+import com.zml.oa.service.ISalaryAdjustService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
 
@@ -53,9 +58,9 @@ import com.zml.oa.service.IVacationService;
  */
 @Component
 @Transactional
-public class ProcessService {
+public class ProcessServiceImp implements IProcessService{
 
-	private static final Logger logger = Logger.getLogger(ProcessService.class);
+	private static final Logger logger = Logger.getLogger(ProcessServiceImp.class);
 	
 	@Autowired
 	protected RuntimeService runtimeService;
@@ -89,6 +94,9 @@ public class ProcessService {
 	
 	@Autowired
 	private IExpenseService expenseService;
+	
+	@Autowired
+	private ISalaryAdjustService saService;
     
     
     /**
@@ -97,6 +105,7 @@ public class ProcessService {
      * @param model
      * @return
      */
+	@Override
 	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> findTodoTask(User user, Model model){
     	// 根据当前用户组查询
@@ -115,6 +124,7 @@ public class ProcessService {
      * @param model
      * @return
      */
+	@Override
 	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> findDoTask(User user, Model model){
     	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
@@ -165,13 +175,39 @@ public class ProcessService {
      * @param user
      * @param taskId
      */
+	@Override
 	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public void doClaim(User user, String taskId){
     	this.identityService.setAuthenticatedUserId(user.getId().toString());
         this.taskService.claim(taskId, user.getId().toString());
     }
     
+	
+	/**
+	 * 获取评论
+	 * @param processInstanceId
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
+    public List<CommentVO> getComments(String processInstanceId) throws Exception{
+		// 查询一个任务所在流程的全部评论
+		List<Comment> comments = this.taskService.getProcessInstanceComments(processInstanceId);
+		List<CommentVO> commnetList = new ArrayList<CommentVO>();
+		for(Comment comment : comments){
+			User user = this.userService.getUserById(new Integer(comment.getUserId()));
+			CommentVO vo = new CommentVO();
+			vo.setContent(comment.getFullMessage());
+			vo.setTime(comment.getTime());
+			vo.setUserName(user.getName());
+			commnetList.add(vo);
+		}
+    	return commnetList;
+    }
     
+	
     /**
      * 计算分页
      * @param totalSum
@@ -200,6 +236,7 @@ public class ProcessService {
      * @param processInstanceId
      * @return
      */
+    @Override
     @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public InputStream getDiagram(String processInstanceId){
     	ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
@@ -225,6 +262,7 @@ public class ProcessService {
      * @param processInstanceId
      * @return
      */
+    @Override
     @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public InputStream getDiagram_noTrace(String resourceType, String processInstanceId){
     	
@@ -247,9 +285,9 @@ public class ProcessService {
      *
      * @return
      */
+    @Override
     @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public String findFinishedProcessInstaces(Model model) {
-        List<BaseVO> results = new ArrayList<BaseVO>();
         HistoricProcessInstanceQuery historQuery = historyService.createHistoricProcessInstanceQuery().finished();
         Integer totalSum = historQuery.list().size();
 		int[] pageParams = getPagination(totalSum, model);
@@ -295,6 +333,7 @@ public class ProcessService {
      * @return
      * @throws Exception
      */
+    @Override
     @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> listRuningVacation(User user) throws Exception{
     	List<Vacation> listVacation = this.vacationService.findByStatus(user.getId(), BaseVO.PENDING);
@@ -327,6 +366,7 @@ public class ProcessService {
      * @return
      * @throws Exception
      */
+    @Override
     @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> listRuningExpense(User user) throws Exception{
     	List<ExpenseAccount> listVacation = this.expenseService.findByStatus(user.getId(), BaseVO.PENDING);
@@ -352,12 +392,43 @@ public class ProcessService {
 		}
 		return result;
     }
-    
+    /**
+     * 查看正在运行的薪资跳转流程
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    @Override
+    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
+	public List<BaseVO> listRuningSalaryAdjust(User user) throws Exception {
+    	List<SalaryAdjust> listSalary = this.saService.findByStatus(user.getId(), BaseVO.PENDING);
+    	List<BaseVO> result = new ArrayList<BaseVO>();
+    	if(listSalary != null ){
+    		for(SalaryAdjust sa : listSalary){
+    			// 查询流程实例
+				ProcessInstance pi = this.runtimeService
+						.createProcessInstanceQuery()
+						.processInstanceId(sa.getProcessInstanceId())
+						.singleResult();
+				Task task = this.taskService.createTaskQuery().processInstanceId(sa.getProcessInstanceId()).singleResult();
+				if (pi != null) {
+					// 查询流程参数
+					BaseVO base = (BaseVO) this.runtimeService.getVariable(pi.getId(), "entity");
+					base.setTask(task);
+		            base.setProcessInstance(pi);
+		            base.setProcessDefinition(getProcessDefinition(pi.getProcessDefinitionId()));
+					result.add(base);
+				}
+    		}
+    	}
+    	return result;
+	}
     
     /**
      * 检查付款金额
      * @param exe
      */
+    @Override
     @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public void bankTransfer(Execution exe) {
 		ExpenseAccount expense = (ExpenseAccount)this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
@@ -372,4 +443,24 @@ public class ProcessService {
 			System.out.println("银行转帐成功");
 		}
 	}
+
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
+	public String startSalaryAdjust(SalaryAdjust salary) throws Exception {
+		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
+        this.identityService.setAuthenticatedUserId(salary.getUserId().toString());
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("entity", salary);
+        variables.put("auditGroup", "director");	//总监组审批
+        String businessKey = salary.getBusinessKey();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.salary", businessKey, variables);
+        String processInstanceId = processInstance.getId();
+        salary.setProcessInstanceId(processInstanceId);
+        this.saService.doUpdate(salary);
+        logger.info("processInstanceId: "+processInstanceId);
+        //最后要设置null，就是这么做，还没研究为什么
+        this.identityService.setAuthenticatedUserId(null);
+        return processInstanceId;
+	}
+
 }

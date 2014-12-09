@@ -18,7 +18,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "T_SALARY")
-public class Salary implements Serializable{
+public class Salary extends BaseVO implements Serializable{
 	
 	/**
 	 * 

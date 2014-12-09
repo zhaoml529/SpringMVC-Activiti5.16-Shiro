@@ -154,16 +154,16 @@ public class WorkflowTraceService {
         return activityInfo;
     }
 
-    private void setTaskGroup(Map<String, Object> vars, Set<Expression> candidateGroupIdExpressions) {
-        String roles = "";
-        for (Expression expression : candidateGroupIdExpressions) {
-            String expressionText = expression.getExpressionText();
-            logger.info("expressionText: "+expressionText);
-            String roleName = identityService.createGroupQuery().groupId(expressionText).singleResult().getName();
-            roles += roleName;
-        }
-        vars.put("任务所属角色", roles);
-    }
+//    private void setTaskGroup(Map<String, Object> vars, Set<Expression> candidateGroupIdExpressions) {
+//        String roles = "";
+//        for (Expression expression : candidateGroupIdExpressions) {
+//            String expressionText = expression.getExpressionText();
+//            logger.info("expressionText: "+expressionText);
+//            String roleName = identityService.createGroupQuery().groupId(expressionText).singleResult().getName();
+//            roles += roleName;
+//        }
+//        vars.put("任务所属角色", roles);
+//    }
 
     /**
      * 设置当前处理人信息
