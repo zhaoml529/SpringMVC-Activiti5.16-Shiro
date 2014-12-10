@@ -1,6 +1,5 @@
 package com.zml.oa.action;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
-import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.User;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
@@ -94,23 +92,6 @@ public class ProcessAction {
         redirectAttributes.addFlashAttribute("message", "任务已签收");
         return "redirect:/processAction/todoTaskList_page";
 	}
-    
-	/**
-	 * 获取评论
-	 * @param processInstanceId
-	 * @param model
-	 * @return
-	 * @throws NumberFormatException
-	 * @throws Exception
-	 */
-	@RequestMapping("/process/comments/{processInstanceId}")
-	public List<CommentVO> getCommnets(@PathVariable("processInstanceId") String processInstanceId, Model model) throws NumberFormatException, Exception{
-		List<CommentVO> comments = this.processService.getComments(processInstanceId);
-		model.addAttribute("commentList", comments);
-		return comments;
-	}
-	
-	
     
     /**
      * 显示流程图,带流程跟踪

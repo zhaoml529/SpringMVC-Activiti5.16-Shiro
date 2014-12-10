@@ -32,7 +32,7 @@ import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -56,7 +56,7 @@ import com.zml.oa.service.IVacationService;
  * @author zml
  *
  */
-@Component
+@Service
 @Transactional
 public class ProcessServiceImp implements IProcessService{
 
@@ -97,7 +97,7 @@ public class ProcessServiceImp implements IProcessService{
 	
 	@Autowired
 	private ISalaryAdjustService saService;
-    
+	
     
     /**
      * 查询代办任务
@@ -461,6 +461,62 @@ public class ProcessServiceImp implements IProcessService{
         //最后要设置null，就是这么做，还没研究为什么
         this.identityService.setAuthenticatedUserId(null);
         return processInstanceId;
+	}
+
+	@Override
+	public String startVacation(Vacation vacation) throws Exception {
+		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
+        identityService.setAuthenticatedUserId(vacation.getUserId().toString());
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("entity", vacation);
+        if(vacation.getDays() <= 3){
+        	variables.put("auditGroup", "manager");
+        }else{
+        	variables.put("auditGroup", "director");
+        }
+        String businessKey = vacation.getBusinessKey();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.vacation", businessKey, variables);
+        String processInstanceId = processInstance.getId();
+        vacation.setProcessInstanceId(processInstanceId);
+        this.vacationService.update(vacation);
+
+        logger.info("processInstanceId: "+processInstanceId);
+        //最后要设置null，就是这么做，还没研究为什么
+        this.identityService.setAuthenticatedUserId(null);
+        return processInstanceId;
+	}
+
+	@Override
+	public String startExpense(ExpenseAccount expense) throws Exception {
+		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
+        this.identityService.setAuthenticatedUserId(expense.getUserId().toString());
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("entity", expense);
+        variables.put("auditGroup", "finance");	//财务组审批
+        String businessKey = expense.getBusinessKey();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.expense", businessKey, variables);
+        String processInstanceId = processInstance.getId();
+        expense.setProcessInstanceId(processInstanceId);
+        this.expenseService.update(expense);
+
+        logger.info("processInstanceId: "+processInstanceId);
+        //最后要设置null，就是这么做，还没研究为什么
+        this.identityService.setAuthenticatedUserId(null);
+        return processInstanceId;
+	}
+
+	@Override
+	public void complete(String taskId, String content, String userid, Map<String, Object> variables) {
+		Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
+		// 根据任务查询流程实例
+    	String processInstanceId = task.getProcessInstanceId();
+    	ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+		//评论人的id  一定要写，不然查看的时候会报错，没有用户
+    	this.identityService.setAuthenticatedUserId(userid);
+		// 添加评论
+		this.taskService.addComment(taskId, pi.getId(), content);
+		// 完成任务
+		this.taskService.complete(taskId, variables);
 	}
 
 }

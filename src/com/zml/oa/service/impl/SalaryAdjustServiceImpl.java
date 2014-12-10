@@ -3,9 +3,12 @@ package com.zml.oa.service.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.service.ISalaryAdjustService;
 
+@Service
 public class SalaryAdjustServiceImpl extends BaseServiceImpl<SalaryAdjust> implements ISalaryAdjustService {
 
 	@Override

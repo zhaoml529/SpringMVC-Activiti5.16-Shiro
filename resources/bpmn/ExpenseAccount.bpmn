@@ -5,7 +5,7 @@
     <startEvent id="startevent1" name="Start" activiti:initiator="applyUserId"></startEvent>
     <userTask id="financeAudit" name="财务审批" activiti:candidateGroups="${auditGroup}"></userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="financeAudit"></sequenceFlow>
-    <serviceTask id="servicetask1" name="银行转账" activiti:expression="${processService.bankTransfer(execution)}"></serviceTask>
+    <serviceTask id="servicetask1" name="银行转账" activiti:expression="${IProcessService.bankTransfer(execution)}"></serviceTask>
     <sequenceFlow id="flow2" sourceRef="financeAudit" targetRef="servicetask1"></sequenceFlow>
     <boundaryEvent id="boundaryerror1" name="Error" attachedToRef="servicetask1">
       <errorEventDefinition></errorEventDefinition>

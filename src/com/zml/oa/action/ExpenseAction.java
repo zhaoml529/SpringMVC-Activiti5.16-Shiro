@@ -1,6 +1,5 @@
 package com.zml.oa.action;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,12 +9,9 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +30,9 @@ import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.User;
-import com.zml.oa.entity.Vacation;
 import com.zml.oa.service.IExpenseService;
+import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
-import com.zml.oa.service.activiti.ProcessServiceImp;
 import com.zml.oa.util.UserUtil;
 
 /**
@@ -56,12 +51,6 @@ public class ExpenseAction {
 	
 	@Autowired
 	protected RuntimeService runtimeService;
-	
-    @Autowired
-    protected IdentityService identityService;
-    
-    @Autowired
-    protected HistoryService historyService;
     
     @Autowired
     protected TaskService taskService;
@@ -70,7 +59,7 @@ public class ExpenseAction {
 	private IUserService userService;
 	
 	@Autowired
-	private ProcessServiceImp processService;
+	private IProcessService processService;
 	
 	
 	/**
@@ -139,17 +128,8 @@ public class ExpenseAction {
         this.expenseService.add(expense);
         String businessKey = expense.getId().toString();
         expense.setBusinessKey(businessKey);
-        ProcessInstance processInstance = null;
         try{
-        	// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
-            this.identityService.setAuthenticatedUserId(user.getId().toString());
-            Map<String, Object> variables = new HashMap<String, Object>();
-            variables.put("entity", expense);
-            variables.put("auditGroup", "finance");	//财务组审批
-            processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.expense", businessKey, variables);
-            String processInstanceId = processInstance.getId();
-            expense.setProcessInstanceId(processInstanceId);
-            this.expenseService.update(expense);
+        	String processInstanceId = this.processService.startExpense(expense);
             redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
             logger.info("processInstanceId: "+processInstanceId);
         }catch (ActivitiException e) {
@@ -163,14 +143,12 @@ public class ExpenseAction {
         } catch (Exception e) {
             logger.error("启动报销流程失败：", e);
             redirectAttributes.addFlashAttribute("error", "系统内部错误！");
-        } finally {
-            identityService.setAuthenticatedUserId(null);
         }
         return "redirect:/expenseAction/toAdd";
 	}
 
 	
-	 /**
+	/**
      * 审批报销流程
      * @param taskId
      * @param model
@@ -186,7 +164,7 @@ public class ExpenseAction {
 		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 		ExpenseAccount expense = (ExpenseAccount) this.runtimeService.getVariable(pi.getId(), "entity");
 		expense.setTask(task);
-		List<CommentVO> commentList = this.processService.getComments(pi.getId());
+		List<CommentVO> commentList = this.processService.getComments(processInstanceId);
 		model.addAttribute("commentList", commentList);
 		model.addAttribute("expense", expense);
     	return "expense/audit_expense";
@@ -204,30 +182,24 @@ public class ExpenseAction {
      */
     @RequestMapping("/complate/{taskId}")
     public String complate(
+    		@RequestParam("expenseId") Integer expenseId,
     		@RequestParam("content") String content,
     		@RequestParam("completeFlag") Boolean completeFlag,
     		@PathVariable("taskId") String taskId, 
     		RedirectAttributes redirectAttributes,
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
-    	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
-		// 根据任务查询流程实例
-    	String processInstanceId = task.getProcessInstanceId();
-    	ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-		//评论人的id  一定要写，不然查看的时候会报错，没有用户
-    	this.identityService.setAuthenticatedUserId(user.getId().toString());
-		// 添加评论
-		this.taskService.addComment(taskId, pi.getId(), content);
-		//获取当前流程下的variable
-        ExpenseAccount expense = (ExpenseAccount) this.runtimeService.getVariable(pi.getId(), "entity");
-        expense.setProcessInstanceId(processInstanceId);
+    	
+		//待测 能不能获取到 processInstanceId
+        ExpenseAccount expense = this.expenseService.findById(expenseId);
+//        expense.setProcessInstanceId(processInstanceId);
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("isPass", completeFlag);
 		variables.put("auditGroup", "finance");
 		expense.setStatus(BaseVO.APPROVAL_SUCCESS);
 		this.expenseService.update(expense);
 		// 完成任务
-		this.taskService.complete(taskId, variables);
+		this.processService.complete(taskId, content, user.getId().toString(), variables);
 		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
     	return "redirect:/processAction/doTaskList_page";
     }

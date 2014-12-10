@@ -1,9 +1,7 @@
 package com.zml.oa.action;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -171,7 +169,7 @@ public class SalaryAction {
 		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 		ExpenseAccount expense = (ExpenseAccount) this.runtimeService.getVariable(pi.getId(), "entity");
 		expense.setTask(task);
-		List<CommentVO> commentList = this.processService.getComments(pi.getId());
+		List<CommentVO> commentList = this.processService.getComments(processInstanceId);
 		model.addAttribute("commentList", commentList);
 		model.addAttribute("expense", expense);
     	return "salary/audit_salary";

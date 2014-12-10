@@ -7,11 +7,11 @@ import com.zml.oa.entity.Vacation;
 
 public interface IVacationService extends IBaseService<Vacation> {
 
-	public Serializable doAdd() throws Exception;
+	public Serializable doAdd(Vacation vacation) throws Exception;
 	
-	public void doUpdate() throws Exception;
+	public void doUpdate(Vacation vacation) throws Exception;
 	
-	public void doDelete() throws Exception;
+	public void doDelete(Vacation vacation) throws Exception;
 	
 	public List<Vacation> toList(Integer userId) throws Exception;
 	

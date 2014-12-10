@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.runtime.Execution;
+import org.activiti.engine.task.Task;
 import org.springframework.ui.Model;
 
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
+import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
+import com.zml.oa.entity.Vacation;
 
 public interface IProcessService {
 	
@@ -23,6 +26,23 @@ public interface IProcessService {
 	 * @throws Exception
 	 */
 	public String startSalaryAdjust(SalaryAdjust salary) throws Exception;
+	
+	/**
+	 * 启动请假流程
+	 * @param vacation
+	 * @return
+	 * @throws Exception
+	 */
+	public String startVacation(Vacation vacation) throws Exception;
+	
+	/**
+	 * 启动报销流程
+	 * @param expense
+	 * @return
+	 * @throws Exception
+	 */
+	public String startExpense(ExpenseAccount expense) throws Exception;
+	
 	/**
 	 * 查询代办任务
 	 * @param user
@@ -45,6 +65,15 @@ public interface IProcessService {
      * @param taskId
      */
     public void doClaim(User user, String taskId) throws Exception;
+    
+    /**
+     * 完成任务
+     * @param taskId
+     * @param content
+     * @param userid
+     * @param completeFlag
+     */
+    public void complete(String taskId, String content, String userid, Map<String, Object> variables) throws Exception;
     
     /**
      * 获取评论

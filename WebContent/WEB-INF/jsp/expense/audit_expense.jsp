@@ -14,8 +14,9 @@ function complete( flag ) {
 </head>
 
 <body>
-<form id="audit" action="${ctx }/expenseAction/complate/${expense.task.id }" method="post">
+<form id="audit" action="${ctx }/expenseAction/complate/${taskId }" method="post">
 	<input type="hidden" name="userId" value="${user.id }" />
+	<input type="hidden" name="expenseId" value="${expense.id }" />
 	<input type="hidden" id="completeFlag" name="completeFlag" value="" />
 	<div id="main">
         <div class="where">

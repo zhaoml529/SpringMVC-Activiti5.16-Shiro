@@ -14,19 +14,18 @@ import com.zml.oa.service.IVacationService;
 public class VacationServiceImpl extends BaseServiceImpl<Vacation> implements IVacationService {
 
 	@Override
-	public Serializable doAdd() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public Serializable doAdd(Vacation vacation) throws Exception {
+		return add(vacation);
 	}
 
 	@Override
-	public void doUpdate() throws Exception {
-		// TODO Auto-generated method stub
+	public void doUpdate(Vacation vacation) throws Exception {
+		update(vacation);
 	}
 
 	@Override
-	public void doDelete() throws Exception {
-		// TODO Auto-generated method stub
+	public void doDelete(Vacation vacation) throws Exception {
+		delete(vacation);
 	}
 
 	@Override

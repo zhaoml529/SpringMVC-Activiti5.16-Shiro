@@ -1,6 +1,5 @@
 package com.zml.oa.action;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,13 +9,10 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +33,7 @@ import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
+import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
 import com.zml.oa.util.UserUtil;
@@ -64,16 +61,13 @@ public class VacationAction {
     protected IdentityService identityService;
     
     @Autowired
-    protected HistoryService historyService;
-    
-    @Autowired
     protected TaskService taskService;
-    
-    @Autowired
-    protected RepositoryService repositoryService;
     
 	@Autowired
 	private IUserService userService;
+	
+	@Autowired
+	private IProcessService processService;
 	
 	/**
 	 * 查询某人的所有请假申请
@@ -158,21 +152,8 @@ public class VacationAction {
         this.vacationService.add(vacation);
         String businessKey = vacation.getId().toString();
         vacation.setBusinessKey(businessKey);
-        ProcessInstance processInstance = null;
         try {
-            // 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
-            identityService.setAuthenticatedUserId(user.getId().toString());
-            Map<String, Object> variables = new HashMap<String, Object>();
-            variables.put("entity", vacation);
-            if(vacation.getDays() <= 3){
-            	variables.put("auditGroup", "manager");
-            }else{
-            	variables.put("auditGroup", "director");
-            }
-            processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.vacation", businessKey, variables);
-            String processInstanceId = processInstance.getId();
-            vacation.setProcessInstanceId(processInstanceId);
-            this.vacationService.update(vacation);
+        	String processInstanceId = this.processService.startVacation(vacation);
             redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
             logger.info("processInstanceId: "+processInstanceId);
         } catch (ActivitiException e) {
@@ -186,8 +167,6 @@ public class VacationAction {
         } catch (Exception e) {
             logger.error("启动请假流程失败：", e);
             redirectAttributes.addFlashAttribute("error", "系统内部错误！");
-        } finally {
-            identityService.setAuthenticatedUserId(null);
         }
 		return "redirect:/vacationAction/toAdd";
 	}
@@ -206,20 +185,9 @@ public class VacationAction {
 		// 根据任务查询流程实例
     	String processInstanceId = task.getProcessInstanceId();
 		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-		// 查询一个任务所在流程的全部评论
-		logger.info("processInstanceId: "+processInstanceId+"--- pi.getId(): "+pi.getId());
-		List<Comment> comments = this.taskService.getProcessInstanceComments(pi.getId());
-		List<CommentVO> commnetList = new ArrayList<CommentVO>();
-		for(Comment comment : comments){
-			User user = this.userService.getUserById(new Integer(comment.getUserId()));
-			CommentVO vo = new CommentVO();
-			vo.setContent(comment.getFullMessage());
-			vo.setTime(comment.getTime());
-			vo.setUserName(user.getName());
-			commnetList.add(vo);
-		}
 		Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
 		vacation.setTask(task);
+		List<CommentVO> commentList = this.processService.getComments(processInstanceId);
 		String taskDefinitionKey = task.getTaskDefinitionKey();
 		logger.info("taskDefinitionKey: "+taskDefinitionKey);
 		String result = null;
@@ -229,7 +197,7 @@ public class VacationAction {
 			result = "vacation/audit_vacation";
 		}
 		model.addAttribute("vacation", vacation);
-		model.addAttribute("commentList", commnetList);
+		model.addAttribute("commentList", commentList);
     	return result;
     }
     
