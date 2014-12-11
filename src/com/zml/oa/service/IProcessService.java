@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.task.Task;
 import org.springframework.ui.Model;
 
 import com.zml.oa.entity.BaseVO;
@@ -129,10 +128,5 @@ public interface IProcessService {
      */
     public List<BaseVO> listRuningSalaryAdjust(User user) throws Exception;
     
-    /**
-     * 检查付款金额
-     * @param exe
-     */
-    public void bankTransfer(Execution exe) throws Exception;
 
 }

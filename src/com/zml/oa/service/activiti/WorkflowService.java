@@ -1,5 +1,6 @@
 package com.zml.oa.service.activiti;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
@@ -27,17 +29,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.User;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.util.WorkflowUtils;
 
 /**
  * 工作流跟踪相关Service
- *
+ * @Component注解(把普通pojo实例化到spring容器中，相当于配置文件中的<bean id="" class=""/>)
  * @author zml
  */
 @Component
-public class WorkflowTraceService {
+public class WorkflowService {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
@@ -55,6 +58,30 @@ public class WorkflowTraceService {
 	@Autowired
 	private IUserService userService;
 
+	
+	
+    /**
+     * 检查付款金额
+     * 此方法演示使用ServiceTask中的activiti:expression属性配合EL表达式执行java方法
+     * @param exe
+     */
+    public void bankTransfer(Execution exe) {
+		// 具体业务会与第三方支付系统产生交互，这样就有可能产生请求发送失败，
+		// 用边界错误事件来处理，如果银行转账失败，流程则会到达现金支付的用户任务
+		// ExpenseAccount.bpmn流程文件中，错误边界事件可以通过workflowService调用此方法也是由于@Component的作用.
+		// 如果此方法是放在@Service中，则需要在流程参数中加入variables.put("workflowService", new WorkflowService())，这样才能通过el获取到bankTransfer();
+    	ExpenseAccount expense = (ExpenseAccount)this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
+
+		if (expense.getMoney().compareTo(new BigDecimal(1000)) == 1 ) {
+			System.out.println("银行转账失败");
+			throw new BpmnError("to much");
+		} else {
+			//具体业务
+			System.out.println("银行转帐成功");
+		}
+	}
+	
+	
     /**
      * 流程跟踪图
      *

@@ -22,7 +22,7 @@ import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.User;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
-import com.zml.oa.service.activiti.WorkflowTraceService;
+import com.zml.oa.service.activiti.WorkflowService;
 import com.zml.oa.util.UserUtil;
 
 /**
@@ -39,7 +39,7 @@ public class ProcessAction {
 	protected IUserService userService;
     
     @Autowired
-    protected WorkflowTraceService traceService;
+    protected WorkflowService traceService;
 
 	@Autowired
 	private IProcessService processService;
