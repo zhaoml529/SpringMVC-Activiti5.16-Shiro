@@ -37,6 +37,7 @@ import org.springframework.ui.Model;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.ExpenseAccount;
+import com.zml.oa.entity.Salary;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
@@ -45,6 +46,7 @@ import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IExpenseService;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.ISalaryAdjustService;
+import com.zml.oa.service.ISalaryService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
 
@@ -95,7 +97,9 @@ public class ProcessServiceImp implements IProcessService{
 	@Autowired
 	private ISalaryAdjustService saService;
 	
-    
+	@Autowired
+	private ISalaryService salaryService;
+	
     /**
      * 查询代办任务
      * @param user
@@ -389,6 +393,7 @@ public class ProcessServiceImp implements IProcessService{
 		}
 		return result;
     }
+    
     /**
      * 查看正在运行的薪资跳转流程
      * @param user
@@ -421,14 +426,17 @@ public class ProcessServiceImp implements IProcessService{
     	return result;
 	}
     
+
 	@Override
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	public String startSalaryAdjust(SalaryAdjust salary) throws Exception {
 		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
         this.identityService.setAuthenticatedUserId(salary.getUserId().toString());
+        Salary sa = this.salaryService.findByUserId(salary.getUserId().toString());
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.put("entity", salary);
-        variables.put("auditGroup", "director");	//总监组审批
+        variables.put("auditGroup", "director");		//总监组审批
+        variables.put("baseMoney", sa.getBaseMoney());  //原有薪金(回滚用)
         String businessKey = salary.getBusinessKey();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.salary", businessKey, variables);
         String processInstanceId = processInstance.getId();

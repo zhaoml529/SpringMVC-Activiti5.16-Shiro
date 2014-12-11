@@ -52,10 +52,16 @@
         </div>
        <div id="dialog-complete" title="complete">
 		  <p>
-		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 5px 0;"></span>
+		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 1px 5px 0;"></span>
 		    ${message}
 		  </p>
 		</div> 
+		<div id="dialog-error" title="error">
+		  <p>
+		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 1px 5px 0;"></span>
+		    ${error}
+		  </p>
+		</div>
       <div class="sort_switch">
           <ul id="TabsNav">
           	  <li class="selected"><a href="#">报销申请</a></li>

@@ -5,19 +5,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>请假申请</title>
-<script type="text/javascript">
-function complete( flag ) {
-	$("#completeFlag").val(flag);
-	$("#audit").submit();
-}
-</script>
 </head>
 
 <body>
 <form id="audit" action="${ctx }/expenseAction/complate/${taskId }" method="post">
 	<input type="hidden" name="userId" value="${user.id }" />
 	<input type="hidden" name="expenseId" value="${expense.id }" />
-	<input type="hidden" id="completeFlag" name="completeFlag" value="" />
 	<div id="main">
         <div class="where">
             <ul>
@@ -50,38 +43,13 @@ function complete( flag ) {
 								<textarea cols="33" rows="5" name="remark">${expense.remark }</textarea>
 							</td>
                         </tr>
-                        <tr>
-                        <td width="15%" class="title1">评论：</td>
-                          	<td class="left">
-                          		
-								<table>
-									<c:forEach var="comment" items="${commentList}">
-									<tr>
-										<td>${comment.userName}- <fmt:formatDate value="${comment.time }" type="date" /> </td>
-									</tr>
-									<tr>
-										<td>${comment.content}</td>
-									</tr>
-									</c:forEach>
-								</table>
-							</td>
-                        </tr>
-                        <tr>
-                          <td width="15%" class="title1">我的意见：</td>
-                          	<td class="left">
-								<textarea cols="33" rows="5" name="content"></textarea>
-							</td>
-                        </tr>
                       </tbody>
                   </table>
 				  
                 </div>
             </div>
             
-            <div class="fun_area" style="text-align:center;">
-            	<input type="button" onclick="complete(true);" value="同 意" class="input_button1"/>
-            	<input type="button" onclick="complete(false);" value="不同意" class="input_button1"/>
-            </div>
+            <div class="fun_area" style="text-align:center;"><input type="submit" value="确 定" class="input_button1"/></div>
 
       </div>
 </div>

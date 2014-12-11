@@ -213,24 +213,15 @@ public class VacationAction {
      */
     @RequestMapping("/complate/{taskId}")
     public String complate(
+    		@RequestParam("vacationId") Integer vacationId,
     		@RequestParam("content") String content,
     		@RequestParam("completeFlag") Boolean completeFlag,
     		@PathVariable("taskId") String taskId, 
     		RedirectAttributes redirectAttributes,
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
-    	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
-		// 根据任务查询流程实例
-    	String processInstanceId = task.getProcessInstanceId();
-    	ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-		//评论人的id  一定要写，不然查看的时候会报错，没有用户
-    	this.identityService.setAuthenticatedUserId(user.getId().toString());
-		// 添加评论
-		this.taskService.addComment(taskId, pi.getId(), content);
-		//获取当前流程下的variable
-        Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
-//		String procId = this.vacationService.findById(vacation.getId()).getProcessInstanceId();
-		vacation.setProcessInstanceId(processInstanceId);
+
+        Vacation vacation = this.vacationService.findById(vacationId);
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("isPass", completeFlag);
 		if(completeFlag){
@@ -243,7 +234,8 @@ public class VacationAction {
 		}
 		this.vacationService.update(vacation);
 		// 完成任务
-		this.taskService.complete(taskId, variables);
+		this.processService.complete(taskId, content, user.getId().toString(), variables);
+		
 		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
     	return "redirect:/processAction/doTaskList_page";
     }
@@ -304,7 +296,8 @@ public class VacationAction {
         	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的请假申请！");
         }
 		variables.put("reApply", reApply);
-    	this.taskService.complete(taskId, variables);
+		
+		this.processService.complete(taskId, null, user.getId().toString(), variables);
 		
     	return "redirect:/processAction/doTaskList_page";
     }

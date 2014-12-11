@@ -1,7 +1,9 @@
 package com.zml.oa.action;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -22,16 +24,20 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
+import com.zml.oa.entity.Vacation;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.ISalaryAdjustService;
 import com.zml.oa.service.IUserService;
+import com.zml.oa.util.BeanUtils;
 import com.zml.oa.util.UserUtil;
 
 /**
@@ -77,7 +83,7 @@ public class SalaryAction {
 		if(!model.containsAttribute("salary")) {
             model.addAttribute("salary", new SalaryAdjust());
         }
-		return new ModelAndView("salary/add_salary").addObject(model);
+		return new ModelAndView("salary/add_salaryAdjust").addObject(model);
 	}
 
 	/**
@@ -123,32 +129,38 @@ public class SalaryAction {
             return "login";
         }
         
-        salary.setApplyDate( new Date() );
-        salary.setUserId(user.getId());
-        salary.setUser_name(user.getName());
-        salary.setTitle(user.getName()+" 的薪资调整申请");
-        salary.setBusinessType(SalaryAdjust.SALARY);
-        salary.setStatus(SalaryAdjust.PENDING);
-        this.saService.doAdd(salary);
-        String businessKey = salary.getId().toString();
-        salary.setBusinessKey(businessKey);
-        try{
-        	String processInstanceId = this.processService.startSalaryAdjust(salary);
-            redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
-            logger.info("processInstanceId: "+processInstanceId);
-        }catch (ActivitiException e) {
-            if (e.getMessage().indexOf("no processes deployed with key") != -1) {
-                logger.warn("没有部署流程!", e);
-                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>-待完成");
-            } else {
-                logger.error("启动报销流程失败：", e);
-                redirectAttributes.addFlashAttribute("error", "系统内部错误！");
-            }
-        } catch (Exception e) {
-            logger.error("启动报销流程失败：", e);
-            redirectAttributes.addFlashAttribute("error", "系统内部错误！");
-        } finally {
-            identityService.setAuthenticatedUserId(null);
+        String userName = salary.getUser_name();
+        user = this.userService.getUserByName(userName);
+        if(!BeanUtils.isBlank(user)){
+	        salary.setApplyDate( new Date() );
+	        salary.setUserId(user.getId());
+	        salary.setUser_name(user.getName());
+	        salary.setTitle(user.getName()+" 的薪资调整申请");
+	        salary.setBusinessType(SalaryAdjust.SALARY);
+	        salary.setStatus(SalaryAdjust.PENDING);
+	        this.saService.doAdd(salary);
+	        String businessKey = salary.getId().toString();
+	        salary.setBusinessKey(businessKey);
+	        try{
+	        	String processInstanceId = this.processService.startSalaryAdjust(salary);
+	            redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
+	            logger.info("processInstanceId: "+processInstanceId);
+	        }catch (ActivitiException e) {
+	            if (e.getMessage().indexOf("no processes deployed with key") != -1) {
+	                logger.warn("没有部署流程!", e);
+	                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>-待完成");
+	            } else {
+	                logger.error("启动报销流程失败：", e);
+	                redirectAttributes.addFlashAttribute("error", "系统内部错误！");
+	            }
+	        } catch (Exception e) {
+	            logger.error("启动报销流程失败：", e);
+	            redirectAttributes.addFlashAttribute("error", "系统内部错误！");
+	        } finally {
+	            identityService.setAuthenticatedUserId(null);
+	        }
+        }else{
+        	redirectAttributes.addFlashAttribute("error", "此用户不存在，不能调整薪资！");
         }
         return "redirect:/salaryAction/toAdd";
 	}
@@ -167,13 +179,105 @@ public class SalaryAction {
 		// 根据任务查询流程实例
     	String processInstanceId = task.getProcessInstanceId();
 		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-		ExpenseAccount expense = (ExpenseAccount) this.runtimeService.getVariable(pi.getId(), "entity");
-		expense.setTask(task);
+		SalaryAdjust salary = (SalaryAdjust) this.runtimeService.getVariable(pi.getId(), "entity");
+		salary.setTask(task);
 		List<CommentVO> commentList = this.processService.getComments(processInstanceId);
+		String taskDefinitionKey = task.getTaskDefinitionKey();
+		logger.info("taskDefinitionKey: "+taskDefinitionKey);
+		String result = null;
+		if("modifyApply".equals(taskDefinitionKey)){
+			result = "vacation/modify_salaryAdjust";
+		}else{
+			result = "vacation/audit_salaryAdjust";
+		}
+		
 		model.addAttribute("commentList", commentList);
-		model.addAttribute("expense", expense);
-    	return "salary/audit_salary";
+		model.addAttribute("salary", salary);
+    	return result;
     }
     
+    @RequestMapping("/complate/{taskId}")
+    public String complate(
+    		@RequestParam("salaryAdjustId") Integer salaryAdjustId,
+    		@RequestParam("content") String content,
+    		@RequestParam("completeFlag") Boolean completeFlag,
+    		@PathVariable("taskId") String taskId, 
+    		RedirectAttributes redirectAttributes,
+    		HttpSession session) throws Exception{
+    	User user = UserUtil.getUserFromSession(session);
+    	
+    	
+    	
+		return taskId;
+
+    }
+    
+    /**
+     * 修改薪资调整
+     * @param salary
+     * @param results
+     * @param taskId
+     * @param salaryId
+     * @param reApply
+     * @param redirectAttributes
+     * @param session
+     * @param model
+     * @return
+     * @throws Exception 
+     */
+    public String modifySalary(
+    		@ModelAttribute("salary") @Valid SalaryAdjust salary,
+			BindingResult results,
+			@PathVariable("taskId") String taskId,
+			@RequestParam("reApply") Boolean reApply,
+			RedirectAttributes redirectAttributes,
+			HttpSession session,
+			Model model) throws Exception{
+    	
+    	
+    	if(results.hasErrors()){
+        	model.addAttribute("salary", salary);
+        	return "vacation/modify_vacation";
+        }
+		
+		User user = UserUtil.getUserFromSession(session);
+        
+        // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
+        if (user == null || user.getId() == null) {
+        	model.addAttribute("msg", "登录超时，请重新登录!");
+            return "redirect:/userAction/login_view";
+        }
+        String userName = salary.getUser_name();
+        user = this.userService.getUserByName(userName);
+        
+        Map<String, Object> variables = new HashMap<String, Object>();
+        if(reApply){
+        	if(!BeanUtils.isBlank(user)){
+	        	//修改薪资调整
+	        	salary.setUserId(user.getId());
+	        	salary.setUser_name(user.getName());
+	        	salary.setTitle(user.getName()+" 的请假申请！");
+	        	salary.setBusinessType(BaseVO.VACATION);
+	        	salary.setStatus(BaseVO.PENDING);
+	        	salary.setApplyDate(new Date());
+	        	salary.setBusinessKey(salary.getId().toString());
+		        this.saService.doUpdate(salary);
+		        variables.put("entity", salary);
+		        variables.put("reApply", reApply);
+		        variables.put("auditGroup", "director");//返回总监重新审批
+		        redirectAttributes.addFlashAttribute("message", "任务办理完成，请假申请已重新提交！");
+        	}else{
+            	redirectAttributes.addFlashAttribute("error", "此用户不存在，不能调整薪资！");
+            	return "redirect:/salaryAction/toApproval/"+taskId;
+            }
+        }else{
+        	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的请假申请！");
+        }
+        //完成任务
+        this.processService.complete(taskId, null, user.getId().toString(), variables);
+        
+        return "redirect:/processAction/doTaskList_page";
+    	
+    }
     
 }

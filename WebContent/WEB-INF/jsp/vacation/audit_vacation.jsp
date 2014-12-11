@@ -16,6 +16,7 @@ function complete( flag ) {
 <body>
 <form id="audit" action="<c:url value="/vacationAction/complate/${vacation.task.id }"/>" method="post">
 	<input type="hidden" name="userId" value="${user.id }" />
+	<input type="hidden" name="vacationId" value="${vacation.id }" />
 	<input type="hidden" id="completeFlag" name="completeFlag" value="" />
 	<div id="main">
         <div class="where">

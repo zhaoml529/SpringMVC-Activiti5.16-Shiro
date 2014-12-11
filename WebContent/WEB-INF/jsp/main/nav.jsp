@@ -22,7 +22,7 @@
 					<li class="last"><a href="${ctx}/processAction/todoTaskList_page" target="mainFrame"><h6>我的任务</h6></a></li>
 					<li class="last"><a href="${ctx}/vacationAction/toAdd" target="mainFrame"><h6>请假</h6></a></li>
 					<li class="last"><a href="${ctx}/expenseAction/toAdd" target="mainFrame"><h6>报捎</h6></a></li>
-					<li class="last"><a href="salary/salaryAdjust.jsp" target="mainFrame"><h6>薪资调整</h6></a></li>
+					<li class="last"><a href="${ctx }/salaryAction/toAdd" target="mainFrame"><h6>薪资调整</h6></a></li>
                 </ul>
             </li>
 

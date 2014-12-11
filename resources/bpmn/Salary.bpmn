@@ -15,16 +15,16 @@
     <sequenceFlow id="flow6" name="同意" sourceRef="exclusivegateway1" targetRef="endevent1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isPass}]]></conditionExpression>
     </sequenceFlow>
-    <serviceTask id="cancelAdjust" name="取消调整" activiti:expression="${processService.cancelAdjust(execution)}"></serviceTask>
-    <sequenceFlow id="flow7" name="不同意" sourceRef="exclusivegateway1" targetRef="cancelAdjust">
+    <serviceTask id="rollbackApply" name="回滚调整" activiti:class="com.zml.oa.ProcessTask.ServiceTask.RollbackSalaryApply"></serviceTask>
+    <sequenceFlow id="flow7" name="不同意" sourceRef="exclusivegateway1" targetRef="rollbackApply">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!isPass}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="modifyApply" name="调整申请" activiti:assignee="${applyUserId}">
       <extensionElements>
-        <activiti:taskListener event="complete" delegateExpression="${afterModifyApplyContentProcessor}"></activiti:taskListener>
+        <activiti:taskListener event="complete" delegateExpression="${afterModifyApplyProcessor}"></activiti:taskListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="flow8" sourceRef="cancelAdjust" targetRef="modifyApply"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="rollbackApply" targetRef="modifyApply"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow9" sourceRef="directorAudit" targetRef="exclusivegateway2"></sequenceFlow>
     <sequenceFlow id="flow10" name="同意" sourceRef="exclusivegateway2" targetRef="hrAudit">
@@ -73,7 +73,7 @@
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="1015.0" y="181.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="cancelAdjust" id="BPMNShape_cancelAdjust">
+      <bpmndi:BPMNShape bpmnElement="rollbackApply" id="BPMNShape_rollbackApply">
         <omgdc:Bounds height="55.0" width="105.0" x="898.0" y="310.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="modifyApply" id="BPMNShape_modifyApply">

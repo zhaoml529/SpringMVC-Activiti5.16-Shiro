@@ -183,23 +183,18 @@ public class ExpenseAction {
     @RequestMapping("/complate/{taskId}")
     public String complate(
     		@RequestParam("expenseId") Integer expenseId,
-    		@RequestParam("content") String content,
-    		@RequestParam("completeFlag") Boolean completeFlag,
     		@PathVariable("taskId") String taskId, 
     		RedirectAttributes redirectAttributes,
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	
-		//待测 能不能获取到 processInstanceId
         ExpenseAccount expense = this.expenseService.findById(expenseId);
-//        expense.setProcessInstanceId(processInstanceId);
 		Map<String, Object> variables = new HashMap<String, Object>();
-		variables.put("isPass", completeFlag);
 		variables.put("auditGroup", "finance");
 		expense.setStatus(BaseVO.APPROVAL_SUCCESS);
 		this.expenseService.update(expense);
 		// 完成任务
-		this.processService.complete(taskId, content, user.getId().toString(), variables);
+		this.processService.complete(taskId, null, user.getId().toString(), variables);
 		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
     	return "redirect:/processAction/doTaskList_page";
     }

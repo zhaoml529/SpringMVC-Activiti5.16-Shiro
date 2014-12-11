@@ -30,7 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.zml.oa.entity.ExpenseAccount;
+import com.zml.oa.entity.Salary;
+import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
+import com.zml.oa.service.ISalaryService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.util.WorkflowUtils;
 
@@ -57,6 +60,9 @@ public class WorkflowService {
     
 	@Autowired
 	private IUserService userService;
+	
+	@Autowired
+	private ISalaryService salaryService;
 
 	
 	
@@ -76,13 +82,38 @@ public class WorkflowService {
 			System.out.println("银行转账失败");
 			throw new BpmnError("to much");
 		} else {
-			//具体业务
+			//具体银行转账业务，调用第三方服务
 			System.out.println("银行转帐成功");
 		}
 	}
-	
-	
+    
     /**
+     * 回滚薪资调整
+     * @param exe
+     * @throws Exception 
+     */
+    public void rollbackApply(Execution exe) throws Exception{
+    	SalaryAdjust salaryAdjust = (SalaryAdjust)this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
+    	BigDecimal baseMoney = (BigDecimal) this.runtimeService.getVariable(exe.getProcessInstanceId(), "baseMoney");
+		Salary salary = this.salaryService.findByUserId(salaryAdjust.getUserId().toString());
+		salary.setBaseMoney(baseMoney);
+		this.salaryService.doUpdate(salary);
+    }
+    
+    /**
+     * 记录薪资调整
+     * @param exe
+     * @throws Exception
+     */
+	public void contentSalary(Execution exe) throws Exception {
+		SalaryAdjust salaryAdjust = (SalaryAdjust) this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
+		Salary salary = this.salaryService.findByUserId(salaryAdjust.getUserId().toString());
+		BigDecimal newMoney = salaryAdjust.getAdjustMoney();
+		salary.setBaseMoney(newMoney);
+		this.salaryService.update(salary);
+	}
+	
+	/**
      * 流程跟踪图
      *
      * @param processInstanceId 流程实例ID
