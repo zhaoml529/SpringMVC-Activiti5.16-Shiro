@@ -1,7 +1,6 @@
 package com.zml.oa.service.activiti;
 
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +13,6 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.history.HistoricFormProperty;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -23,7 +21,6 @@ import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
@@ -87,7 +84,7 @@ public class ProcessServiceImp implements IProcessService{
     ProcessEngineConfiguration processEngineConfiguration;
     
     @Autowired
-    protected WorkflowTraceService traceService;
+    protected WorkflowService traceService;
     
 	@Autowired
 	private IVacationService vacationService;
@@ -424,26 +421,6 @@ public class ProcessServiceImp implements IProcessService{
     	return result;
 	}
     
-    /**
-     * 检查付款金额
-     * @param exe
-     */
-    @Override
-    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
-    public void bankTransfer(Execution exe) {
-		ExpenseAccount expense = (ExpenseAccount)this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
-		// 具体业务会与第三方支付系统产生交互，这样就有可能产生请求发送失败，
-		// 用边界错误事件来处理，如果银行转账失败，流程则会到达现金支付的用户任务
-		
-		if (expense.getMoney().compareTo(new BigDecimal(1000)) == 1 ) {
-			System.out.println("银行转账失败");
-			throw new BpmnError("to much");
-		} else {
-			//具体业务
-			System.out.println("银行转帐成功");
-		}
-	}
-
 	@Override
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	public String startSalaryAdjust(SalaryAdjust salary) throws Exception {
