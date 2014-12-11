@@ -30,10 +30,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
-import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
-import com.zml.oa.entity.Vacation;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.ISalaryAdjustService;
 import com.zml.oa.service.IUserService;
@@ -186,9 +184,9 @@ public class SalaryAction {
 		logger.info("taskDefinitionKey: "+taskDefinitionKey);
 		String result = null;
 		if("modifyApply".equals(taskDefinitionKey)){
-			result = "vacation/modify_salaryAdjust";
+			result = "salary/modify_salaryAdjust";
 		}else{
-			result = "vacation/audit_salaryAdjust";
+			result = "salary/audit_salaryAdjust";
 		}
 		
 		model.addAttribute("commentList", commentList);
@@ -205,10 +203,22 @@ public class SalaryAction {
     		RedirectAttributes redirectAttributes,
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
-    	
-    	
-    	
-		return taskId;
+    	String groupType = user.getGroup().getType();
+    	SalaryAdjust salaryAdjust = this.saService.findById(salaryAdjustId);
+    	Map<String, Object> variables = new HashMap<String, Object>();
+    	if("boss".equals(groupType) && completeFlag){
+        	salaryAdjust.setStatus(BaseVO.APPROVAL_SUCCESS);
+        	this.saService.doUpdate(salaryAdjust);
+    	}else if(!completeFlag){
+    		salaryAdjust.setStatus(BaseVO.APPROVAL_FAILED);
+    		variables.put("entity", salaryAdjust);
+    		this.saService.doUpdate(salaryAdjust);
+    	}
+		variables.put("isPass", completeFlag);
+		variables.put("businessKey", salaryAdjustId);
+		this.processService.complete(taskId, content, user.getId().toString(), variables);
+		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
+		return "redirect:/processAction/doTaskList_page";
 
     }
     
@@ -237,7 +247,7 @@ public class SalaryAction {
     	
     	if(results.hasErrors()){
         	model.addAttribute("salary", salary);
-        	return "vacation/modify_vacation";
+        	return "salary/modify_salaryjust";
         }
 		
 		User user = UserUtil.getUserFromSession(session);
@@ -257,7 +267,7 @@ public class SalaryAction {
 	        	salary.setUserId(user.getId());
 	        	salary.setUser_name(user.getName());
 	        	salary.setTitle(user.getName()+" 的请假申请！");
-	        	salary.setBusinessType(BaseVO.VACATION);
+	        	salary.setBusinessType(BaseVO.SALARY);
 	        	salary.setStatus(BaseVO.PENDING);
 	        	salary.setApplyDate(new Date());
 	        	salary.setBusinessKey(salary.getId().toString());

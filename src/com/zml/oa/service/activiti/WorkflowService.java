@@ -106,6 +106,9 @@ public class WorkflowService {
      * @throws Exception
      */
 	public void contentSalary(Execution exe) throws Exception {
+		System.out.println("***************pId: "+exe.getProcessInstanceId());
+		System.out.println("***************ActId: "+exe.getActivityId());
+		System.out.println("***************Id: "+exe.getId());
 		SalaryAdjust salaryAdjust = (SalaryAdjust) this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
 		Salary salary = this.salaryService.findByUserId(salaryAdjust.getUserId().toString());
 		BigDecimal newMoney = salaryAdjust.getAdjustMoney();

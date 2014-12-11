@@ -3,11 +3,27 @@
   <process id="com.zml.oa.salary" name="薪资调整" isExecutable="true">
     <documentation>薪资调整流程演示</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="applyUserId"></startEvent>
-    <userTask id="directorAudit" name="总监审批" activiti:candidateGroups="${auditGroup}"></userTask>
+    <userTask id="directorAudit" name="总监审批">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskLintener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="directorAudit"></sequenceFlow>
-    <userTask id="hrAudit" name="人事审批" activiti:candidateGroups="${auditGroup}"></userTask>
-    <callActivity id="callactivity1" name="调整薪资" calledElement="CountSalary"></callActivity>
-    <userTask id="bossAudit" name="老板审批" activiti:candidateUsers="${bossAudit}"></userTask>
+    <userTask id="hrAudit" name="人事审批">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskLintener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <callActivity id="callactivity1" name="调整薪资" calledElement="CountSalary">
+      <extensionElements>
+        <activiti:in source="outEntity" sourceExpression="${businessKey}" target="inEntity"></activiti:in>
+      </extensionElements>
+    </callActivity>
+    <userTask id="bossAudit" name="老板审批">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskLintener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow4" sourceRef="callactivity1" targetRef="bossAudit"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow5" sourceRef="bossAudit" targetRef="exclusivegateway1"></sequenceFlow>
