@@ -33,8 +33,8 @@ public class SalaryAdjustServiceImpl extends BaseServiceImpl<SalaryAdjust> imple
 	}
 
 	@Override
-	public SalaryAdjust findById(Integer id) throws Exception {
-		return getUnique("SalaryAdjust", new String[]{"userId"}, new String[]{id.toString()});
+	public SalaryAdjust findByUserId(Integer userId) throws Exception {
+		return getUnique("SalaryAdjust", new String[]{"userId"}, new String[]{userId.toString()});
 	}
 
 	@Override
@@ -42,6 +42,11 @@ public class SalaryAdjustServiceImpl extends BaseServiceImpl<SalaryAdjust> imple
 			throws Exception {
 		List<SalaryAdjust> list = findByWhere("SalaryAdjust", new String[]{"userId", "status"}, new String[]{userId.toString(), status});
 		return list;
+	}
+
+	@Override
+	public SalaryAdjust findById(Integer id) throws Exception {
+		return getUnique("SalaryAdjust", new String[]{"id"}, new String[]{id.toString()});
 	}
 
 }

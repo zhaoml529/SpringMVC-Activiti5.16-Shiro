@@ -15,6 +15,8 @@ public interface ISalaryAdjustService {
 	
 	public List<SalaryAdjust> toList(Integer userId) throws Exception;
 	
+	public SalaryAdjust findByUserId(Integer userId) throws Exception;
+	
 	public SalaryAdjust findById(Integer id) throws Exception;
 	
 	public List<SalaryAdjust> findByStatus(Integer userId, String status) throws Exception; 

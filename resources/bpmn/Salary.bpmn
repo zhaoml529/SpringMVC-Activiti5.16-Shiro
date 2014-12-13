@@ -16,7 +16,8 @@
     </userTask>
     <callActivity id="callactivity1" name="调整薪资" calledElement="CountSalary">
       <extensionElements>
-        <activiti:in source="outEntity" sourceExpression="${businessKey}" target="inEntity"></activiti:in>
+        <activiti:in sourceExpression="${businessKey}" target="businessKey"></activiti:in>
+        <activiti:out source="inEntity" target="businessKey"></activiti:out>
       </extensionElements>
     </callActivity>
     <userTask id="bossAudit" name="老板审批">
@@ -161,7 +162,7 @@
         <omgdi:waypoint x="1032.0" y="450.0"></omgdi:waypoint>
         <omgdi:waypoint x="1032.0" y="216.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="48.0" x="569.0" y="430.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="48.0" x="543.0" y="430.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">

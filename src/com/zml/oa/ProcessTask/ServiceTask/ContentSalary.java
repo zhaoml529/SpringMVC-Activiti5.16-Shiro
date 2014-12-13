@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.zml.oa.entity.Salary;
 import com.zml.oa.entity.SalaryAdjust;
+import com.zml.oa.service.ISalaryAdjustService;
 import com.zml.oa.service.ISalaryService;
 
 /**
@@ -18,22 +19,25 @@ import com.zml.oa.service.ISalaryService;
  */
 public class ContentSalary implements JavaDelegate {
 
-	 @Autowired
+	@Autowired
     protected RuntimeService runtimeService;
 	 
 	@Autowired
 	private ISalaryService salaryService;
 	
+	@Autowired
+	private ISalaryAdjustService saService;
+	
 	@Override
 	public void execute(DelegateExecution execution) throws Exception {
-//		SalaryAdjust salaryAdjust = (SalaryAdjust) execution.getVariable("inEntity");
-		String businessKey = (String) execution.getVariable("businessKey");
+		Integer businessKey = (Integer) execution.getVariable("businessKey");
 		System.out.println("%%%%%%%%%%%%%%businessKey: "+ businessKey);
-//		SalaryAdjust salaryAdjust = (SalaryAdjust) this.runtimeService.getVariable(execution.getProcessInstanceId(), "entity");
-//		Salary salary = this.salaryService.findByUserId(salaryAdjust.getUserId().toString());
-//		BigDecimal newMoney = salaryAdjust.getAdjustMoney();
-//		salary.setBaseMoney(newMoney);
-//		this.salaryService.update(salary);
+		SalaryAdjust salaryAdjust = this.saService.findById(businessKey);
+		
+		Salary salary = this.salaryService.findByUserId(salaryAdjust.getUserId().toString());
+		BigDecimal newMoney = salaryAdjust.getAdjustMoney();
+		salary.setBaseMoney(newMoney);
+		this.salaryService.update(salary);
 		
 	}
 
