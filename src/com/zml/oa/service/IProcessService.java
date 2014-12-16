@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.runtime.Execution;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.springframework.ui.Model;
 
 import com.zml.oa.entity.BaseVO;
@@ -128,5 +129,24 @@ public interface IProcessService {
      */
     public List<BaseVO> listRuningSalaryAdjust(User user) throws Exception;
     
+    /**
+     * 管理运行中流程
+     * @return
+     * @throws Exception
+     */
+    public List<ProcessInstance> listRuningProcess(Model model) throws Exception;
 
+    /**
+     * 激活流程实例
+     * @param processInstanceId
+     * @throws Exception
+     */
+    public void activateProcessInstance(String processInstanceId) throws Exception;
+    
+    /**
+     * 挂起流程实例
+     * @param processInstanceId
+     * @throws Exception
+     */
+    public void suspendProcessInstance(String processInstanceId) throws Exception;
 }
