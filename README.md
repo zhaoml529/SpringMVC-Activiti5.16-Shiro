@@ -32,3 +32,7 @@ SpringOA简介
 1.加入安全框架Shiro.<br>
 2.加入缓存 ehcache.<br>
 3.前端页面Extjs.<br>
+
+首页
+--------
+![](https://github.com/zhaoml529/SpringOA/raw/master/WebContent/WEB-INF/images/main.jpg)  
