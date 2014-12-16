@@ -19,6 +19,11 @@ import com.zml.oa.service.activiti.ProcessServiceImp;
 @Component
 @Transactional
 public class UserTaskLintener implements TaskListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2190559253653576032L;
+	
 	private static final Logger logger = Logger.getLogger(UserTaskLintener.class);
     @Autowired
     protected RepositoryService repositoryService;
@@ -47,7 +52,9 @@ public class UserTaskLintener implements TaskListener {
 		}else if("employeeAudit".equals(taskDefinitionKey)){
 			delegateTask.addCandidateGroup("employee");
 		}else if("bossAudit".equals(taskDefinitionKey)){
-			delegateTask.setAssignee("boss");
+//			老板只有一个，这里直接添加任务受理人（setAssignee）为boss就可以，不用再去"抢占"式的领取代办任务。
+//			delegateTask.setAssignee("boss"); //具体boss的Id号
+			delegateTask.addCandidateGroup("boss");
 		}
 	}
 }
