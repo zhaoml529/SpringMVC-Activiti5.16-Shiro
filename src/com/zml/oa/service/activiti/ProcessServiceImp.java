@@ -299,38 +299,7 @@ public class ProcessServiceImp implements IProcessService{
         Integer totalSum = historQuery.list().size();
 		int[] pageParams = getPagination(totalSum, model);
 		List<HistoricProcessInstance> list = historQuery.orderByProcessInstanceEndTime().desc().listPage(pageParams[0], pageParams[1]);
-		System.out.println(list.size()+" $$$$$$$$$$$");
 		
-		// 关联业务实体
-        for (HistoricProcessInstance historicProcessInstance : list) {
-        	
-        	String processInstanceId = historicProcessInstance.getId();
-        	Map<String, Object> entity = historicProcessInstance.getProcessVariables();
-        	System.out.println(entity.size()+" ***********");
-        	//获取当前流程下的key为entity的variable
-//            BaseVO base = (BaseVO) this.historyService.createHistoricVariableInstanceQuery().variableName(arg0).getVariable(processInstanceId, "entity");
-        	System.out.println(processInstanceId+" $$$$$$$$$$$");
-            List<HistoricVariableInstance> listHistory = this.historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list();
-
-           for(HistoricVariableInstance variableInstance : listHistory) {
-             System.out.println("variable: " + variableInstance.getVariableName() + " = " + variableInstance.getValue());
-           }
-
-           List<HistoricDetail> formProperties = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).formProperties().list();
-          System.out.println("formProListSize: "+formProperties.size());
-           for (HistoricDetail historicDetail : formProperties) {
-             HistoricFormProperty field = (HistoricFormProperty) historicDetail;
-             System.out.println("field id: " + field.getPropertyId() + ", value: " + field.getPropertyValue());
-           }
-            
-//            String businessKey = historicProcessInstance.getBusinessKey();
-//            Leave leave = leaveManager.getLeave(new Long(businessKey));
-//            leave.setProcessDefinition(getProcessDefinition(historicProcessInstance.getProcessDefinitionId()));
-//            leave.setHistoricProcessInstance(historicProcessInstance);
-//            results.add(leave);
-        }
-//        model.addAttribute("tasklist", taskList);
-//		model.addAttribute("taskType", BaseVO.CANDIDATE);
         return null;
     }
     

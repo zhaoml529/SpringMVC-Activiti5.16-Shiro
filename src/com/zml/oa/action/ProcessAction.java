@@ -153,10 +153,12 @@ public class ProcessAction {
      * 读取已结束中的流程
      *
      * @return
+     * @throws Exception 
      */
     @RequestMapping(value = "/process/finished")
-    public String findFinishedProcessInstaces(Model model) {
+    public String findFinishedProcessInstaces(Model model) throws Exception {
         //待完成，见ProcessService
+    	this.processService.findFinishedProcessInstaces(model);
         return null;
     }
     
