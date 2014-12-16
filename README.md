@@ -5,8 +5,9 @@ SpringOA简介
 
 框架简介
 --------
-本项目是一个开源基础框架。框架以Spring Framework为核心、Spring MVC作为模型视图控制器、Hibernate作为数据库操作层。<br>
-可以为学习SpringMVC的同学提供帮助。<br>
+由于最近在学习Activit本项目参考Workflow讲义上的实战项目，并且加入了自己的东西，并不是照搬过来。
+框架以Spring Framework为核心、Spring MVC作为模型视图控制器、Hibernate作为数据库操作层。<br>
+本项目也可以为学习SpringMVC的同学提供帮助。<br>
 本项目以查询待办任务、查待受理任务、查看运行中的流程以及流程控制中的一些问题为基础入门Activiti。<br>
 功能有请假流程实例、报销流程实例、薪资调整流程实例等功能。<br>
 
@@ -26,7 +27,7 @@ SpringOA简介
 </ul>
 
 
-未来功能
+后续功能
 --------
 1.加入安全框架Shiro.<br>
 2.加入缓存 ehcache.<br>
