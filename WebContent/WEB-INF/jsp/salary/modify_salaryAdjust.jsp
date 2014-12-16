@@ -14,7 +14,7 @@
 </head>
 
 <body>
-<form:form action="${ctx }/vacationAction/modifySalary/${salary.task.id }" id="salary" modelAttribute="salary" method="POST">
+<form:form action="${ctx }/salaryAction/modifySalary/${salary.task.id }" id="salary" modelAttribute="salary" method="POST">
 	<input type="hidden" name="id" value="${salary.id }" />
 	<input type="hidden" name="userId" value="${salary.userId }" />
 	<input type="hidden" id="reApply" name="reApply" value="" />
@@ -38,7 +38,7 @@
                 	<table class="tableHue2" width="100%" border="1" bordercolor="#dddddd" cellspacing="0" cellpadding="0">
                       <tbody>
                         <tr>
-							<td width="15%" class="title1">输入员工姓名：</td>
+							<td width="15%" class="title1">输您的姓名：</td>
 							<td class="left"><input name="user_name" type="text" value="${salary.user_name }" class="input_text2" size="30" /></td>
                         </tr>
                         <tr>

@@ -18,9 +18,9 @@
 		var taskType = "${taskType}";
 		$("#" + taskType).attr("class", "selected");
 		if(taskType == "candidate"){
-			$("#taskForm").attr("action","${ctx}/processAction/todoTaskList_page")
+			$("#taskForm").attr("action","${ctx}/processAction/todoTaskList_page");
 		}else{
-			$("#taskForm").attr("action","${ctx}/processAction/doTaskList_page")
+			$("#taskForm").attr("action","${ctx}/processAction/doTaskList_page");
 		}
 	    // 跟踪
 	    $('.trace').click(graphTrace);
@@ -38,8 +38,6 @@
 		    });
 		}
 	});
-	
-	 // 获取图片资源
 	
 </script>
 </head>
