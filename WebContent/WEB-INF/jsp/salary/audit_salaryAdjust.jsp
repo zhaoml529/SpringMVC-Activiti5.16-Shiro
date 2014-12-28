@@ -37,7 +37,7 @@ function complete( flag ) {
                 	<table class="tableHue2" width="100%" border="1" bordercolor="#dddddd" cellspacing="0" cellpadding="0">
                       <tbody>
                         <tr>
-							<td width="15%" class="title1">输入员工姓名：</td>
+							<td width="15%" class="title1">员工姓名：</td>
 							<td class="left"><input name="user_name" type="text" value="${salary.user_name }" class="input_text2" size="30" /></td>
                         </tr>
                         <tr>

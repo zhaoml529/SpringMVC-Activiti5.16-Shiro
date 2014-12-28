@@ -27,12 +27,13 @@
 	<div id="main">
       <div class="sort_switch">
           <ul id="TabsNav">
-          	  <li class="" id="vacation"><a href="${ctx}/processAction/process/getRuningProcessInstance/vacation">请假申请</a></li>
-          	  <li class="" id="salary"><a href="${ctx}/processAction/process/getRuningProcessInstance/salary">薪资调整申请</a></li>
-          	  <li class="" id="expense"><a href="${ctx}/processAction/process/getRuningProcessInstance/expense">报销申请</a></li>
+          	  <li class="" id="vacation"><a href="${ctx}/processAction/process/runingProcessInstance/vacation/list_page">请假申请</a></li>
+          	  <li class="" id="salary"><a href="${ctx}/processAction/process/runingProcessInstance/salary/list_page">薪资调整申请</a></li>
+          	  <li class="" id="expense"><a href="${ctx}/processAction/process/runingProcessInstance/expense/list_page">报销申请</a></li>
           </ul>
       </div>
       <div class="sort_content">
+      	<form id="runingForm" action="${ctx }/processAction/process/runingProcessInstance/${businessType }/list_page" method="post">
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
               <thead>
                 <tr>
@@ -73,8 +74,12 @@
                   </td>
                 </tr>
               </c:forEach>
+              <tr>
+              		<td class="fun_area" colspan="6" align="center">${page }</td>
+              </tr>
               </tbody>
           </table>
+         </form>
       </div>
 </div>
 </body>

@@ -28,6 +28,7 @@
 <body>
 <form:form action="${ctx }/vacationAction/modifyVacation/${vacation.task.id }" id="vacation" modelAttribute="vacation" method="POST">
 	<input type="hidden" name="id" value="${vacation.id }" />
+	<input type="hidden" name="processInstanceId" value="${vacation.processInstanceId }" />
 	<input type="hidden" name="userId" value="${user.id }" />
 	<input type="hidden" id="reApply" name="reApply" value="" />
 	<div id="main">

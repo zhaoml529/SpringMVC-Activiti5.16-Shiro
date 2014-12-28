@@ -40,7 +40,7 @@ import com.zml.oa.util.UserUtil;
 
 /**
  * @ClassName: VacationAction
- * @Description:请假控制类
+ * @Description:请假控制类,没有用动态任务分配
  * @author: zml
  * @date: 2014-12-1 上午12:35:50
  *
@@ -187,6 +187,7 @@ public class VacationAction {
 		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 		Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
 		vacation.setTask(task);
+		vacation.setProcessInstanceId(processInstanceId);
 		List<CommentVO> commentList = this.processService.getComments(processInstanceId);
 		String taskDefinitionKey = task.getTaskDefinitionKey();
 		logger.info("taskDefinitionKey: "+taskDefinitionKey);
@@ -220,17 +221,20 @@ public class VacationAction {
     		RedirectAttributes redirectAttributes,
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
-
+    	String groupType = user.getGroup().getType();
         Vacation vacation = this.vacationService.findById(vacationId);
+        Vacation baseVacation = (Vacation) this.runtimeService.getVariable(vacation.getProcessInstanceId(), "entity");
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("isPass", completeFlag);
 		if(completeFlag){
 			variables.put("auditGroup", "hr");
-			vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
+			if("hr".equals(groupType)){
+				vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
+			}
 		}else{
-            vacation.setTitle(vacation.getUser_name()+" 的请假申请失败,需修改后重新提交！");
-            vacation.setStatus(BaseVO.APPROVAL_FAILED);
-			variables.put("entity", vacation);
+			baseVacation.setTitle(baseVacation.getUser_name()+" 的请假申请失败,需修改后重新提交！");
+			vacation.setStatus(BaseVO.APPROVAL_FAILED);
+			variables.put("entity", baseVacation);
 		}
 		this.vacationService.update(vacation);
 		// 完成任务
@@ -256,6 +260,7 @@ public class VacationAction {
 			@ModelAttribute("vacation") @Valid Vacation vacation,
 			BindingResult results,
 			@PathVariable("taskId") String taskId,
+			@RequestParam("processInstanceId") String processInstanceId,
 			@RequestParam("reApply") Boolean reApply,
 			RedirectAttributes redirectAttributes,
 			HttpSession session,
@@ -284,6 +289,7 @@ public class VacationAction {
 	        vacation.setStatus(BaseVO.PENDING);
 	        vacation.setApplyDate(new Date());
 	        vacation.setBusinessKey(vacation.getId().toString());
+	        vacation.setProcessInstanceId(processInstanceId);
 	        this.vacationService.update(vacation);
 	        variables.put("entity", vacation);
 	        if(vacation.getDays() <= 3){

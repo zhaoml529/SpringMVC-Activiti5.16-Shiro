@@ -18,7 +18,7 @@
 		<ul id="nav">
         	<li><a href="#" onclick="clickNav(this);return false;" class="parent" id="1"><h5><strong>用户功能</strong></h5></a>
             	<ul id="opt_1" class="child_area">
-					<li class="last"><a href="${ctx}/processAction/process/getRuningProcessInstance/vacation" target="mainFrame"><h6>申请查看</h6></a></li>
+					<li class="last"><a href="${ctx}/processAction/process/runingProcessInstance/vacation/list_page" target="mainFrame"><h6>申请查看</h6></a></li>
 					<li class="last"><a href="${ctx}/processAction/todoTaskList_page" target="mainFrame"><h6>我的任务</h6></a></li>
 					<li class="last"><a href="${ctx}/vacationAction/toAdd" target="mainFrame"><h6>请假</h6></a></li>
 					<li class="last"><a href="${ctx}/expenseAction/toAdd" target="mainFrame"><h6>报捎</h6></a></li>
@@ -31,6 +31,7 @@
                 	<li class="last"><a href="${ctx}/groupAction/toList" target="mainFrame"><h6>用户组管理</h6></a></li>
                 	<li class="last"><a href="${ctx}/userAction/toList_page" target="mainFrame"><h6>用户管理</h6></a></li>
                 	<li class="last"><a href="${ctx}/pd-list.action" target="mainFrame"><h6>流程定义 </h6></a></li>
+                	<li class="last"><a href="${ctx }/processAction/process/runningProcess_page" target="mainFrame"><h6>运行中的流程 </h6></a></li>
                 </ul>
             </li>
         </ul>

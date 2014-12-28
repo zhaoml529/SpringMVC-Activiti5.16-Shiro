@@ -22,6 +22,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -49,6 +50,7 @@ import com.zml.oa.service.ISalaryAdjustService;
 import com.zml.oa.service.ISalaryService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
+import com.zml.oa.util.BeanUtils;
 
 /**
  * 流程相关Service
@@ -148,7 +150,11 @@ public class ProcessServiceImp implements IProcessService{
         for (Task task : tasks) {
         	String processInstanceId = task.getProcessInstanceId();
             ProcessInstance processInstance = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).active().singleResult();
-          //获取当前流程下的key为entity的variable
+            if(BeanUtils.isBlank(processInstance)){
+            	//如果有挂起的流程则continue
+            	continue;
+            }
+            //获取当前流程下的key为entity的variable
             BaseVO base = (BaseVO) this.runtimeService.getVariable(processInstance.getId(), "entity");
             base.setTask(task);
             base.setProcessInstance(processInstance);
@@ -293,38 +299,7 @@ public class ProcessServiceImp implements IProcessService{
         Integer totalSum = historQuery.list().size();
 		int[] pageParams = getPagination(totalSum, model);
 		List<HistoricProcessInstance> list = historQuery.orderByProcessInstanceEndTime().desc().listPage(pageParams[0], pageParams[1]);
-		System.out.println(list.size()+" $$$$$$$$$$$");
 		
-		// 关联业务实体
-        for (HistoricProcessInstance historicProcessInstance : list) {
-        	
-        	String processInstanceId = historicProcessInstance.getId();
-        	Map<String, Object> entity = historicProcessInstance.getProcessVariables();
-        	System.out.println(entity.size()+" ***********");
-        	//获取当前流程下的key为entity的variable
-//            BaseVO base = (BaseVO) this.historyService.createHistoricVariableInstanceQuery().variableName(arg0).getVariable(processInstanceId, "entity");
-        	System.out.println(processInstanceId+" $$$$$$$$$$$");
-            List<HistoricVariableInstance> listHistory = this.historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list();
-
-           for(HistoricVariableInstance variableInstance : listHistory) {
-             System.out.println("variable: " + variableInstance.getVariableName() + " = " + variableInstance.getValue());
-           }
-
-           List<HistoricDetail> formProperties = historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).formProperties().list();
-          System.out.println("formProListSize: "+formProperties.size());
-           for (HistoricDetail historicDetail : formProperties) {
-             HistoricFormProperty field = (HistoricFormProperty) historicDetail;
-             System.out.println("field id: " + field.getPropertyId() + ", value: " + field.getPropertyValue());
-           }
-            
-//            String businessKey = historicProcessInstance.getBusinessKey();
-//            Leave leave = leaveManager.getLeave(new Long(businessKey));
-//            leave.setProcessDefinition(getProcessDefinition(historicProcessInstance.getProcessDefinitionId()));
-//            leave.setHistoricProcessInstance(historicProcessInstance);
-//            results.add(leave);
-        }
-//        model.addAttribute("tasklist", taskList);
-//		model.addAttribute("taskType", BaseVO.CANDIDATE);
         return null;
     }
     
@@ -436,6 +411,7 @@ public class ProcessServiceImp implements IProcessService{
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.put("entity", salary);
         variables.put("auditGroup", "director");		//总监组审批
+        variables.put("businessKey", salary.getId());
         variables.put("baseMoney", sa.getBaseMoney());  //原有薪金(回滚用)
         String businessKey = salary.getBusinessKey();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.salary", businessKey, variables);
@@ -499,9 +475,32 @@ public class ProcessServiceImp implements IProcessService{
 		//评论人的id  一定要写，不然查看的时候会报错，没有用户
     	this.identityService.setAuthenticatedUserId(userid);
 		// 添加评论
-		this.taskService.addComment(taskId, pi.getId(), content);
+    	if(content != null){
+    		this.taskService.addComment(taskId, pi.getId(), content);
+    	}
 		// 完成任务
 		this.taskService.complete(taskId, variables);
+	}
+
+	@Override
+	public List<ProcessInstance> listRuningProcess(Model model) throws Exception {
+		ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery();
+		Integer totalSum = processInstanceQuery.list().size();
+		int[] pageParams = getPagination(totalSum, model);
+		List<ProcessInstance> list = processInstanceQuery.orderByProcessInstanceId().desc().listPage(pageParams[0], pageParams[1]);
+		return list;
+	}
+
+	@Override
+	public void activateProcessInstance(String processInstanceId)
+			throws Exception {
+		runtimeService.activateProcessInstanceById(processInstanceId);
+	}
+
+	@Override
+	public void suspendProcessInstance(String processInstanceId)
+			throws Exception {
+		runtimeService.suspendProcessInstanceById(processInstanceId);
 	}
 
 }

@@ -18,9 +18,9 @@
 		var taskType = "${taskType}";
 		$("#" + taskType).attr("class", "selected");
 		if(taskType == "candidate"){
-			$("#taskForm").attr("action","${ctx}/processAction/todoTaskList_page")
+			$("#taskForm").attr("action","${ctx}/processAction/todoTaskList_page");
 		}else{
-			$("#taskForm").attr("action","${ctx}/processAction/doTaskList_page")
+			$("#taskForm").attr("action","${ctx}/processAction/doTaskList_page");
 		}
 	    // 跟踪
 	    $('.trace').click(graphTrace);
@@ -39,8 +39,6 @@
 		}
 	});
 	
-	 // 获取图片资源
-	
 </script>
 </head>
 
@@ -56,7 +54,7 @@
           <ul id="TabsNav">
           	  <li class="" id="candidate"><a href="${ctx}/processAction/todoTaskList_page">待办的任务</a></li>
           	  <li class="" id="assignee"><a href="${ctx}/processAction/doTaskList_page">受理的任务</a></li>
-          	  <li class="" id="assignee"><a href="${ctx}/processAction/process/finished">已完成的任务</a></li>
+          	  <%-- <li class="" id="assignee"><a href="${ctx}/processAction/process/finished">已完成的任务</a></li> --%>
           </ul>
       </div>
       

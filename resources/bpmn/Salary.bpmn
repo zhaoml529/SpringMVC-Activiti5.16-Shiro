@@ -17,7 +17,6 @@
     <callActivity id="callactivity1" name="调整薪资" calledElement="CountSalary">
       <extensionElements>
         <activiti:in sourceExpression="${businessKey}" target="businessKey"></activiti:in>
-        <activiti:out source="inEntity" target="businessKey"></activiti:out>
       </extensionElements>
     </callActivity>
     <userTask id="bossAudit" name="老板审批">
@@ -32,13 +31,17 @@
     <sequenceFlow id="flow6" name="同意" sourceRef="exclusivegateway1" targetRef="endevent1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isPass}]]></conditionExpression>
     </sequenceFlow>
-    <serviceTask id="rollbackApply" name="回滚调整" activiti:class="com.zml.oa.ProcessTask.ServiceTask.RollbackSalaryApply"></serviceTask>
+    <serviceTask id="rollbackApply" name="回滚调整" activiti:delegateExpression="${rollbackSalaryApply}"></serviceTask>
     <sequenceFlow id="flow7" name="不同意" sourceRef="exclusivegateway1" targetRef="rollbackApply">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!isPass}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="modifyApply" name="调整申请" activiti:assignee="${applyUserId}">
       <extensionElements>
-        <activiti:taskListener event="complete" delegateExpression="${afterModifyApplyProcessor}"></activiti:taskListener>
+        <activiti:taskListener event="complete" delegateExpression="${afterModifyApplyProcessor}">
+          <activiti:field name="businessKey">
+            <activiti:expression>${businessKey}</activiti:expression>
+          </activiti:field>
+        </activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow8" sourceRef="rollbackApply" targetRef="modifyApply"></sequenceFlow>

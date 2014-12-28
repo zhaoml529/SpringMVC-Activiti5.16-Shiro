@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>请假申请</title>
+<title>报销申请</title>
 </head>
 
 <body>
@@ -19,7 +19,7 @@
         
       <div class="sort_switch">
           <ul id="TabsNav">
-          	  <li class="selected"><a href="#">请假申请</a></li>
+          	  <li class="selected"><a href="#">报销申请</a></li>
           </ul>
       </div>
       
@@ -35,12 +35,12 @@
                         </tr>
                         <tr>
                           <td width="15%" class="title1">金额 ：</td>
-                          <td class="left"><input name="money" value="${expense.money }" type="text" class="input_text2" size="30" /></td>
+                          <td class="left"><input name="money" value="${expense.money }" type="text" readonly="readonly" class="input_text2" size="30" /></td>
                         </tr>
                         <tr>
                           <td width="15%" class="title1">描述：</td>
                           	<td class="left">
-								<textarea cols="33" rows="5" name="remark">${expense.remark }</textarea>
+								<textarea cols="33" rows="5" name="remark" readonly="readonly">${expense.remark }</textarea>
 							</td>
                         </tr>
                       </tbody>

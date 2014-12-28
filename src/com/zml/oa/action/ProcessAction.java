@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.User;
+import com.zml.oa.pagination.Pagination;
+import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.activiti.WorkflowService;
@@ -150,10 +153,12 @@ public class ProcessAction {
      * 读取已结束中的流程
      *
      * @return
+     * @throws Exception 
      */
     @RequestMapping(value = "/process/finished")
-    public String findFinishedProcessInstaces(Model model) {
+    public String findFinishedProcessInstaces(Model model) throws Exception {
         //待完成，见ProcessService
+    	this.processService.findFinishedProcessInstaces(model);
         return null;
     }
     
@@ -165,7 +170,7 @@ public class ProcessAction {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value="/process/getRuningProcessInstance/{businessType}")
+    @RequestMapping(value="/process/runingProcessInstance/{businessType}/list_page")
     public String getRuningProcessInstance(@PathVariable("businessType") String businessType,HttpSession session , Model model) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	List<BaseVO> baseVO = null;
@@ -182,7 +187,45 @@ public class ProcessAction {
     		baseVO = this.processService.listRuningExpense(user);
     		model.addAttribute("businessType", BaseVO.EXPENSE);
     	}
+    	Pagination pagination = PaginationThreadUtils.get();
+		model.addAttribute("page", pagination.getPageStr());
     	model.addAttribute("baseList", baseVO);
     	return "apply/list_running";
+    }
+    /**
+     * 管理运行中的流程
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="/process/runningProcess_page")
+    public String listRuningProcess(Model model) throws Exception{
+    	List<ProcessInstance> list = this.processService.listRuningProcess(model);
+    	model.addAttribute("list", list);
+		return "workflow/running_manage";
+    }
+    
+    /**
+     * 激活、挂起流程实例
+     * @param status
+     * @param processInstanceId
+     * @param redirectAttributes
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "process/updateProcessStatus/{status}/{processInstanceId}")
+    public String updateProcessStatus(
+    		@PathVariable("status") String status, 
+    		@PathVariable("processInstanceId") String processInstanceId,
+            RedirectAttributes redirectAttributes) throws Exception{
+    	
+    	if (status.equals("active")) {
+    		this.processService.activateProcessInstance(processInstanceId);
+            redirectAttributes.addFlashAttribute("message", "已激活ID为[ " + processInstanceId + " ]的流程实例。");
+        } else if (status.equals("suspend")) {
+        	this.processService.suspendProcessInstance(processInstanceId);
+            redirectAttributes.addFlashAttribute("message", "已挂起ID为[ " + processInstanceId + " ]的流程实例。");
+        }
+    	return "redirect:/processAction/process/runningProcess_page";
     }
 }

@@ -40,6 +40,7 @@ import com.zml.oa.util.WorkflowUtils;
 /**
  * 工作流跟踪相关Service
  * @Component注解(把普通pojo实例化到spring容器中，相当于配置文件中的<bean id="" class=""/>)
+ * 目的是让Spring容器管理workflowService，这样@Autowired 才能自动注入
  * @author zml
  */
 @Component
@@ -79,7 +80,7 @@ public class WorkflowService {
     	ExpenseAccount expense = (ExpenseAccount)this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
 
 		if (expense.getMoney().compareTo(new BigDecimal(1000)) == 1 ) {
-			System.out.println("银行转账失败");
+			System.out.println("银行转账失败,大于1000块，转为现金支付！");
 			throw new BpmnError("to much");
 		} else {
 			//具体银行转账业务，调用第三方服务
@@ -106,9 +107,6 @@ public class WorkflowService {
      * @throws Exception
      */
 	public void contentSalary(Execution exe) throws Exception {
-		System.out.println("***************pId: "+exe.getProcessInstanceId());
-		System.out.println("***************ActId: "+exe.getActivityId());
-		System.out.println("***************Id: "+exe.getId());
 		SalaryAdjust salaryAdjust = (SalaryAdjust) this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
 		Salary salary = this.salaryService.findByUserId(salaryAdjust.getUserId().toString());
 		BigDecimal newMoney = salaryAdjust.getAdjustMoney();

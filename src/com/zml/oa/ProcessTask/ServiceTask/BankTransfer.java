@@ -2,11 +2,11 @@ package com.zml.oa.ProcessTask.ServiceTask;
 
 import java.math.BigDecimal;
 
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zml.oa.entity.ExpenseAccount;
 
@@ -16,14 +16,14 @@ import com.zml.oa.entity.ExpenseAccount;
  * @author ZML
  *
  */
+
+@Component
+@Transactional
 public class BankTransfer implements JavaDelegate {
 
-    @Autowired
-    protected RuntimeService runtimeService;
-    
 	@Override
 	public void execute(DelegateExecution execution) throws Exception {
-		ExpenseAccount expense = (ExpenseAccount)this.runtimeService.getVariable(execution.getProcessInstanceId(), "entity");
+		ExpenseAccount expense = (ExpenseAccount) execution.getVariable("entity");
 		if (expense.getMoney().compareTo(new BigDecimal(1000)) == 1 ) {
 			System.out.println("银行转账失败");
 			throw new BpmnError("to much");

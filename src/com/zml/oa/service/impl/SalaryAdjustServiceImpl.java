@@ -40,7 +40,7 @@ public class SalaryAdjustServiceImpl extends BaseServiceImpl<SalaryAdjust> imple
 	@Override
 	public List<SalaryAdjust> findByStatus(Integer userId, String status)
 			throws Exception {
-		List<SalaryAdjust> list = findByWhere("SalaryAdjust", new String[]{"userId", "status"}, new String[]{userId.toString(), status});
+		List<SalaryAdjust> list = findByPage("SalaryAdjust", new String[]{"userId", "status"}, new String[]{userId.toString(), status});
 		return list;
 	}
 
