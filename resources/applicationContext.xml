@@ -72,7 +72,7 @@
 	
 	<!-- 对标注@Transactional注解的Bean进行处理，以织入事务管理切面 -->
 	<!-- 为@Transactional注解事务开启事务支持 -->
-    <tx:annotation-driven transaction-manager="transactionManager" /> 
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/> 
     
     
     <!-- Activiti的bean -->
@@ -84,7 +84,7 @@
         <!-- 生成流程图的字体 -->
         <property name="activityFontName" value="${diagram.activityFontName}"/>
         <property name="labelFontName" value="${diagram.labelFontName}"/>
-		<property name="deploymentResources" value="classpath*:/deploy/*" />
+		<property name="deploymentResources" value="classpath*:/bpmn/*" />
 	</bean>
 	<!-- 流程引擎的bean -->
 	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
@@ -97,5 +97,6 @@
 	<bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
 	<bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
 	<bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService" />
+	
 	
 </beans>
