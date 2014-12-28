@@ -74,6 +74,19 @@
     <mvc:interceptors>
     	<mvc:interceptor>
 	    	<mvc:mapping path="/**" />
+	    	<mvc:exclude-mapping path="/"/>
+	    	<mvc:exclude-mapping path="/userAction/login_view"/>
+	    	<mvc:exclude-mapping path="/userAction/login"/>
+	    	<mvc:exclude-mapping path="/main/top"/>
+	    	<mvc:exclude-mapping path="/main/welcome"/>
+	    	<mvc:exclude-mapping path="/main/nav"/>
+	    	<mvc:exclude-mapping path="/css/**"/>
+	    	<mvc:exclude-mapping path="/js/**"/>
+	    	<mvc:exclude-mapping path="/images/**"/>
+	    	<bean class="com.zml.oa.interceptor.LoginInterceptor" />
+    	</mvc:interceptor>
+    	<mvc:interceptor>
+	    	<mvc:mapping path="/**" />
 	    	<bean class="com.zml.oa.interceptor.PaginationInterceptor" />
     	</mvc:interceptor>
     </mvc:interceptors>

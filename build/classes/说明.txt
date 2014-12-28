@@ -1,2 +1,0 @@
-spring jpa 带配置。
-@ModelAttribute  不能自动封装页面数据为实体（可能与spring jpa有关系）
