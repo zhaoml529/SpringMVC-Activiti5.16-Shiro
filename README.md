@@ -18,6 +18,7 @@ SpringOA简介
 <li>Spring-3.2.2.RELEASE</li>
 <li>Hibernate-4.2.2.Final</li>
 <li>Hibernate-validator-4.2.0.Final</li>
+<li>validation-api-1.0.0.GA.jar</li>
 </ul>
 
 数据库
