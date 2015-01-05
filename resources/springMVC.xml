@@ -70,7 +70,7 @@
          <property name="defaultStatusCode" value="500"></property>  
      </bean>  
 
-	<!-- 分页拦截器 -->
+	
     <mvc:interceptors>
     	<mvc:interceptor>
 	    	<mvc:mapping path="/**" />
@@ -85,6 +85,7 @@
 	    	<mvc:exclude-mapping path="/images/**"/>
 	    	<bean class="com.zml.oa.interceptor.LoginInterceptor" />
     	</mvc:interceptor>
+    	<!-- 分页拦截器 -->
     	<mvc:interceptor>
 	    	<mvc:mapping path="/**" />
 	    	<bean class="com.zml.oa.interceptor.PaginationInterceptor" />
