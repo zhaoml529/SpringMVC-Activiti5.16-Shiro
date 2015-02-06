@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+        version="2.0">
+    <description>functions</description>
+    <tlib-version>3.0</tlib-version>
+    <short-name>fn</short-name>
+    <uri>http://github.com/zhaoml529/tags/functions</uri>
+
+    <function>
+        <description>obj in collection</description>
+        <name>in</name>
+        <function-class>com.zml.oa.util.Functions</function-class>
+        <function-signature>boolean in(java.lang.Iterable,java.lang.Object)</function-signature>
+    </function>
+
+  	<function>
+        <description>用户身份</description>
+        <name>principal</name>
+        <function-class>com.zml.oa.util.Functions</function-class>
+        <function-signature>java.lang.String principal(org.apache.shiro.session.Session)</function-signature>
+    </function>
+    <function>
+        <description>是否强制退出</description>
+        <name>isForceLogout</name>
+        <function-class>com.zml.oa.util.Functions</function-class>
+        <function-signature>boolean isForceLogout(org.apache.shiro.session.Session)</function-signature>
+    </function>
+
+
+</taglib>

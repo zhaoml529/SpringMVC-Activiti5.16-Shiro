@@ -1,0 +1,48 @@
+body {
+	/*background: url(bg.png) no-repeat center center #1d1d1d; */
+	color: #eee;
+	font-family: Corbel, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+}
+
+#rocket {
+	width: 275px;
+	height: 375px;
+	background: url(rocket.png) no-repeat;
+	margin: 80px auto 50px;
+	position: relative;
+}
+
+/*	Two steam classes. */
+.steam1,.steam2 {
+	position: absolute;
+	bottom: 78px;
+	left: 50px;
+	width: 80px;
+	height: 80px;
+	background: url(steam.png) no-repeat;
+	opacity: 0.8;
+}
+
+/**	.steam2 shows the bottom part (dark version)
+ *	of the background image.
+ */
+.steam2 {
+	background-position: left bottom;
+}
+
+/* Using the HTML4 hgroup element */
+hgroup {
+	display: block;
+	margin: 80px auto;
+	width: 850px;
+	font-family: "Century Gothic", Calibri, "Myriad Pro", Arial, Helvetica, sans-serif;
+	text-align: center;
+}
+
+h2 {
+	color: #76D7FB;
+	font-size: 18px;
+	font-weight: normal;
+	line-height: 20px;
+}
