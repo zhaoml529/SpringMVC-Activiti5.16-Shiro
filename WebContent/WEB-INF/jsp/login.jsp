@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/taglibs/taglibs.jsp"%>
+<%@taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
@@ -62,26 +63,44 @@
 		
 		<div class="formDiv">
 			<span style="color:red; height: 30px;">${msg}</span>
-			<form method="post" action="${ctx }/userAction/login">
+			<form method="post" action="">
 				<div class="textDiv">
 					<span style="width: 300px; margin-right: 20px;">用户名: </span>
-					<input type="text" name="name"/>
+					<input type="text" name="name" value="<shiro:principal/>"/>
 				
 				</div>
 				<div class="textDiv">
 					<span style="width: 300px; margin-right: 40px;">密码:</span> 
 					<input type="password" name="passwd"/>
 				</div>
+				<div class="textDiv">
+				<c:if test="${jcaptchaEbabled}"> 
+					<span style="width: 300px; margin-right: 40px;">验证码:</span> 
+					<input type="text" name="jcaptchaCode"> 
+					<img class="jcaptcha-btn jcaptcha-img" src="${ctx}/jcaptcha.jpg" title="点击更换验证码"> 
+					<a class="jcaptcha-btn" href="javascript:;">换一张</a> 
+					</c:if> 
+				</div>
+				<div class="textDiv">
+					<span style="width: 300px; margin-right: 40px;">记住我</span> 
+					<input type="checkbox" name="rememberMe" value="true">
+				</div>
 				<div class="buttonDiv">
 					<input type="submit" value="确定"/>
-					<input type="button" value="取消"/>
+					<input type="button" value="注册" onclick="window.location.href='${ctx }/userAction/toAdd'"/>
 				</div>
 			</form>
 		</div>
 	</div>
 
 </div>
-
+<script>
+    $(function() {
+        $(".jcaptcha-btn").click(function() {
+            $(".jcaptcha-img").attr("src", '${ctx}/jcaptcha.jpg?'+new Date().getTime());
+        });
+    });
+</script>
 
 
 </BODY>
