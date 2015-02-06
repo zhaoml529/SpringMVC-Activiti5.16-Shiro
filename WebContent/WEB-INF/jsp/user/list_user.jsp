@@ -48,7 +48,10 @@
                   <td>${user.name}</td>
                   <td>${user.registerDate}</td>
                   <td>${user.group.name}</td>
-                  <td><a href="<c:url value='/userAction/delete/${user.id }' />">删除</a></td>
+                  <td>
+                  	<a href="<c:url value='/userAction/toUpdate/${user.id }' />">修改</a>|
+                  	<a href="<c:url value='/userAction/delete/${user.id }' />">删除</a>
+                  </td>
                 </tr>
               </c:forEach>
               	<tr>

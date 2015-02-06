@@ -116,10 +116,27 @@ public class UserAction {
 		user.setRegisterDate(new Date());
 		Serializable id = this.userService.doAdd(user);
 		logger.info("Serializable id: "+id);
-		int i=4/0;
 		return "redirect:/userAction/toList_page";
 		
 	}
+	
+	@RequiresPermissions("admin:user:toUpdate")
+	@RequestMapping(value = "/toUpdate/{id}", method = RequestMethod.GET)
+	public String toUpdate(@PathVariable("id") Integer id,Model model) throws Exception{
+		List<Group> list = this.groupService.getGroupList();
+		User user = this.userService.getUserById(id);
+		model.addAttribute("groupList", list);
+		model.addAttribute("user", user);
+		return "user/update_user";
+	}
+	
+	@RequiresPermissions("admin:user:doUpdate")
+	@RequestMapping(value = "/doUpdate", method = RequestMethod.POST)
+	public String doUpdate(@ModelAttribute("user") User user) throws Exception{
+		this.userService.doUpdate(user);
+		return "redirect:/userAction/toList_page";
+	}
+	
 	
 	@RequiresPermissions("admin:user:doDelete")
 	@RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
