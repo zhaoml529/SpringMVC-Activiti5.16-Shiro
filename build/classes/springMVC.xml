@@ -1,19 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns:p="http://www.springframework.org/schema/p"
-	   xmlns:context="http://www.springframework.org/schema/context"
-	   xmlns:aop="http://www.springframework.org/schema/aop"
-	   xmlns:mvc="http://www.springframework.org/schema/mvc"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans	   
-							http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-							http://www.springframework.org/schema/context
-							http://www.springframework.org/schema/context/spring-context-3.2.xsd
-							http://www.springframework.org/schema/mvc
-							http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
-							http://www.springframework.org/schema/aop 
-							http://www.springframework.org/schema/aop/spring-aop.xsd
-							">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:cache="http://www.springframework.org/schema/cache" 
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	   http://www.springframework.org/schema/cache  
+	   http://www.springframework.org/schema/cache/spring-cache.xsd 
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
 	 <!-- springMVC.XML 表现层配置文件，只应加装表现层Bean -->
 	 
 	 <!-- 对包进行扫描，实现注释驱动Bean定义，同时将bean自动注入容器中使用。即解决了@Controller标识的类的bean的注入和使用。  -->
@@ -31,7 +33,7 @@
 	</context:component-scan>
 	
 	<!-- 当访问主页时自动转发到/userAction/login_view控制器。 -->
-	<mvc:view-controller path="/" view-name="forward:/userAction/login_view"/>
+	<!-- <mvc:view-controller path="/" view-name="forward:/userAction/login_view"/> -->
 	
 	<!-- restful -->
 	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
@@ -55,39 +57,22 @@
      <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
          <property name="exceptionMappings">  
              <props>  
-                 <prop key="java.lang.Exception">ErrorPage/Exception</prop>  
-                 <prop key="java.lang.Throwable">ErrorPage/Exception</prop>  
+                 <prop key="java.lang.Exception">error/500</prop>  
+                 <prop key="java.lang.RuntimeException">error/500</prop>  
+                 <prop key="java.lang.Throwable">error/500</prop>  
+                 <prop key="UnauthorizedException">error/noRealm</prop>  
              </props>  
-         </property>  
-         <property name="statusCodes">  
-             <props>  
-                 <prop key="ErrorPage/Exception">500</prop>  
-                 <prop key="ErrorPage/Exception">404</prop>  
-             </props>  
-         </property>  
+         </property>    
          <!-- 设置日志输出级别，不定义则默认不输出警告等错误日志信息 -->  
          <property name="warnLogCategory" value="WARN"></property>  
          <!-- 默认错误页面，当找不到上面mappings中指定的异常对应视图时，使用本默认配置 -->  
-         <property name="defaultErrorView" value="errors/error"></property>  
+         <property name="defaultErrorView" value="error/500"></property>  
          <!-- 默认HTTP状态码 -->  
          <property name="defaultStatusCode" value="500"></property>  
      </bean>  
 
 	
     <mvc:interceptors>
-    	<mvc:interceptor>
-	    	<mvc:mapping path="/**" />
-	    	<mvc:exclude-mapping path="/"/>
-	    	<mvc:exclude-mapping path="/userAction/login_view"/>
-	    	<mvc:exclude-mapping path="/userAction/login"/>
-	    	<mvc:exclude-mapping path="/main/top"/>
-	    	<mvc:exclude-mapping path="/main/welcome"/>
-	    	<mvc:exclude-mapping path="/main/nav"/>
-	    	<mvc:exclude-mapping path="/css/**"/>
-	    	<mvc:exclude-mapping path="/js/**"/>
-	    	<mvc:exclude-mapping path="/images/**"/>
-	    	<bean class="com.zml.oa.interceptor.LoginInterceptor" />
-    	</mvc:interceptor>
     	<!-- 分页拦截器 -->
     	<mvc:interceptor>
 	    	<mvc:mapping path="/**" />

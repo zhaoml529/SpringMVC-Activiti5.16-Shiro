@@ -8,10 +8,10 @@
 </head>
 
 <frameset rows="69,*" cols="*" frameborder="no" border="0" framespacing="0">
-  <frame src="${ctx}/main/top" name="topFrame" scrolling="no" noresize="noresize" id="topFrame" title="topFrame" />
+  <frame src="${ctx}/top" name="topFrame" scrolling="no" noresize="noresize" id="topFrame" title="topFrame" />
   <frameset rows="*" cols="195,*" framespacing="0" frameborder="no" border="0">
-    <frame src="${ctx}/main/nav" name="navFrame" scrolling="yes" noresize="noresize" id="navFrame" title="leftFrame" />
-    <frame src="${ctx}/main/welcome" name="mainFrame" id="mainFrame" title="mainFrame" />
+    <frame src="${ctx}/nav" name="navFrame" scrolling="yes" noresize="noresize" id="navFrame" title="leftFrame" />
+    <frame src="${ctx}/welcome" name="mainFrame" id="mainFrame" title="mainFrame" />
   </frameset>
 </frameset>
 <noframes>

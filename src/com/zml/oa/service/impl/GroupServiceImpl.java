@@ -14,7 +14,6 @@ import com.zml.oa.service.IGroupService;
 public class GroupServiceImpl extends BaseServiceImpl<Group> implements IGroupService {
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<Group> getGroupList() throws Exception{
 		List<Group> list = getAllList("Group");
 		return list;

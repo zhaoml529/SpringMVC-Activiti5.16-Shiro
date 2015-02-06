@@ -29,7 +29,7 @@ public class BaseDaoImpl<T> implements IBaseDao<T> {
 	
 	@Override
 	public Serializable add(T bean) throws Exception{
-		return this.getSession().save(bean) ;
+		return getSession().save(bean) ;
 	}
 	
 	@Override

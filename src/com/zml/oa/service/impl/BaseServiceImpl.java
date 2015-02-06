@@ -47,7 +47,6 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<T> getAllList(String tableSimpleName) throws Exception{
 		StringBuffer sff = new StringBuffer();  
         sff.append("select a from ").append(tableSimpleName).append(" a ");  
@@ -56,7 +55,6 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public T getUnique(String tableSimpleName, String[] columns, String[] values) throws Exception{
 		StringBuffer sb = new StringBuffer();  
         sb.append("select a from ").append(tableSimpleName).append( " a where ");  
@@ -76,7 +74,6 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 	}
 	
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<T> findByWhere(String tableSimpleName, String[] columns,
 			String[] values) throws Exception{
 		StringBuffer sb = new StringBuffer();  
@@ -96,7 +93,6 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<T> getCount(String tableSimpleName) throws Exception{
     	String hql = "select count(*) from " + tableSimpleName;
     	List<T> list = this.baseDao.createQuery(hql);
@@ -104,37 +100,31 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	public Serializable add(T bean) throws Exception{
 		return this.baseDao.add(bean);
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	public void saveOrUpdate(T bean) throws Exception{
 		this.baseDao.saveOrUpdate(bean);
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	public void delete(T bean) throws Exception{
 		this.baseDao.delete(bean);
 	}
 
 	@Override
-	@Transactional(rollbackFor=Exception.class)
 	public void update(T bean) throws Exception{
 		this.baseDao.update(bean);
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public T getBean(Class<T> obj, Serializable id) throws Exception{
 		return this.baseDao.getBean(obj, id);
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<T> findByPage(String tableSimpleName, String[] columns, String[] values) throws Exception{
 		Pagination pagination = PaginationThreadUtils.get();
 		if (pagination == null) {

@@ -7,11 +7,11 @@
  */
 package com.zml.oa.service.impl;
 
+import java.io.Serializable;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.zml.oa.entity.User;
 import com.zml.oa.service.IUserService;
@@ -28,9 +28,10 @@ import com.zml.oa.util.BeanUtils;
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User> implements IUserService {
 
+    @Autowired
+    private PasswordHelper passwordHelper;
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public User getUserByName(String user_name) throws Exception{
 		User user = getUnique("User", new String[]{"name"}, new String[] {user_name});
 		if(BeanUtils.isBlank(user)){
@@ -41,7 +42,6 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<User> getUserList_page() throws Exception{
 		List<User> list = findByPage("User", new String[]{}, new String[]{});
 		return list;
@@ -50,6 +50,25 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
 	@Override
 	public User getUserById(Integer id) throws Exception {
 		return getUnique("User", new String[]{"id"}, new String[]{id.toString()});
+	}
+
+	@Override
+	public Serializable doAdd(User user) throws Exception {
+        //加密密码
+        passwordHelper.encryptPassword(user);
+		return add(user);
+	}
+
+	@Override
+	public void doUpdate(User user) throws Exception {
+		//pwd 为修改后的
+		passwordHelper.encryptPassword(user);
+		update(user);
+	}
+
+	@Override
+	public void doDelete(User user) throws Exception {
+		delete(user);
 	}
 	
 

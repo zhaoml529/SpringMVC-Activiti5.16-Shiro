@@ -9,12 +9,12 @@
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!-- 缓存管理器 -->
-    <bean id="cacheManager" class="com.github.zhangkaitao.shiro.spring.SpringCacheManagerWrapper">
+    <bean id="cacheManager" class="com.zml.oa.shiro.cache.CacheManagerWrapper">
         <property name="cacheManager" ref="springCacheManager"/>
     </bean>
 
     <!-- 凭证匹配器 -->
-    <bean id="credentialsMatcher" class="com.zml.oa.credentials.RetryLimitHashedCredentialsMatcher">
+    <bean id="credentialsMatcher" class="com.zml.oa.shiro.credentials.RetryLimitHashedCredentialsMatcher">
         <constructor-arg ref="cacheManager"/>
         <property name="hashAlgorithmName" value="md5"/>
         <property name="hashIterations" value="2"/>
@@ -22,13 +22,13 @@
     </bean>
 
     <!-- Realm实现 -->
-    <bean id="userRealm" class="com.zml.oa.realm.UserRealm">
+    <bean id="userRealm" class="com.zml.oa.shiro.realm.UserRealm">
         <property name="credentialsMatcher" ref="credentialsMatcher"/>
         <property name="cachingEnabled" value="false"/>
-		<!--<property name="authenticationCachingEnabled" value="true"/> --><!-- 启用身份验证缓存，即缓存AuthenticationInfo信息，默认false -->
-		<!--<property name="authenticationCacheName" value="authenticationCache"/> --><!-- 缓存AuthenticationInfo信息的缓存名称 -->
-		<!--<property name="authorizationCachingEnabled" value="true"/> --><!-- 启用授权缓存，即缓存AuthorizationInfo信息，默认false -->
-		<!--<property name="authorizationCacheName" value="authorizationCache"/> --><!-- 缓存AuthorizationInfo信息的缓存名称 -->
+		<property name="authenticationCachingEnabled" value="true"/><!-- 启用身份验证缓存，即缓存AuthenticationInfo信息，默认false -->
+		<property name="authenticationCacheName" value="authenticationCache"/><!-- 缓存AuthenticationInfo信息的缓存名称 -->
+		<property name="authorizationCachingEnabled" value="true"/><!-- 启用授权缓存，即缓存AuthorizationInfo信息，默认false -->
+		<property name="authorizationCacheName" value="authorizationCache"/><!-- 缓存AuthorizationInfo信息的缓存名称 -->
     </bean>
 
     <!-- 会话ID生成器 -->
@@ -37,43 +37,46 @@
     <!-- 会话Cookie模板 -->
     <bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
         <constructor-arg value="sid"/>
-        <property name="httpOnly" value="true"/>
-        <property name="maxAge" value="-1"/>
+        <property name="httpOnly" value="true"/><!-- 有助于减少跨站点脚本攻击 -->
+        <property name="maxAge" value="-1"/><!-- 关闭浏览器时过期cookie -->
     </bean>
 
     <bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
         <constructor-arg value="rememberMe"/>
         <property name="httpOnly" value="true"/>
-        <property name="maxAge" value="2592000"/><!-- 30天 -->
+        <property name="maxAge" value="2592000"/><!-- 30天  maxAge=-1表示浏览器关闭时失效此 Cookie-->
     </bean>
 
     <!-- rememberMe管理器 -->
     <bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
         <!-- rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度（128 256 512 位）-->
+        <!-- cipherKey是加密rememberMe Cookie的密钥；默认AES算法 -->
         <property name="cipherKey"
                   value="#{T(org.apache.shiro.codec.Base64).decode('4AvVhmFLUs0KTA3Kprsdag==')}"/>
         <property name="cookie" ref="rememberMeCookie"/>
     </bean>
 
-    <!-- 会话DAO -->
+    <!-- 会话DAO 用于会话的CRUD-->
     <bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+    	<!-- 设置Session缓存名字，默认就是shiro-activeSessionCache -->
         <property name="activeSessionsCacheName" value="shiro-activeSessionCache"/>
         <property name="sessionIdGenerator" ref="sessionIdGenerator"/>
     </bean>
 
     <!-- 会话验证调度器 -->
     <bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler">
-        <property name="sessionValidationInterval" value="1800000"/>
+        <property name="sessionValidationInterval" value="1800000"/> <!--设置调度时间间隔 半小时  默认值为1小时-->
         <property name="sessionManager" ref="sessionManager"/>
     </bean>
 
     <!-- 会话管理器 -->
     <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-        <property name="globalSessionTimeout" value="1800000"/>
-        <property name="deleteInvalidSessions" value="true"/>
-        <property name="sessionValidationSchedulerEnabled" value="true"/>
-        <property name="sessionValidationScheduler" ref="sessionValidationScheduler"/>
+        <property name="globalSessionTimeout" value="1800000"/> <!-- 设置全局会话超时时间 半小时 -->
+        <property name="deleteInvalidSessions" value="true"/> <!-- 删除过期的会话 -->
+        <property name="sessionValidationSchedulerEnabled" value="true"/> <!-- 是否开启会话验证器 默认开启 -->
+        <property name="sessionValidationScheduler" ref="sessionValidationScheduler"/> <!-- 设置会话调度器 -->
         <property name="sessionDAO" ref="sessionDAO"/>
+        <!-- 是否启用Session Id Cookie,默认是启动；如果是禁用则默认使用servlet容器的 JSESSIONID -->
         <property name="sessionIdCookieEnabled" value="true"/>
         <property name="sessionIdCookie" ref="sessionIdCookie"/>
     </bean>
@@ -93,31 +96,67 @@
     </bean>
 
     <!-- 基于Form表单的身份验证过滤器 -->
-    <bean id="formAuthenticationFilter" class="org.apache.shiro.web.filter.authc.FormAuthenticationFilter">
-        <property name="usernameParam" value="username"/>
-        <property name="passwordParam" value="password"/>
+    <bean id="formAuthenticationFilter" class="com.zml.oa.shiro.filter.CustomFormAuthenticationFilter">
+        <property name="usernameParam" value="name"/>   <!-- 指定登录表单提交的用户名参数名 -->
+        <property name="passwordParam" value="passwd"/>   <!-- 指定登录表单提交的密码参数名 -->
         <property name="rememberMeParam" value="rememberMe"/>
-        <property name="loginUrl" value="/login"/>
+        <!-- <property name="successUrl" value="/"/> 指定登录成功后重定向的默认地址（默认是“/”）（如果有上一个地址会自动重定向带该地址）-->
+        <!-- <property name="failureKeyAttribute" value="shiroLoginFailure" />  failureKeyAttribute指定登录失败时的 request属性 key（默认 shiroLoginFailure） -->
+        <property name="loginUrl" value="/loginAction/login"/>			<!-- 指定身份验证的登录表单 -->
+    </bean>
+    
+	<!-- 验证码 -->
+    <bean id="jCaptchaValidateFilter" class="com.zml.oa.shiro.jcaptcha.JCaptchaValidateFilter">
+        <property name="jcaptchaEbabled" value="true"/>			<!-- 开启验证码支持 -->
+        <property name="jcaptchaParam" value="jcaptchaCode"/>	<!-- 前台提交的验证码参数名 -->
+        <property name="failureKeyAttribute" value="shiroLoginFailure"/>	<!-- 验证码验证失败后存储到的属性名 -->
     </bean>
 
-    <bean id="sysUserFilter" class="com.zml.oa.filter.SysUserFilter"/>
+	<!-- 并发登录控制 -->
+	<bean id="kickoutSessionControlFilter" class="com.zml.oa.shiro.filter.KickoutSessionControlFilter">
+        <property name="cacheManager" ref="cacheManager"/>		<!-- 用于保存用户—会话之间的关系的 -->
+        <property name="sessionManager" ref="sessionManager"/>	<!-- 用于根据会话ID，获取会话进行踢出操作的 -->
+        <property name="kickoutAfter" value="false"/>			<!-- 是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户 -->
+        <property name="maxSession" value="1"/>					<!-- 比如 2 的意思是同一个用户允许最多同时两个人登录 -->
+        <property name="kickoutUrl" value="/loginAction/login?kickout=1"/>	<!-- 被踢出后重定向到的地址 -->
+    </bean>
+
+    <bean id="forceLogoutFilter" class="com.zml.oa.shiro.filter.ForceLogoutFilter"/>
 
     <!-- Shiro的Web过滤器 -->
+    <!-- 
+   	   <value>
+           /login = authc			authc拦截器表示需要通过身份验证才能登录,anon为不需要登录即可访问
+           /logout = logout			指定退出地址是/logout，其会自动委托给 SecurityManager.logout方法退出
+           /authenticated = authc   访问authenticated这个url时要先通过身份验证
+           /index.jsp = authc
+           /userAction/login = anon
+           /** = user,sysUser       访问该地址的用户是身份验证通过或RememberMe登录的都可以；user、authc、logout都为Shiro默认的拦截器
+       </value>
+    -->
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
-        <property name="loginUrl" value="/login"/>
+        <property name="loginUrl" value="/loginAction/login"/>
         <property name="filters">
             <util:map>
                 <entry key="authc" value-ref="formAuthenticationFilter"/>
-                <entry key="sysUser" value-ref="sysUserFilter"/>
+                <entry key="kickout" value-ref="kickoutSessionControlFilter"/>
+                <entry key="jCaptchaValidate" value-ref="jCaptchaValidateFilter"/>
+                <entry key="forceLogout" value-ref="forceLogoutFilter"/>
             </util:map>
         </property>
         <property name="filterChainDefinitions">
             <value>
-                /login = authc
+                /loginAction/login = jCaptchaValidate,authc
+                /taglibs.jsp = anon
                 /logout = logout
-                /authenticated = authc
-                /** = user,sysUser
+                /userAction/toAdd = anon
+                /userAction/doAdd = anon
+                /jcaptcha* = anon
+                /images/**=anon 
+             	/js/**=anon
+            	/css/**=anon
+                /** = user,forceLogout,kickout
             </value>
         </property>
     </bean>

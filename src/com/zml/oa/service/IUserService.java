@@ -7,6 +7,7 @@
  */
 package com.zml.oa.service;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.zml.oa.entity.User;
@@ -18,11 +19,19 @@ import com.zml.oa.entity.User;
  * @date: 2014-11-9 上午12:39:07
  *
  */
-public interface IUserService extends IBaseService<User>{
+public interface IUserService {
 
 	public List<User> getUserList_page() throws Exception;
 	
 	public User getUserByName(String user_name) throws Exception;
 
 	public User getUserById(Integer id) throws Exception;
+	
+	public Serializable doAdd(User user) throws Exception;
+	
+	public void doUpdate(User user) throws Exception;
+	
+	public void doDelete(User user) throws Exception;
 }
+
+

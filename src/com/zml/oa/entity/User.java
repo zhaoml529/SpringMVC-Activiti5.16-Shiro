@@ -48,11 +48,16 @@ public class User implements Serializable{
 	@Column(name = "USER_PWD")
 	private String passwd;
 	
+	@Column(name = "USER_SALT")
+	private String salt; // 加密密码的盐
+	
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
 	@Column(name = "REG_DATE")
 	private Date registerDate;
 	
+	@Column(name = "LOCKED")
+    private Integer locked;
 	
 	//bi-directional many-to-many association to Group
 //    @ManyToMany
@@ -120,6 +125,24 @@ public class User implements Serializable{
 	public void setGroup(Group group) {
 		this.group = group;
 	}
-    
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
+
+	public Integer getLocked() {
+		return locked;
+	}
+
+	public void setLocked(Integer locked) {
+		this.locked = locked;
+	}
 	
+    public String getCredentialsSalt() {
+        return name + salt;
+    }
 }

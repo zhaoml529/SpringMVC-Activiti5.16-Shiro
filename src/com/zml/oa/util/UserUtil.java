@@ -12,8 +12,6 @@ import com.zml.oa.entity.User;
  */
 public class UserUtil {
 
-    public static final String USER = "user";
-
     /**
      * 设置用户到session
      *
@@ -21,7 +19,7 @@ public class UserUtil {
      * @param user
      */
     public static void saveUserToSession(HttpSession session, User user) {
-        session.setAttribute(USER, user);
+        session.setAttribute(Constants.CURRENT_USER, user);
     }
 
     /**
@@ -31,7 +29,7 @@ public class UserUtil {
      * @return
      */
     public static User getUserFromSession(HttpSession session) {
-        Object attribute = session.getAttribute(USER);
+        Object attribute = session.getAttribute(Constants.CURRENT_USER);
         return attribute == null ? null : (User) attribute;
     }
 
@@ -40,6 +38,6 @@ public class UserUtil {
      * @param session
      */
     public static void removeUserFromSession(HttpSession session) {
-    	session.removeAttribute(USER);
+    	session.removeAttribute(Constants.CURRENT_USER);
     }
 }
