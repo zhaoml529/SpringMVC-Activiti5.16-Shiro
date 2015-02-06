@@ -1,3 +1,11 @@
+/applicationContext.xml
+/bpmn/
 /com/
-/spring-config-cache.xml
+/deploy/
 /ehcache/
+/jdbc.properties
+/log4j.properties
+/spring-config-cache.xml
+/spring-config-shiro.xml
+/springMVC.xml
+/sql/
