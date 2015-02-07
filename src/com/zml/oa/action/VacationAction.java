@@ -76,7 +76,7 @@ public class VacationAction {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequiresPermissions("*:vacation:list")
+	@RequiresPermissions("user:vacation:list")
 	@RequestMapping("/toList_page")
 	public String toList(HttpSession session, Model model) throws Exception{
 		User user = UserUtil.getUserFromSession(session);
@@ -99,7 +99,7 @@ public class VacationAction {
 	 * @param model
 	 * @return
 	 */
-	@RequiresPermissions("user:vacation:*")
+	@RequiresPermissions("user:vacation:toAdd")
 	@RequestMapping(value = "/toAdd", method = RequestMethod.GET)
 	public ModelAndView toAdd(Model model){
 		if(!model.containsAttribute("vacation")) {
@@ -115,7 +115,7 @@ public class VacationAction {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequiresPermissions("*:vacation:details")
+	@RequiresPermissions("user:vacation:details")
 	@RequestMapping(value="/details/{id}", method = RequestMethod.GET)
 	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
 		Vacation vacation = this.vacationService.findById(id);
@@ -128,7 +128,7 @@ public class VacationAction {
      *
      * @param leave
      */
-	@RequiresPermissions("*:vacation:doAdd")
+	@RequiresPermissions("user:vacation:doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
 	public String doAdd(
 			@ModelAttribute("vacation") @Valid Vacation vacation,BindingResult results, 
@@ -184,7 +184,7 @@ public class VacationAction {
      * @throws NumberFormatException
      * @throws Exception
      */
-	@RequiresPermissions("*:vacation:toApproval") 	//*代表 经理、总监、人力
+	@RequiresPermissions("user:vacation:toApproval") 	//*代表 经理、总监、人力
     @RequestMapping("/toApproval/{taskId}")
     public String toApproval(@PathVariable("taskId") String taskId, Model model) throws NumberFormatException, Exception{
     	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -218,7 +218,7 @@ public class VacationAction {
      * @return
      * @throws Exception
      */
-	@RequiresPermissions("user:*:complate")  //也可以根据请假业务写成   *:manager,director,hr:complate  
+	@RequiresPermissions("user:vacation:complate")  //数据库中权限字符串为user:*:complate， 通配符*匹配到vacation所以有权限操作 
     @RequestMapping("/complate/{taskId}")
     public String complate(
     		@RequestParam("vacationId") Integer vacationId,
@@ -262,7 +262,7 @@ public class VacationAction {
      * @return
      * @throws Exception 
      */
-	@RequiresPermissions("user:*:modify")
+	@RequiresPermissions("user:vacation:modify")
 	@RequestMapping(value = "/modifyVacation/{taskId}", method = RequestMethod.POST)
 	public String modifyVacation(
 			@ModelAttribute("vacation") @Valid Vacation vacation,

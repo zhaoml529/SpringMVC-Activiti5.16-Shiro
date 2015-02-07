@@ -68,7 +68,7 @@ public class ExpenseAction {
 	 * @param model
 	 * @return
 	 */
-	@RequiresPermissions("user:expense:*")
+	@RequiresPermissions("user:expense:toAdd")
 	@RequestMapping(value = "/toAdd", method = RequestMethod.GET)
 	public ModelAndView toAdd(Model model){
 		if(!model.containsAttribute("expense")) {
@@ -84,7 +84,7 @@ public class ExpenseAction {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequiresPermissions("*:expense:details")
+	@RequiresPermissions("user:expense:details")
 	@RequestMapping(value="/details/{id}", method = RequestMethod.GET)
 	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
 		ExpenseAccount expense = this.expenseService.findById(id);
@@ -102,7 +102,7 @@ public class ExpenseAction {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequiresPermissions("*:expense:doAdd")
+	@RequiresPermissions("user:expense:doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
 	public String doAdd(
 			@ModelAttribute("expense") @Valid ExpenseAccount expense,BindingResult results, 
@@ -160,7 +160,7 @@ public class ExpenseAction {
      * @throws NumberFormatException
      * @throws Exception
      */
-	@RequiresPermissions("*:expense:toApproval") 	//*代表 财务， 如果业务编号，也可以代表其他角色
+	@RequiresPermissions("user:expense:toApproval") 	//*代表 财务， 如果业务编号，也可以代表其他角色
     @RequestMapping("/toApproval/{taskId}")
     public String toApproval(@PathVariable("taskId") String taskId, Model model) throws NumberFormatException, Exception{
     	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -185,7 +185,7 @@ public class ExpenseAction {
      * @return
      * @throws Exception
      */
-	@RequiresPermissions("user:*:complate")
+	@RequiresPermissions("user:expense:complate")
     @RequestMapping("/complate/{taskId}")
     public String complate(
     		@RequestParam("expenseId") Integer expenseId,
