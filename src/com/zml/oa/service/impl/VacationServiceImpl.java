@@ -29,20 +29,17 @@ public class VacationServiceImpl extends BaseServiceImpl<Vacation> implements IV
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<Vacation> toList(Integer userId) throws Exception {
 		List<Vacation> list = findByPage("Vacation", new String[]{"userId"}, new String[]{userId.toString()});
 		return list;
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public Vacation findById(Integer id) throws Exception {
 		return getUnique("Vacation", new String[]{"id"}, new String[]{id.toString()});
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<Vacation> findByStatus(Integer userId, String status) throws Exception {
 		List<Vacation> list = findByPage("Vacation", new String[]{"userId","status"}, new String[]{userId.toString(), status});
 		return list;

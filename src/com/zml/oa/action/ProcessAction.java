@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.log4j.Logger;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -56,6 +57,7 @@ public class ProcessAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@RequiresPermissions("*:task:todoTask")
 	@RequestMapping(value = "/todoTaskList_page", method = {RequestMethod.POST, RequestMethod.GET})
 	public String todoTaskList_page(HttpSession session, Model model) throws Exception{
 		String userId = UserUtil.getUserFromSession(session).getId().toString();
@@ -75,6 +77,7 @@ public class ProcessAction {
      * @throws NumberFormatException
      * @throws Exception
      */
+	@RequiresPermissions("*:task:doTask")
     @RequestMapping(value="/doTaskList_page", method = {RequestMethod.POST, RequestMethod.GET})
     public String doTaskList_page(HttpSession session, Model model) throws NumberFormatException, Exception{
     	User user = UserUtil.getUserFromSession(session);
@@ -88,6 +91,7 @@ public class ProcessAction {
 	 * 签收任务
 	 * @return
 	 */
+	@RequiresPermissions("*:task:claim")
 	@RequestMapping("/claim/{taskId}")
 	public String claim(@PathVariable("taskId") String taskId, HttpSession session, RedirectAttributes redirectAttributes) throws Exception{
 		User user = UserUtil.getUserFromSession(session);
@@ -141,6 +145,7 @@ public class ProcessAction {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("*:process:trace")
     @RequestMapping(value = "/process/trace/{pid}")
     @ResponseBody
     public List<Map<String, Object>> traceProcess(@PathVariable("pid") String processInstanceId) throws Exception {
@@ -150,11 +155,12 @@ public class ProcessAction {
     
     
     /**
-     * 读取已结束中的流程
+     * 读取已结束的流程
      *
      * @return
      * @throws Exception 
      */
+    @RequiresPermissions("*:process:finished")
     @RequestMapping(value = "/process/finished")
     public String findFinishedProcessInstaces(Model model) throws Exception {
         //待完成，见ProcessService
@@ -170,6 +176,7 @@ public class ProcessAction {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("process:*:running") //process:vacation,salary,expense:running
     @RequestMapping(value="/process/runingProcessInstance/{businessType}/list_page")
     public String getRuningProcessInstance(@PathVariable("businessType") String businessType,HttpSession session , Model model) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
@@ -198,6 +205,7 @@ public class ProcessAction {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("admin:process:*")
     @RequestMapping(value="/process/runningProcess_page")
     public String listRuningProcess(Model model) throws Exception{
     	List<ProcessInstance> list = this.processService.listRuningProcess(model);
@@ -213,6 +221,7 @@ public class ProcessAction {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("admin:process:suspend,active")
     @RequestMapping(value = "process/updateProcessStatus/{status}/{processInstanceId}")
     public String updateProcessStatus(
     		@PathVariable("status") String status, 

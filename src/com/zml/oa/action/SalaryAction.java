@@ -16,6 +16,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.log4j.Logger;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -76,6 +77,7 @@ public class SalaryAction {
 	 * @param model
 	 * @return
 	 */
+	@RequiresPermissions("user:salary:*")
 	@RequestMapping(value = "/toAdd", method = RequestMethod.GET)
 	public ModelAndView toAdd(Model model){
 		if(!model.containsAttribute("salary")) {
@@ -91,6 +93,7 @@ public class SalaryAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@RequiresPermissions("*:salary:details")
 	@RequestMapping(value="/details/{id}", method = RequestMethod.GET)
 	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
 		SalaryAdjust salaryAd = this.saService.findById(id);
@@ -108,6 +111,7 @@ public class SalaryAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@RequiresPermissions("*:salary:doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
 	public String doAdd(
 			@ModelAttribute("salary") @Valid SalaryAdjust salary,BindingResult results, 
@@ -176,6 +180,7 @@ public class SalaryAction {
      * @throws NumberFormatException
      * @throws Exception
      */
+	@RequiresPermissions("*:salary:toApproval")
     @RequestMapping("/toApproval/{taskId}")
     public String toApproval(@PathVariable("taskId") String taskId, Model model) throws NumberFormatException, Exception{
     	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -199,6 +204,7 @@ public class SalaryAction {
     	return result;
     }
     
+	@RequiresPermissions("user:*:complate")
     @RequestMapping("/complate/{taskId}")
     public String complate(
     		@RequestParam("salaryAdjustId") Integer salaryAdjustId,
@@ -242,6 +248,7 @@ public class SalaryAction {
      * @return
      * @throws Exception 
      */
+	@RequiresPermissions("user:*:modify")
     @RequestMapping("/modifySalary/{taskId}")
     public String modifySalary(
     		@ModelAttribute("salary") @Valid SalaryAdjust salary,

@@ -109,7 +109,6 @@ public class ProcessServiceImp implements IProcessService{
      * @return
      */
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> findTodoTask(User user, Model model){
     	// 根据当前用户组查询
 //      TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
@@ -128,7 +127,6 @@ public class ProcessServiceImp implements IProcessService{
      * @return
      */
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> findDoTask(User user, Model model){
     	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
     	Integer totalSum = taskQuery.list().size();
@@ -144,7 +142,6 @@ public class ProcessServiceImp implements IProcessService{
      * @param tasks
      * @return
      */
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     protected List<BaseVO> getBaseVOList(List<Task> tasks) {
     	List<BaseVO> taskList = new ArrayList<BaseVO>();
         for (Task task : tasks) {
@@ -170,7 +167,6 @@ public class ProcessServiceImp implements IProcessService{
      * @param processDefinitionId 流程定义ID
      * @return
      */
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     protected ProcessDefinition getProcessDefinition(String processDefinitionId) {
         ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
         logger.info(processDefinition.getVersion());
@@ -183,7 +179,6 @@ public class ProcessServiceImp implements IProcessService{
      * @param taskId
      */
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public void doClaim(User user, String taskId){
     	this.identityService.setAuthenticatedUserId(user.getId().toString());
         this.taskService.claim(taskId, user.getId().toString());
@@ -198,7 +193,6 @@ public class ProcessServiceImp implements IProcessService{
 	 * @throws Exception
 	 */
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<CommentVO> getComments(String processInstanceId) throws Exception{
 		// 查询一个任务所在流程的全部评论
 		List<Comment> comments = this.taskService.getProcessInstanceComments(processInstanceId);
@@ -244,7 +238,6 @@ public class ProcessServiceImp implements IProcessService{
      * @return
      */
     @Override
-    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public InputStream getDiagram(String processInstanceId){
     	ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processInstance.getProcessDefinitionId());
@@ -270,7 +263,6 @@ public class ProcessServiceImp implements IProcessService{
      * @return
      */
     @Override
-    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public InputStream getDiagram_noTrace(String resourceType, String processInstanceId){
     	
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
@@ -293,7 +285,6 @@ public class ProcessServiceImp implements IProcessService{
      * @return
      */
     @Override
-    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public String findFinishedProcessInstaces(Model model) {
         HistoricProcessInstanceQuery historQuery = historyService.createHistoricProcessInstanceQuery().finished();
         Integer totalSum = historQuery.list().size();
@@ -310,7 +301,6 @@ public class ProcessServiceImp implements IProcessService{
      * @throws Exception
      */
     @Override
-    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> listRuningVacation(User user) throws Exception{
     	List<Vacation> listVacation = this.vacationService.findByStatus(user.getId(), BaseVO.PENDING);
 		List<BaseVO> result = new ArrayList<BaseVO>();
@@ -343,7 +333,6 @@ public class ProcessServiceImp implements IProcessService{
      * @throws Exception
      */
     @Override
-    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
     public List<BaseVO> listRuningExpense(User user) throws Exception{
     	List<ExpenseAccount> listVacation = this.expenseService.findByStatus(user.getId(), BaseVO.PENDING);
 		List<BaseVO> result = new ArrayList<BaseVO>();
@@ -376,7 +365,6 @@ public class ProcessServiceImp implements IProcessService{
      * @throws Exception
      */
     @Override
-    @Transactional(propagation=Propagation.NOT_SUPPORTED, readOnly=true)
 	public List<BaseVO> listRuningSalaryAdjust(User user) throws Exception {
     	List<SalaryAdjust> listSalary = this.saService.findByStatus(user.getId(), BaseVO.PENDING);
     	List<BaseVO> result = new ArrayList<BaseVO>();
@@ -403,7 +391,6 @@ public class ProcessServiceImp implements IProcessService{
     
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	public String startSalaryAdjust(SalaryAdjust salary) throws Exception {
 		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
         this.identityService.setAuthenticatedUserId(salary.getUserId().toString());
