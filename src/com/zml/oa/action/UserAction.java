@@ -59,6 +59,7 @@ public class UserAction {
 	@Autowired
     private SessionDAO sessionDAO;
 	
+	@RequiresPermissions("admin:*")
 	@RequestMapping("/toList_page")
 	public String userList_page(HttpServletRequest request, Model model) throws Exception{
 		List<User> listUser = this.userService.getUserList_page();
@@ -69,6 +70,7 @@ public class UserAction {
 		return "user/list_user";
 	}
 	
+	//此方法没用到，用Shiro提供的授权和认证服务
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String login(@RequestParam("name")String name, @RequestParam("passwd")String passwd, HttpServletRequest request, Model model) throws Exception{
 		logger.info("login - username=" + name + ", password=" + passwd);
@@ -88,18 +90,6 @@ public class UserAction {
 			logger.info(name+" 用户名不存在");
 			return "login";
 		}
-	}
-	
-	@RequestMapping("/logout")
-	public String logout(HttpSession session){
-		UserUtil.removeUserFromSession(session);
-		return "login";
-	}
-	
-	@RequestMapping("/login_view")
-	public String login_view(){
-		logger.info("跳转登录页面");
-		return "login";
 	}
 
 	@RequiresPermissions("admin:user:toAdd")

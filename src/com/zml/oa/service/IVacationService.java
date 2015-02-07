@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.zml.oa.entity.Vacation;
 
-public interface IVacationService extends IBaseService<Vacation> {
+public interface IVacationService {
 
 	public Serializable doAdd(Vacation vacation) throws Exception;
 	

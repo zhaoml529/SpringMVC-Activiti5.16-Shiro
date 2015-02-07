@@ -11,7 +11,7 @@ import com.zml.oa.entity.Group;
  * @date: 2014-11-27 下午15:05:07
  *
  */
-public interface IGroupService extends IBaseService<Group> {
+public interface IGroupService {
 
 	public List<Group> getGroupList() throws Exception;
 	

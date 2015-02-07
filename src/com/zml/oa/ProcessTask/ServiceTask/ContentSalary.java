@@ -42,7 +42,7 @@ public class ContentSalary implements JavaDelegate {
 		Salary salary = this.salaryService.findByUserId(salaryAdjust.getUserId().toString());
 		BigDecimal newMoney = salaryAdjust.getAdjustMoney();
 		salary.setBaseMoney(newMoney);
-		this.salaryService.update(salary);
+		this.salaryService.doUpdate(salary);
 		
 	}
 

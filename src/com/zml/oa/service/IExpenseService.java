@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.zml.oa.entity.ExpenseAccount;
 
-public interface IExpenseService extends IBaseService<ExpenseAccount>{
+public interface IExpenseService {
 
 	public Serializable doAdd(ExpenseAccount bean) throws Exception;
 	

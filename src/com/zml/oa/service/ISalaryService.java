@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.zml.oa.entity.Salary;
 
-public interface ISalaryService extends IBaseService<Salary> {
+public interface ISalaryService {
 
 	public Serializable doAdd(Salary salary) throws Exception;
 	

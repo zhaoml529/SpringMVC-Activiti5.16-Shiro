@@ -149,7 +149,7 @@ public class VacationAction {
         vacation.setBusinessType(BaseVO.VACATION); 			//业务类型：请假申请
         vacation.setStatus(BaseVO.PENDING);					//审批中
         vacation.setApplyDate(new Date());
-        this.vacationService.add(vacation);
+        this.vacationService.doAdd(vacation);
         String businessKey = vacation.getId().toString();
         vacation.setBusinessKey(businessKey);
         try {
@@ -236,7 +236,7 @@ public class VacationAction {
 			vacation.setStatus(BaseVO.APPROVAL_FAILED);
 			variables.put("entity", baseVacation);
 		}
-		this.vacationService.update(vacation);
+		this.vacationService.doUpdate(vacation);
 		// 完成任务
 		this.processService.complete(taskId, content, user.getId().toString(), variables);
 		
@@ -290,7 +290,7 @@ public class VacationAction {
 	        vacation.setApplyDate(new Date());
 	        vacation.setBusinessKey(vacation.getId().toString());
 	        vacation.setProcessInstanceId(processInstanceId);
-	        this.vacationService.update(vacation);
+	        this.vacationService.doUpdate(vacation);
 	        variables.put("entity", vacation);
 	        if(vacation.getDays() <= 3){
             	variables.put("auditGroup", "manager");

@@ -125,7 +125,7 @@ public class ExpenseAction {
         expense.setTitle(user.getName()+" 的报销申请");
         expense.setBusinessType(BaseVO.EXPENSE);
         expense.setStatus(BaseVO.PENDING);
-        this.expenseService.add(expense);
+        this.expenseService.doAdd(expense);
         String businessKey = expense.getId().toString();
         expense.setBusinessKey(businessKey);
         try{
@@ -192,7 +192,7 @@ public class ExpenseAction {
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("auditGroup", "finance");
 		expense.setStatus(BaseVO.APPROVAL_SUCCESS);
-		this.expenseService.update(expense);
+		this.expenseService.doUpdate(expense);
 		// 完成任务
 		this.processService.complete(taskId, null, user.getId().toString(), variables);
 		redirectAttributes.addFlashAttribute("message", "任务办理完成！");

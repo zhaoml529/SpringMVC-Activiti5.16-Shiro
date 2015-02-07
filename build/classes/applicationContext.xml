@@ -83,7 +83,7 @@
            	<tx:method name="doUpdate*" propagation="REQUIRED" />  
            	<tx:method name="doMerge*" propagation="REQUIRED" />  
            	<tx:method name="doDelete*" propagation="REQUIRED" />  
-           	<tx:method name="dRemove*" propagation="REQUIRED" />  
+           	<tx:method name="doRemove*" propagation="REQUIRED" />  
            	<tx:method name="delete" propagation="REQUIRED" />  
            	<tx:method name="doPut*" propagation="REQUIRED" />  
 
@@ -92,6 +92,7 @@
             <tx:method name="count*" propagation="REQUIRED" read-only="true"/>
             <tx:method name="find*" propagation="REQUIRED" read-only="true"/>
             <tx:method name="list*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="toList*" propagation="REQUIRED" read-only="true"/>
             <tx:method name="*" propagation="REQUIRED"/>
         </tx:attributes>
     </tx:advice>

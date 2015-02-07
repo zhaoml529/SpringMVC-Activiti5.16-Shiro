@@ -439,7 +439,7 @@ public class ProcessServiceImp implements IProcessService{
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.vacation", businessKey, variables);
         String processInstanceId = processInstance.getId();
         vacation.setProcessInstanceId(processInstanceId);
-        this.vacationService.update(vacation);
+        this.vacationService.doUpdate(vacation);
 
         logger.info("processInstanceId: "+processInstanceId);
         //最后要设置null，就是这么做，还没研究为什么
@@ -458,7 +458,7 @@ public class ProcessServiceImp implements IProcessService{
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.expense", businessKey, variables);
         String processInstanceId = processInstance.getId();
         expense.setProcessInstanceId(processInstanceId);
-        this.expenseService.update(expense);
+        this.expenseService.doUpdate(expense);
 
         logger.info("processInstanceId: "+processInstanceId);
         //最后要设置null，就是这么做，还没研究为什么
