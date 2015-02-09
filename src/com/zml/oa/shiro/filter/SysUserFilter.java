@@ -14,6 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.zml.oa.entity.User;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.util.Constants;
+/**
+ * 每次把用户信息放入request中，暂时没用。
+ * @author ZML
+ *
+ */
 
 public class SysUserFilter extends PathMatchingFilter {
     

@@ -19,7 +19,7 @@ import org.apache.shiro.web.util.WebUtils;
 
 /**
  * 用户踢出
- * @author Administrator
+ * @author zml
  *
  */
 

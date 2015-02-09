@@ -10,7 +10,7 @@ import org.apache.shiro.cache.CacheManager;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 
+ * 输错5次密码锁定2分钟，ehcache.xml配置
  * @author ZML
  *
  */
