@@ -1,7 +1,7 @@
 SpringOA简介
 ========
 
-基于SpringMVC+Activiti 5.16 的简单OA，可以快速入门Activiti学习用。
+基于SpringMVC+Shiro+Activiti 5.16 的简单OA，可以快速入门Activiti学习用。
 
 框架简介
 --------
@@ -11,14 +11,16 @@ SpringOA简介
 本项目以查询待办任务、查待受理任务、查看运行中的流程以及流程控制中的一些问题为基础入门Activiti。<br>
 功能有请假流程实例、报销流程实例、薪资调整流程实例等功能。<br>
 
+
 框架版本
 --------
 <ul>
 <li>Activiti 5.16</li>
-<li>Spring-3.2.2.RELEASE</li>
+<li>Spring-4.0.0.RELEASE</li>
+<li>shiro-all-1.2.3</li>
 <li>Hibernate-4.2.2.Final</li>
 <li>Hibernate-validator-4.2.0.Final</li>
-<li>validation-api-1.0.0.GA.jar</li>
+<li>validation-api-1.0.0.GA</li>
 </ul>
 
 数据库
@@ -30,8 +32,8 @@ SpringOA简介
 
 后续功能
 --------
-1.加入安全框架Shiro.<br>
-2.加入缓存 ehcache.<br>
+1.加入安全框架Shiro. ---已实现<br>
+2.加入缓存 ehcache. --已实现<br>
 3.前端页面Extjs.<br>
 
 首页
