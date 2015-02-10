@@ -64,6 +64,7 @@
 		<div class="formDiv">
 			<span style="color:red; height: 30px;">${msg}</span>
 			<form method="post" action="">
+			<div style="margin: auto auto auto 40%; text-align: left;">
 				<div class="textDiv">
 					<span style="width: 300px; margin-right: 20px;">用户名: </span>
 					<input type="text" name="name" value="<shiro:principal/>"/>
@@ -75,15 +76,15 @@
 				</div>
 				<div class="textDiv">
 				<c:if test="${jcaptchaEbabled}"> 
-					<span style="width: 300px; margin-right: 40px;">验证码:</span> 
-					<input type="text" name="jcaptchaCode"> 
+					<span style="width: 300px; margin-right: 20px;">验证码:</span> 
+					<input type="text" name="jcaptchaCode" style="width: 100px"> 
 					<img class="jcaptcha-btn jcaptcha-img" src="${ctx}/jcaptcha.jpg" title="点击更换验证码"> 
 					<a class="jcaptcha-btn" href="javascript:;">换一张</a> 
-					</c:if> 
+				</c:if> 
 				</div>
 				<div class="textDiv">
-					<span style="width: 300px; margin-right: 40px;">记住我</span> 
-					<input type="checkbox" name="rememberMe" value="true">
+					<input type="checkbox" style="width: 50px" name="rememberMe" value="true">下次自动登录
+				</div>
 				</div>
 				<div class="buttonDiv">
 					<input type="submit" value="确定"/>
