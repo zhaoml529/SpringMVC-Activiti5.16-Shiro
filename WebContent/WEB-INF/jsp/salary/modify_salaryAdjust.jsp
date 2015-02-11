@@ -51,6 +51,22 @@
 								<textarea cols="33" rows="5" name="dscp">${salary.dscp }</textarea>
 							</td>
                         </tr>
+                        <tr>
+                       		<td width="15%" class="title1">评论：</td>
+                          	<td class="left">
+                          		
+								<table>
+									<c:forEach var="comment" items="${commentList}">
+									<tr>
+										<td>${comment.userName}- <fmt:formatDate value="${comment.time }" type="date" /> </td>
+									</tr>
+									<tr>
+										<td>${comment.content}</td>
+									</tr>
+									</c:forEach>
+								</table>
+							</td>
+                        </tr>
                       </tbody>
                    </table>
                 </div>
