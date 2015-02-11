@@ -10,6 +10,10 @@ import java.util.List;
  */
 public class UserTask implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8889804050417208965L;
 	private Integer id;
 	private String procDefKey;		//com.zml.oa.vacation
 	private String procDefName;		//请假申请

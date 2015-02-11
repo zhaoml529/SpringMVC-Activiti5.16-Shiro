@@ -13,11 +13,8 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.history.HistoricDetail;
-import org.activiti.engine.history.HistoricFormProperty;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -31,8 +28,6 @@ import org.activiti.spring.ProcessEngineFactoryBean;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import com.zml.oa.entity.BaseVO;
@@ -58,7 +53,6 @@ import com.zml.oa.util.BeanUtils;
  *
  */
 @Service
-@Transactional
 public class ProcessServiceImp implements IProcessService{
 
 	private static final Logger logger = Logger.getLogger(ProcessServiceImp.class);

@@ -3,8 +3,6 @@ package com.zml.oa.service.impl;
 import java.io.Serializable;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.zml.oa.entity.Salary;
 import com.zml.oa.service.ISalaryService;
