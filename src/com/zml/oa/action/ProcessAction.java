@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,9 +15,11 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -33,8 +37,10 @@ import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
+import com.zml.oa.service.activiti.WorkflowProcessDefinitionService;
 import com.zml.oa.service.activiti.WorkflowService;
 import com.zml.oa.util.UserUtil;
+import com.zml.oa.util.WorkflowUtils;
 
 /**
  * 流程控制类
@@ -59,6 +65,8 @@ public class ProcessAction {
 	@Autowired
 	private RepositoryService repositoryService;
 	
+	@Autowired
+	private WorkflowProcessDefinitionService workflowProcessDefinitionService;
     
     /**
 	 * 查询待办任务
@@ -332,6 +340,78 @@ public class ProcessAction {
     @RequestMapping(value = "/process/delete")
     public String delete(@RequestParam("deploymentId") String deploymentId) {
         repositoryService.deleteDeployment(deploymentId, true);
+        return "redirect:/processAction/process/listProcess_page";
+    }
+    
+    /**
+     * 导入部署
+     * @param exportDir
+     * @param file
+     * @return
+     */
+    @RequestMapping(value = "/process/deploy")
+    public String deploy(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, @RequestParam(value = "file", required = false) MultipartFile file) {
+    	//@Value("${export.diagram.path}")
+    	//@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
+        String fileName = file.getOriginalFilename();
+        try {
+            InputStream fileInputStream = file.getInputStream();
+            Deployment deployment = null;
+
+            String extension = FilenameUtils.getExtension(fileName);
+            if (extension.equals("zip") || extension.equals("bar")) {
+                ZipInputStream zip = new ZipInputStream(fileInputStream);
+                deployment = repositoryService.createDeployment().addZipInputStream(zip).deploy();
+            } else {
+                deployment = repositoryService.createDeployment().addInputStream(fileName, fileInputStream).deploy();
+            }
+
+            List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).list();
+
+            for (ProcessDefinition processDefinition : list) {
+                WorkflowUtils.exportDiagramToFile(repositoryService, processDefinition, exportDir);
+            }
+
+        } catch (Exception e) {
+            logger.error("error on deploy process, because of file input stream", e);
+        }
+
+        return "redirect:/processAction/process/listProcess_page";
+    }
+    
+    /**
+     * 部署全部流程
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/process/redeploy/all")
+    public String redeployAll(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, RedirectAttributes redirectAttributes) throws Exception {
+    	try {
+    		workflowProcessDefinitionService.deployAllFromClasspath(exportDir);
+    		redirectAttributes.addFlashAttribute("message", "已重新部署全部流程！");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
+			throw e;
+		}
+        return "redirect:/processAction/process/listProcess_page";
+    }
+    
+    /**
+     * 部署单个流程
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/process/redeploy/single")
+    public String redeploySingle(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, RedirectAttributes redirectAttributes) throws Exception {
+        try {
+        	workflowProcessDefinitionService.redeploySingleFrom(exportDir,"com.zml.oa.vacation");
+        	redirectAttributes.addFlashAttribute("message", "已重新部署全部流程！");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
+			throw e;
+		}
         return "redirect:/processAction/process/listProcess_page";
     }
 }
