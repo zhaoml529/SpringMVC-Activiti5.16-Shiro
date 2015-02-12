@@ -19,7 +19,6 @@ import com.zml.oa.service.ISalaryService;
  */
 
 @Component
-@Transactional
 public class RollbackSalaryApply implements JavaDelegate {
 
 	@Autowired

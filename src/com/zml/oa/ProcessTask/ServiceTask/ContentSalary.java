@@ -25,7 +25,6 @@ import com.zml.oa.service.ISalaryService;
  *
  */
 @Component
-@Transactional
 public class ContentSalary implements JavaDelegate {
 
 	@Autowired

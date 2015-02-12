@@ -6,7 +6,6 @@ import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.zml.oa.entity.ExpenseAccount;
 
@@ -18,7 +17,6 @@ import com.zml.oa.entity.ExpenseAccount;
  */
 
 @Component
-@Transactional
 public class BankTransfer implements JavaDelegate {
 
 	@Override
