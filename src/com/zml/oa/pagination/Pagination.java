@@ -15,7 +15,6 @@ public class Pagination {
 	protected String orderColumn;
 	protected String preName = "";
 	
-	
 	public String getOrderStr() {
 		return orderStr;
 	}
@@ -28,6 +27,7 @@ public class Pagination {
 	public void setOrderColumn(String orderColumn) {
 		this.orderColumn = orderColumn;
 	}
+
 	public Integer getFirstResult() {
 		return firstResult;
 	}
@@ -70,17 +70,18 @@ public class Pagination {
 	public void setPageStr(String pageStr) {
 		this.pageStr = pageStr;
 	}
-	public Integer getTotalSum() {
-		return totalSum;
-	}
-	public void setTotalSum(Integer totalSum) {
-		this.totalSum = totalSum;
-	}
+
 	public Integer getCurrentPage() {
 		return currentPage;
 	}
 	public void setCurrentPage(Integer currentPage) {
 		this.currentPage = currentPage;
+	}
+	public Integer getTotalPage() {
+		return totalPage;
+	}
+	public void setTotalPage(Integer totalPage) {
+		this.totalPage = totalPage;
 	}
 	public Integer getPrePage() {
 		return prePage;
@@ -94,13 +95,12 @@ public class Pagination {
 	public void setNextPage(Integer nextPage) {
 		this.nextPage = nextPage;
 	}
-	public Integer getTotalPage() {
-		return totalPage;
+	public Integer getTotalSum() {
+		return totalSum;
 	}
-	public void setTotalPage(Integer totalPage) {
-		this.totalPage = totalPage;
+	public void setTotalSum(Integer totalSum) {
+		this.totalSum = totalSum;
 	}
-	
 	//处理分页
 	public void processTotalPage()
 	{

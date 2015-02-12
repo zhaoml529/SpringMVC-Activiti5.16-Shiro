@@ -1,7 +1,9 @@
 package com.zml.oa.pagination;
 
-public class PaginationThreadUtils {
+import org.apache.log4j.Logger;
 
+public class PaginationThreadUtils {
+	private static final Logger logger = Logger.getLogger(PaginationThreadUtils.class);
 	private static final ThreadLocal<Pagination> pagination = new ThreadLocal<Pagination>();
 
 	public static Pagination get() {
@@ -21,4 +23,34 @@ public class PaginationThreadUtils {
 		pagination.remove();
 	}
 
+	/**
+	 * 计算分页
+	 * @param totalSum
+	 * @return
+	 */
+	public static int[] setPage(Integer totalSum) {
+		Pagination pagination = PaginationThreadUtils.get();
+		if (pagination == null) {
+			pagination = new Pagination();
+			PaginationThreadUtils.set(pagination);
+			pagination.setCurrentPage(1);
+		}
+		
+		if (pagination.getTotalSum() == 0) {
+			pagination.setTotalSum(totalSum);
+		}
+		logger.info("currentPage: "+pagination.getCurrentPage()+" pageNum: "+pagination.getPageNum());
+		int firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
+		int maxResult = pagination.getPageNum();
+		//校验分页情况
+		if (firstResult >= pagination.getTotalSum() || firstResult < 0) {
+			firstResult = 0;
+			pagination.setCurrentPage(1);
+		}
+		pagination.setFirstResult(firstResult);
+		pagination.setMaxResult(maxResult);
+		//分页处理
+		pagination.processTotalPage();
+		return new int[]{firstResult, maxResult};
+	}
 }
