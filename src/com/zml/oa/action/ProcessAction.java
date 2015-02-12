@@ -1,12 +1,18 @@
 package com.zml.oa.action;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Deployment;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -18,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
@@ -35,6 +42,7 @@ import com.zml.oa.util.UserUtil;
  *
  */
 @Controller
+@RequiresPermissions("admin:*")
 @RequestMapping("/processAction")
 public class ProcessAction {
 	private static final Logger logger = Logger.getLogger(ProcessAction.class);
@@ -47,6 +55,9 @@ public class ProcessAction {
 
 	@Autowired
 	private IProcessService processService;
+	
+	@Autowired
+	private RepositoryService repositoryService;
 	
     
     /**
@@ -117,19 +128,37 @@ public class ProcessAction {
 	        }
 	}
     
+    /**
+     * 显示图片通过部署id，不带流程跟踪(没有乱码问题)
+     * @param processDefinitionId
+     * @param resourceType
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "/process/resource/process-definition")
+    public void loadByDeployment(@RequestParam("processDefinitionId") String processDefinitionId, @RequestParam("resourceType") String resourceType,
+                                 HttpServletResponse response) throws Exception {
+    	InputStream resourceAsStream = this.processService.getDiagramByProDefinitionId_noTrace(resourceType, processDefinitionId);
+        byte[] b = new byte[1024];
+        int len = -1;
+        while ((len = resourceAsStream.read(b, 0, 1024)) != -1) {
+            response.getOutputStream().write(b, 0, len);
+        }
+    }
+    
     
     /**
-     * 显示图片，不带流程跟踪(没有乱码问题)
+     * 显示图片通过流程id，不带流程跟踪(没有乱码问题)-没用作为代码演示
      *
      * @param resourceType      资源类型(xml|image)
      * @param processInstanceId 流程实例ID
      * @param response
      * @throws Exception
      */
-    @RequestMapping(value = "/process/process-instance")
+    @RequestMapping(value = "/process/resource/process-instance")
     public void loadByProcessInstance(@RequestParam("type") String resourceType, @RequestParam("pid") String processInstanceId, HttpServletResponse response)
             throws Exception {
-        InputStream resourceAsStream = this.processService.getDiagram_noTrace(resourceType, processInstanceId);
+        InputStream resourceAsStream = this.processService.getDiagramByProInstanceId_noTrace(resourceType, processInstanceId);
         byte[] b = new byte[1024];
         int len = -1;
         while ((len = resourceAsStream.read(b, 0, 1024)) != -1) {
@@ -222,10 +251,11 @@ public class ProcessAction {
      * @throws Exception
      */
     @RequiresPermissions("admin:process:suspend,active")
-    @RequestMapping(value = "process/updateProcessStatus/{status}/{processInstanceId}")
+    @RequestMapping(value = "/process/updateProcessStatus/{status}/{processInstanceId}/{type}")
     public String updateProcessStatus(
     		@PathVariable("status") String status, 
     		@PathVariable("processInstanceId") String processInstanceId,
+    		@PathVariable("type") String type,
             RedirectAttributes redirectAttributes) throws Exception{
     	
     	if (status.equals("active")) {
@@ -235,6 +265,55 @@ public class ProcessAction {
         	this.processService.suspendProcessInstance(processInstanceId);
             redirectAttributes.addFlashAttribute("message", "已挂起ID为[ " + processInstanceId + " ]的流程实例。");
         }
-    	return "redirect:/processAction/process/runningProcess_page";
+    	String result = null;
+    	if("processDefinition".equals(type)){
+    		result = "redirect:/processAction/process/listProcess_page";
+    	}else if("".equals(type)){
+    		result = "redirect:/processAction/process/runningProcess_page";
+    	}
+    	return result;
+    }
+    
+    /**
+     * 流程定义
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @RequiresPermissions("admin:process:*")
+    @RequestMapping(value = "/process/listProcess_page")
+    public ModelAndView listProcess(HttpServletRequest request) throws Exception{
+    	ModelAndView mav = new ModelAndView("workflow/list_process");
+    	
+    	//objects保存两个对象，Object[0]:是ProcessDefinition（流程定义），Object[1]:是Deployment（流程部署）
+    	List<Object[]> objects = new ArrayList<Object[]>();
+    	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
+    	int[] pageParams = PaginationThreadUtils.setPage(processDefinitionQuery.list().size());
+		logger.info("firstResult: "+pageParams[0]+" maxResult: "+pageParams[1]);
+    	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
+    	for (ProcessDefinition processDefinition : processDefinitionList) {
+            String deploymentId = processDefinition.getDeploymentId();
+            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+            objects.add(new Object[]{processDefinition, deployment});
+        }
+    	Pagination pagination = PaginationThreadUtils.get();
+    	mav.addObject("obj", objects);
+    	mav.addObject("page", pagination.getPageStr());
+    	return mav;
+    }
+    
+    /**
+     * 删除部署的流程，级联删除流程实例 true。
+     * 不管是否指定级联删除，部署的相关数据均会被删除，这些数据包括流程定义的身份数据（IdentityLink）、流程定义数据（ProcessDefinition）、流程资源（Resource）
+     * 部署数据（Deployment）。
+     * 如果设置级联(true)，测绘删除流程实例数据（ProcessInstance）,其中流程实例也包括流程任务（Task）与流程实例的历史数据；如果设置flase 将不会级联删除。
+     * 如果数据库中已经存在流程实例数据，那么将会删除失败，因为在删除流程定义时，流程定义数据的ID已经被流程实例的相关数据所引用。
+     *
+     * @param deploymentId 流程部署ID
+     */
+    @RequestMapping(value = "/process/delete")
+    public String delete(@RequestParam("deploymentId") String deploymentId) {
+        repositoryService.deleteDeployment(deploymentId, true);
+        return "redirect:/processAction/process/listProcess_page";
     }
 }
