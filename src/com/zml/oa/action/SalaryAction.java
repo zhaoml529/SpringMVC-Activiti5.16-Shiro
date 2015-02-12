@@ -289,7 +289,6 @@ public class SalaryAction {
 		        	salary.setBusinessKey(salary.getId().toString());
 			        this.saService.doUpdate(salary);
 			        variables.put("entity", salary);
-			        variables.put("reApply", reApply);
 	//		        variables.put("auditGroup", "director");//返回总监重新审批
 			        redirectAttributes.addFlashAttribute("message", "任务办理完成，薪资调整申请已重新提交！");
         		}else{
@@ -303,6 +302,7 @@ public class SalaryAction {
         }else{
         	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的薪资调整申请！");
         }
+        variables.put("reApply", reApply);
         //完成任务
         this.processService.complete(taskId, null, user.getId().toString(), variables);
         
