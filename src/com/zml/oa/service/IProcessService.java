@@ -90,12 +90,21 @@ public interface IProcessService {
     public InputStream getDiagram(String processInstanceId) throws Exception;
     
     /**
-     * 显示图片，不带流程跟踪(没有乱码问题)
+     * 显示图片-通过流程ID，不带流程跟踪(没有乱码问题)
      * @param resourceType
      * @param processInstanceId
      * @return
      */
-    public InputStream getDiagram_noTrace(String resourceType, String processInstanceId) throws Exception;
+    public InputStream getDiagramByProInstanceId_noTrace(String resourceType, String processInstanceId) throws Exception;
+    
+    /**
+     * 显示图片-通过部署ID，不带流程跟踪(没有乱码啊问题)
+     * @param resourceType
+     * @param processInstanceId
+     * @return
+     * @throws Exception
+     */
+    public InputStream getDiagramByProDefinitionId_noTrace(String resourceType, String processDefinitionId) throws Exception;
 
     /**
      * 读取已结束中的流程(待完善)

@@ -15,6 +15,10 @@ import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.activiti.engine.impl.javax.el.ExpressionFactory;
+import org.activiti.engine.impl.javax.el.ValueExpression;
+import org.activiti.engine.impl.juel.ExpressionFactoryImpl;
+import org.activiti.engine.impl.juel.SimpleContext;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
@@ -24,6 +28,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.aspectj.weaver.patterns.IScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +38,10 @@ import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.Salary;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
+import com.zml.oa.service.IGroupService;
 import com.zml.oa.service.ISalaryService;
 import com.zml.oa.service.IUserService;
+import com.zml.oa.util.BeanUtils;
 import com.zml.oa.util.WorkflowUtils;
 
 /**
@@ -64,6 +71,9 @@ public class WorkflowService {
 	
 	@Autowired
 	private ISalaryService salaryService;
+	
+	@Autowired
+	private IGroupService groupService;
 
 	
 	
@@ -75,7 +85,7 @@ public class WorkflowService {
     public void bankTransfer(Execution exe) {
 		// 具体业务会与第三方支付系统产生交互，这样就有可能产生请求发送失败，
 		// 用边界错误事件来处理，如果银行转账失败，流程则会到达现金支付的用户任务
-		// ExpenseAccount.bpmn流程文件中，错误边界事件可以通过workflowService调用此方法也是由于@Component的作用.
+		// ExpenseAccount.bpmn流程文件中，错误边界事件可以通过workflowService调用此方法，也是由于@Component的作用.
 		// 如果此方法是放在@Service中，则需要在流程参数中加入variables.put("workflowService", new WorkflowService())，这样才能通过el获取到bankTransfer();
     	ExpenseAccount expense = (ExpenseAccount)this.runtimeService.getVariable(exe.getProcessInstanceId(), "entity");
 
@@ -172,7 +182,7 @@ public class WorkflowService {
         vars.put("任务类型", WorkflowUtils.parseToZhType(properties.get("type").toString()));
 
         ActivityBehavior activityBehavior = activity.getActivityBehavior();
-        logger.debug("activityBehavior={}", activityBehavior);
+        logger.info("activityBehavior={}", activityBehavior);
         if (activityBehavior instanceof UserTaskActivityBehavior) {
 
             Task currentTask = null;
@@ -189,26 +199,45 @@ public class WorkflowService {
 			 */
             UserTaskActivityBehavior userTaskActivityBehavior = (UserTaskActivityBehavior) activityBehavior;
             TaskDefinition taskDefinition = userTaskActivityBehavior.getTaskDefinition();
-            Set<Expression> candidateGroupIdExpressions = taskDefinition.getCandidateGroupIdExpressions();
-            if (!candidateGroupIdExpressions.isEmpty()) {
-
-                // 任务的处理角色
-//                setTaskGroup(vars, candidateGroupIdExpressions);
-            	vars.put("任务所属角色", "-待完成-");
-            	
-            	
-                // 当前处理人
-                if (currentTask != null) {
-                    setCurrentTaskAssignee(vars, currentTask);
-                }
+            
+            //任务所属角色
+            String taskDefinKey = taskDefinition.getKey();
+            logger.info("taskDefinKey: "+taskDefinKey);
+            if(taskDefinKey.startsWith("director")){
+            	vars.put("任务所属角色", "总监组");
+            }else if(taskDefinKey.startsWith("finance")){
+            	vars.put("任务所属角色", "财务组");
+            }else if(taskDefinKey.startsWith("hr")){
+            	vars.put("任务所属角色", "人事组");
+            }else if(taskDefinKey.startsWith("manager")){
+            	vars.put("任务所属角色", "经理组");
             }
+            
+            //当前处理人
+	         if (currentTask != null) {
+	             setCurrentTaskAssignee(vars, currentTask);
+	         }
+	         
+//            Set<Expression> candidateGroupIdExpressions = taskDefinition.getCandidateGroupIdExpressions();
+//            if (!candidateGroupIdExpressions.isEmpty()) {
+//
+//                // 任务的处理角色
+//            	setTaskGroup(vars, candidateGroupIdExpressions);
+//            	vars.put("任务所属角色", "-待完成-");
+//            	
+//            	
+//                // 当前处理人
+//                if (currentTask != null) {
+//                    setCurrentTaskAssignee(vars, currentTask);
+//                }
+//            }
         }
 
         vars.put("节点说明", properties.get("documentation"));
-
+        logger.info("properties: "+properties);
         String description = activity.getProcessDefinition().getDescription();
         vars.put("描述", description);
-        logger.debug("trace variables: {}", vars);
+        logger.info("trace variables: {}", vars);
         activityInfo.put("vars", vars);
         return activityInfo;
     }
@@ -218,6 +247,8 @@ public class WorkflowService {
 //        for (Expression expression : candidateGroupIdExpressions) {
 //            String expressionText = expression.getExpressionText();
 //            logger.info("expressionText: "+expressionText);
+//            isCondition("auditGroup", expressionText, "director");
+//            //自带group用这个
 //            String roleName = identityService.createGroupQuery().groupId(expressionText).singleResult().getName();
 //            roles += roleName;
 //        }
@@ -237,10 +268,14 @@ public class WorkflowService {
         logger.info("assignee: "+assignee);
         if (assignee != null) {
         	User assigneeUser = this.userService.getUserById(new Integer(assignee));
-        	
 //            User assigneeUser = identityService.createUserQuery().userId(assignee).singleResult();
 //            String userInfo = assigneeUser.getFirstName() + " " + assigneeUser.getLastName();
-            vars.put("当前处理人", assigneeUser.getName());
+        	if(!BeanUtils.isBlank(assigneeUser)){
+        		vars.put("当前处理人", assigneeUser.getName());
+        	}else{
+        		vars.put("当前处理人", "不存在！");
+        	}
+            
             logger.info("当前处理人: "+assigneeUser);
         }
     }
@@ -255,11 +290,11 @@ public class WorkflowService {
         Task currentTask = null;
         try {
             String activitiId = (String) PropertyUtils.getProperty(processInstance, "activityId");
-            logger.debug("current activity id: {}", activitiId);
+            logger.info("current activity id: {}", activitiId);
 
             currentTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey(activitiId)
                     .singleResult();
-            logger.debug("current task for processInstance: {}", ToStringBuilder.reflectionToString(currentTask));
+            logger.info("current task for processInstance: {}", ToStringBuilder.reflectionToString(currentTask));
 
         } catch (Exception e) {
             logger.error("can not get property activityId from processInstance: {}", processInstance);
@@ -288,4 +323,16 @@ public class WorkflowService {
         activityInfo.put("x", activity.getX());
         activityInfo.put("y", activity.getY());
     }
+    
+    
+    public String isCondition(String key, String el, String value) {  
+        ExpressionFactory factory = new ExpressionFactoryImpl();    
+        SimpleContext context = new SimpleContext();    
+        context.setVariable(key, factory.createValueExpression(value, String.class));    
+        ValueExpression e = factory.createValueExpression(context, el, String.class);  
+        logger.info("el info key: "+key+" el: "+el+" value: "+value+" e: "+e+" e.value: "+e.getValue(context));
+        return (String) e.getValue(context);  
+    }  
+    
+    
 }

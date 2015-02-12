@@ -108,9 +108,11 @@ public class ProcessServiceImp implements IProcessService{
 //      TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
 		TaskQuery taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
 		Integer totalSum = taskQuery.list().size();
-		int[] pageParams = getPagination(totalSum, model);
+		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
+		Pagination pagination = PaginationThreadUtils.get();
 		List<Task> tasks = taskQuery.orderByTaskCreateTime().desc().listPage(pageParams[0], pageParams[1]);
 		List<BaseVO> taskList = getBaseVOList(tasks);
+		model.addAttribute("page", pagination.getPageStr());
 		return taskList;
     }
     
@@ -124,9 +126,11 @@ public class ProcessServiceImp implements IProcessService{
     public List<BaseVO> findDoTask(User user, Model model){
     	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
     	Integer totalSum = taskQuery.list().size();
-		int[] pageParams = getPagination(totalSum, model);
+    	int[] pageParams = PaginationThreadUtils.setPage(totalSum);
+    	Pagination pagination = PaginationThreadUtils.get();
 		List<Task> tasks = taskQuery.orderByTaskCreateTime().desc().listPage(pageParams[0], pageParams[1]);
 		List<BaseVO> taskList = getBaseVOList(tasks);
+		model.addAttribute("page", pagination.getPageStr());
 		return taskList;
     }
     
@@ -202,29 +206,6 @@ public class ProcessServiceImp implements IProcessService{
     	return commnetList;
     }
     
-	
-    /**
-     * 计算分页
-     * @param totalSum
-     * @return
-     */
-    protected int[] getPagination(Integer totalSum, Model model){
-    	Pagination pagination = PaginationThreadUtils.get();
-        if (pagination == null) {
- 			pagination = new Pagination();
- 			PaginationThreadUtils.set(pagination);
- 			pagination.setCurrentPage(1);
- 		}
- 		if (pagination.getTotalSum() == 0) {
- 			pagination.setTotalSum(totalSum);
- 		}
- 		pagination.processTotalPage();
- 		int firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
-		int maxResult = pagination.getPageNum();
-		model.addAttribute("page", pagination.getPageStr());
-		return new int[]{firstResult, maxResult};
-    }
-    
     
     /**
      * 显示流程图,带流程跟踪
@@ -251,13 +232,13 @@ public class ProcessServiceImp implements IProcessService{
     }
     
     /**
-     * 显示图片，不带流程跟踪(没有乱码问题)
+     * 显示图片-通过流程ID，，不带流程跟踪(没有乱码问题)
      * @param resourceType
      * @param processInstanceId
      * @return
      */
     @Override
-    public InputStream getDiagram_noTrace(String resourceType, String processInstanceId){
+    public InputStream getDiagramByProInstanceId_noTrace(String resourceType, String processInstanceId){
     	
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstance.getProcessDefinitionId())
@@ -274,6 +255,28 @@ public class ProcessServiceImp implements IProcessService{
     }
     
     /**
+     * 显示图片-通过部署ID，不带流程跟踪(没有乱码啊问题)
+     * @param resourceType
+     * @param processInstanceId
+     * @return
+     * @throws Exception
+     */
+	@Override
+	public InputStream getDiagramByProDefinitionId_noTrace(String resourceType,
+			String processDefinitionId) throws Exception {
+		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+        String resourceName = "";
+        if (resourceType.equals("png") || resourceType.equals("image")) {
+            resourceName = processDefinition.getDiagramResourceName();
+        } else if (resourceType.equals("xml")) {
+            resourceName = processDefinition.getResourceName();
+        }
+        InputStream resourceAsStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), resourceName);
+        return resourceAsStream;
+	}
+
+    
+    /**
      * 读取已结束中的流程(待完善)
      *
      * @return
@@ -282,9 +285,10 @@ public class ProcessServiceImp implements IProcessService{
     public String findFinishedProcessInstaces(Model model) {
         HistoricProcessInstanceQuery historQuery = historyService.createHistoricProcessInstanceQuery().finished();
         Integer totalSum = historQuery.list().size();
-		int[] pageParams = getPagination(totalSum, model);
+        int[] pageParams = PaginationThreadUtils.setPage(totalSum);
+    	Pagination pagination = PaginationThreadUtils.get();
 		List<HistoricProcessInstance> list = historQuery.orderByProcessInstanceEndTime().desc().listPage(pageParams[0], pageParams[1]);
-		
+		model.addAttribute("page", pagination.getPageStr());
         return null;
     }
     
@@ -391,7 +395,8 @@ public class ProcessServiceImp implements IProcessService{
         Salary sa = this.salaryService.findByUserId(salary.getUserId().toString());
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.put("entity", salary);
-        variables.put("auditGroup", "director");		//总监组审批
+        //此处已经加入监听来动态分配任务--UserTaskLintener
+        //variables.put("auditGroup", "director");		//总监组审批
         variables.put("businessKey", salary.getId());
         variables.put("baseMoney", sa.getBaseMoney());  //原有薪金(回滚用)
         String businessKey = salary.getBusinessKey();
@@ -434,7 +439,8 @@ public class ProcessServiceImp implements IProcessService{
         this.identityService.setAuthenticatedUserId(expense.getUserId().toString());
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.put("entity", expense);
-        variables.put("auditGroup", "finance");	//财务组审批
+        //此处已经加入监听来动态分配任务--UserTaskLintener
+        //variables.put("auditGroup", "finance");	//财务组审批
         String businessKey = expense.getBusinessKey();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.expense", businessKey, variables);
         String processInstanceId = processInstance.getId();
@@ -467,8 +473,10 @@ public class ProcessServiceImp implements IProcessService{
 	public List<ProcessInstance> listRuningProcess(Model model) throws Exception {
 		ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery();
 		Integer totalSum = processInstanceQuery.list().size();
-		int[] pageParams = getPagination(totalSum, model);
+		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
+		Pagination pagination = PaginationThreadUtils.get();
 		List<ProcessInstance> list = processInstanceQuery.orderByProcessInstanceId().desc().listPage(pageParams[0], pageParams[1]);
+		model.addAttribute("page", pagination.getPageStr());
 		return list;
 	}
 
