@@ -104,4 +104,5 @@ body{width:98%;background:url(../images/main_bg.gif) repeat-x fixed;}
 
 /* main end -----------------------------------------------------*/
 
+#main fieldset div {padding:10px 10px;margin-top:10px;font-weight:bold;}
 
