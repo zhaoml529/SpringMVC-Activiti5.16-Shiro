@@ -78,10 +78,10 @@
 					<td>${p.suspended }</td>
 					<td>
 						<c:if test="${p.suspended }">
-							<a href="${ctx }/processAction/process/updateProcessStatus/active/${p.processInstanceId}">激活</a>
+							<a href="${ctx }/processAction/process/updateProcessStatus/active/${p.processInstanceId}/runningProcess">激活</a>
 						</c:if>
 						<c:if test="${!p.suspended }">
-							<a href="${ctx }/processAction/process/updateProcessStatus/suspend/${p.processInstanceId}">挂起</a>
+							<a href="${ctx }/processAction/process/updateProcessStatus/suspend/${p.processInstanceId}/runningProcess">挂起</a>
 						</c:if>
 					</td>
 				</tr>
