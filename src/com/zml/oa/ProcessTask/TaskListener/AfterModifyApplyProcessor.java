@@ -1,14 +1,11 @@
 package com.zml.oa.ProcessTask.TaskListener;
 
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.service.ISalaryAdjustService;
@@ -20,7 +17,6 @@ import com.zml.oa.service.ISalaryAdjustService;
  *
  */
 @Component("afterModifyApplyProcessor")
-@Transactional
 public class AfterModifyApplyProcessor implements TaskListener {
 
 	/**

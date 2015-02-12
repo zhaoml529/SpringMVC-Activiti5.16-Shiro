@@ -3,13 +3,9 @@ package com.zml.oa.ProcessTask.TaskListener;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.zml.oa.service.activiti.ProcessServiceImp;
 
 /**
  * 动态用户任务分配
@@ -17,7 +13,6 @@ import com.zml.oa.service.activiti.ProcessServiceImp;
  *
  */
 @Component
-@Transactional
 public class UserTaskLintener implements TaskListener {
 	/**
 	 * 
@@ -54,7 +49,8 @@ public class UserTaskLintener implements TaskListener {
 		}else if("bossAudit".equals(taskDefinitionKey)){
 //			老板只有一个，这里直接添加任务受理人（setAssignee）为boss就可以，不用再去"抢占"式的领取代办任务。
 //			delegateTask.setAssignee("boss"); //具体boss的Id号
-			delegateTask.addCandidateGroup("boss");
+//			delegateTask.addCandidateGroup("boss");
+			delegateTask.addCandidateUser("boss");
 		}
 	}
 }
