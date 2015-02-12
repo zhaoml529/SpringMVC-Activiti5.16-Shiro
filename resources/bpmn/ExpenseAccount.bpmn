@@ -3,7 +3,11 @@
   <process id="com.zml.oa.expense" name="报销流程" isExecutable="true">
     <documentation>报销流程演示</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="applyUserId"></startEvent>
-    <userTask id="financeAudit" name="财务审批" activiti:candidateGroups="${auditGroup}"></userTask>
+    <userTask id="financeAudit" name="财务审批" activiti:candidateGroups="${auditGroup}">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskLintener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="financeAudit"></sequenceFlow>
     <serviceTask id="servicetask1" name="银行转账" activiti:expression="${workflowService.bankTransfer(execution)}"></serviceTask>
     <sequenceFlow id="flow2" sourceRef="financeAudit" targetRef="servicetask1"></sequenceFlow>

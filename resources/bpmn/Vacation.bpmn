@@ -5,11 +5,15 @@
     <startEvent id="startevent1" name="Start" activiti:initiator="applyUserId"></startEvent>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow2" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
-    <userTask id="managerAudit" name="经理审批" activiti:candidateGroups="${auditGroup}"></userTask>
+    <userTask id="managerAudit" name="经理审批" activiti:candidateGroups="${auditGroup}">
+      <documentation>请假天数小于等于3天，由我审批。</documentation>
+    </userTask>
     <sequenceFlow id="flow3" name="小于等于3天" sourceRef="exclusivegateway1" targetRef="managerAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${entity.days <= 3}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="directorAudit" name="总监审批" activiti:candidateGroups="${auditGroup}"></userTask>
+    <userTask id="directorAudit" name="总监审批" activiti:candidateGroups="${auditGroup}">
+      <documentation>请假天数大于3天，由我审批。</documentation>
+    </userTask>
     <sequenceFlow id="flow4" name="大于3天" sourceRef="exclusivegateway1" targetRef="directorAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${entity.days > 3}]]></conditionExpression>
     </sequenceFlow>
