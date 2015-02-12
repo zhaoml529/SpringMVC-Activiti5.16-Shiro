@@ -84,10 +84,10 @@ $(function() {
 						<td><fmt:formatDate value="${deployment.deploymentTime }"  type="both"/></td>
 						<td>${process.suspended} |
 							<c:if test="${process.suspended }">
-								<a href="${ctx }/processAction/process/updateProcessStatus/active/${process.id}/processDefinition">激活</a>
+								<a href="${ctx }/processAction/process/updateProcessStatusByProDefinitionId/active/${process.id}">激活</a>
 							</c:if>
 							<c:if test="${!process.suspended }">
-								<a href="${ctx }/processAction/process/updateProcessStatus/suspend/${process.id}/processDefinition">挂起</a>
+								<a href="${ctx }/processAction/process/updateProcessStatusByProDefinitionId/suspend/${process.id}">挂起</a>
 							</c:if>
 						</td>
 						<td>
