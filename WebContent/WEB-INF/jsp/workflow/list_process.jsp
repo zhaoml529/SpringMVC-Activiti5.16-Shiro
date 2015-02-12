@@ -14,7 +14,24 @@ $(function() {
 	$('#deploy').click(function() {
 		$('#deployFieldset').toggle('normal');
 	});
+	$('#redeploy').click(function() {
+		window.location.href = '${ctx }/processAction/process/redeploy/all';
+	});
 });
+
+function doSearch(currentPage)
+{
+	var pageNum = document.getElementById("pageNum").value;
+	if(isNaN(pageNum))
+	{
+		alert("请输入正确的行数!");
+	}
+	else
+	{
+		document.getElementById('currentPage').value = currentPage;
+		document.forms[1].submit();
+	}
+}
 </script>
 
 </head>
@@ -39,13 +56,12 @@ $(function() {
 		<div id="message" class="info" style="display:inline;"><b>提示：</b>点击xml或者png链接可以查看具体内容！</div>
 		<input type="button" id="deploy" value="部署流程" class="input_button4"/>
 		<input type="button" id="redeploy" value="重新部署流程" class="input_button4"/>
-		<a id='redeploy' href='${ctx }/workflow/redeploy/all' >重新部署流程</a>
 	  </div>
 	  <fieldset id="deployFieldset" style="display: none">
-		<legend align="left">部署新流程</legend>
+		<legend style="margin-left: 10px" align="left">部署新流程</legend>
 		<div align="left">
 		<b>支持文件格式：</b>zip、bar、bpmn、bpmn20.xml<br /><br />
-		<form action="${ctx }/workflow/deploy" method="post" enctype="multipart/form-data">
+		<form action="${ctx }/processAction/process/deploy" method="post" enctype="multipart/form-data">
 			<input type="file" name="file" />
 			<input type="submit" class="input_button4" value="Submit" />
 		</form>
