@@ -124,36 +124,18 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 
 	@Override
 	public List<T> findByPage(String tableSimpleName, String[] columns, String[] values) throws Exception{
-		Pagination pagination = PaginationThreadUtils.get();
-		if (pagination == null) {
-			pagination = new Pagination();
-			PaginationThreadUtils.set(pagination);
-			pagination.setCurrentPage(1);
+		Integer totalSum = 0;
+		List<T> list = new ArrayList<T>();
+		if(columns.length <= 0 && values.length <= 0){
+			list = getAllList(tableSimpleName);
+		}else{
+			list = findByWhere(tableSimpleName, columns, values);
 		}
-		if (pagination.getTotalSum() == 0) {
-			List<T> list = new ArrayList<T>();
-			if(columns.length <= 0 && values.length <= 0){
-				list = getAllList(tableSimpleName);
-			}else{
-				list = findByWhere(tableSimpleName, columns, values);
-			}
-			if(BeanUtils.isBlank(list)){
-				pagination.setTotalSum(0);
-			}else{
-				pagination.setTotalSum(list.size());
-			}
+		if(!BeanUtils.isBlank(list)){
+			totalSum = list.size();
 		}
+		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
 		
-		int firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
-		int maxResult = pagination.getPageNum();
-		//校验分页情况
-		if (firstResult >= pagination.getTotalSum() || firstResult < 0) {
-			firstResult = 0;
-			pagination.setCurrentPage(1);
-		}
-		//分页处理
-		pagination.processTotalPage();
-		PaginationThreadUtils.set(pagination);
 		StringBuffer sb = new StringBuffer();  
         sb.append("select a from ").append(tableSimpleName).append( " a where ");  
         if(columns.length==values.length){  
@@ -168,7 +150,7 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 	    	   hql = hql.substring(0, hql.length()-6);
 	       }
 	       logger.info("findByPage: HQL: "+hql);
-	       List<T> list = this.baseDao.findByPage(hql, firstResult, maxResult); 
+	       list = this.baseDao.findByPage(hql, pageParams[0], pageParams[1]); 
 	       return list.size()>0?list:null;
         }else{
         	logger.info("findByPage: columns.length != values.length");
