@@ -243,7 +243,7 @@ public class ProcessAction {
     }
     
     /**
-     * 激活、挂起流程实例
+     * 激活、挂起流程实例-根据processInstanceId
      * @param status
      * @param processInstanceId
      * @param redirectAttributes
@@ -251,11 +251,10 @@ public class ProcessAction {
      * @throws Exception
      */
     @RequiresPermissions("admin:process:suspend,active")
-    @RequestMapping(value = "/process/updateProcessStatus/{status}/{processInstanceId}/{type}")
-    public String updateProcessStatus(
+    @RequestMapping(value = "/process/updateProcessStatusByProInstanceId/{status}/{processInstanceId}")
+    public String updateProcessStatusByProInstanceId(
     		@PathVariable("status") String status, 
     		@PathVariable("processInstanceId") String processInstanceId,
-    		@PathVariable("type") String type,
             RedirectAttributes redirectAttributes) throws Exception{
     	
     	if (status.equals("active")) {
@@ -265,13 +264,32 @@ public class ProcessAction {
         	this.processService.suspendProcessInstance(processInstanceId);
             redirectAttributes.addFlashAttribute("message", "已挂起ID为[ " + processInstanceId + " ]的流程实例。");
         }
-    	String result = null;
-    	if("processDefinition".equals(type)){
-    		result = "redirect:/processAction/process/listProcess_page";
-    	}else if("".equals(type)){
-    		result = "redirect:/processAction/process/runningProcess_page";
-    	}
-    	return result;
+    	return "redirect:/processAction/process/runningProcess_page";
+    }
+    
+    /**
+     * 激活、挂起流程实例-根据processDefinitionId
+     * @param status
+     * @param processInstanceId
+     * @param redirectAttributes
+     * @return
+     * @throws Exception
+     */
+    @RequiresPermissions("admin:process:suspend,active")
+    @RequestMapping(value = "/process/updateProcessStatusByProDefinitionId/{status}/{processDefinitionId}")
+    public String updateProcessStatusByProDefinitionId(
+    		@PathVariable("status") String status, 
+    		@PathVariable("processDefinitionId") String processDefinitionId,
+            RedirectAttributes redirectAttributes) throws Exception{
+    	
+    	if (status.equals("active")) {
+            redirectAttributes.addFlashAttribute("message", "已激活ID为[" + processDefinitionId + "]的流程定义。");
+            repositoryService.activateProcessDefinitionById(processDefinitionId, true, null);
+        } else if (status.equals("suspend")) {
+            repositoryService.suspendProcessDefinitionById(processDefinitionId, true, null);
+            redirectAttributes.addFlashAttribute("message", "已挂起ID为[" + processDefinitionId + "]的流程定义。");
+        }
+    	return "redirect:/processAction/process/listProcess_page";
     }
     
     /**
