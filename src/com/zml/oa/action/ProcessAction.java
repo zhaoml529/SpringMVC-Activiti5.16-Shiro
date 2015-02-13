@@ -1,6 +1,8 @@
 package com.zml.oa.action;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +11,14 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
+import org.activiti.bpmn.converter.BpmnXMLConverter;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -31,6 +40,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.User;
 import com.zml.oa.pagination.Pagination;
@@ -284,12 +295,12 @@ public class ProcessAction {
      * @throws Exception
      */
     @RequiresPermissions("admin:process:suspend,active")
-    @RequestMapping(value = "/process/updateProcessStatusByProDefinitionId/{status}/{processDefinitionId}")
+    @RequestMapping(value = "/process/updateProcessStatusByProDefinitionId")
     public String updateProcessStatusByProDefinitionId(
-    		@PathVariable("status") String status, 
-    		@PathVariable("processDefinitionId") String processDefinitionId,
+    		@RequestParam("status") String status,
+    		@RequestParam("processDefinitionId") String processDefinitionId,
             RedirectAttributes redirectAttributes) throws Exception{
-    	
+    	//如果用/{status}/{processDefinitionId} rest风格，@PathVariable获取的processDefinitionId 为com.zml.oa,实际是com.zml.oa.vacation:1:32529.难道是BUG?
     	if (status.equals("active")) {
             redirectAttributes.addFlashAttribute("message", "已激活ID为[" + processDefinitionId + "]的流程定义。");
             repositoryService.activateProcessDefinitionById(processDefinitionId, true, null);
@@ -414,4 +425,37 @@ public class ProcessAction {
 		}
         return "redirect:/processAction/process/listProcess_page";
     }
+    
+    @RequestMapping(value = "/process/convert_to_model")
+    public String convertToModel(@RequestParam("processDefinitionId") String processDefinitionId)
+            throws UnsupportedEncodingException, XMLStreamException {
+    	ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(processDefinitionId).singleResult();
+        InputStream bpmnStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(),
+                processDefinition.getResourceName());
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        InputStreamReader in = new InputStreamReader(bpmnStream, "UTF-8");
+        XMLStreamReader xtr = xif.createXMLStreamReader(in);
+        BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
+
+        BpmnJsonConverter converter = new BpmnJsonConverter();
+        com.fasterxml.jackson.databind.node.ObjectNode modelNode = converter.convertToJson(bpmnModel);
+        org.activiti.engine.repository.Model modelData = repositoryService.newModel();
+        modelData.setKey(processDefinition.getKey());
+        modelData.setName(processDefinition.getResourceName());
+        modelData.setCategory(processDefinition.getDeploymentId());
+
+        ObjectNode modelObjectNode = new ObjectMapper().createObjectNode();
+        modelObjectNode.put(ModelDataJsonConstants.MODEL_NAME, processDefinition.getName());
+        modelObjectNode.put(ModelDataJsonConstants.MODEL_REVISION, 1);
+        modelObjectNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION, processDefinition.getDescription());
+        modelData.setMetaInfo(modelObjectNode.toString());
+
+        repositoryService.saveModel(modelData);
+
+        repositoryService.addModelEditorSource(modelData.getId(), modelNode.toString().getBytes("utf-8"));
+
+        return "redirect:/processAction/process/listProcess_page";
+    }
+    
 }
