@@ -100,15 +100,15 @@ function doSearch(currentPage)
 						<td><fmt:formatDate value="${deployment.deploymentTime }"  type="both"/></td>
 						<td>${process.suspended} |
 							<c:if test="${process.suspended }">
-								<a href="${ctx }/processAction/process/updateProcessStatusByProDefinitionId/active/${process.id}">激活</a>
+								<a href="${ctx }/processAction/process/updateProcessStatusByProDefinitionId?status=active&processDefinitionId=${process.id}">激活</a>
 							</c:if>
 							<c:if test="${!process.suspended }">
-								<a href="${ctx }/processAction/process/updateProcessStatusByProDefinitionId/suspend/${process.id}">挂起</a>
+								<a href="${ctx }/processAction/process/updateProcessStatusByProDefinitionId?status=suspend&processDefinitionId=${process.id}">挂起</a>
 							</c:if>
 						</td>
 						<td>
-	                        <a href='${ctx }/processAction/process/delete?deploymentId=${process.deploymentId}'>删除</a>
-	                        <a href='${ctx }/processAction/process/convert-to-model?processDefinitionId=${process.id}'>转换为Model</a>
+	                        <a href='${ctx }/processAction/process/delete?deploymentId=${process.deploymentId}'>删除</a>|
+	                        <a href='${ctx }/processAction/process/convert_to_model?processDefinitionId=${process.id}'>转换为Model</a>
 	                    </td>
 					</tr>
 				  </c:forEach>
