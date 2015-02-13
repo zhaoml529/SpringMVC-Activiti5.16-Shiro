@@ -3,13 +3,13 @@ package com.zml.oa.service.activiti;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang3.ArrayUtils;
@@ -43,30 +43,6 @@ public class WorkflowProcessDefinitionService {
     protected HistoryService historyService;
 
     /**
-     * 根据流程实例ID查询流程定义对象{@link ProcessDefinition}
-     *
-     * @param processInstanceId 流程实例ID
-     * @return 流程定义对象{@link ProcessDefinition}
-     */
-    public ProcessDefinition findProcessDefinitionByPid(String processInstanceId) {
-        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        String processDefinitionId = historicProcessInstance.getProcessDefinitionId();
-        ProcessDefinition processDefinition = findProcessDefinition(processDefinitionId);
-        return processDefinition;
-    }
-
-    /**
-     * 根据流程定义ID查询流程定义对象{@link ProcessDefinition}
-     *
-     * @param processDefinitionId 流程定义对象ID
-     * @return 流程定义对象{@link ProcessDefinition}
-     */
-    public ProcessDefinition findProcessDefinition(String processDefinitionId) {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
-        return processDefinition;
-    }
-
-    /**
      * 部署classpath下面的流程定义
      * <p>
      * 从属性配置文件中获取属性<b>workflow.modules</b>扫描**deployments**
@@ -92,7 +68,8 @@ public class WorkflowProcessDefinitionService {
      */
     public void deployFromClasspath(String exportDir, String... processKey) throws Exception {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
-        String[] processKeys = {"salary", "vacation", "expense", "CountSalary"};
+//        String[] processKeys = {"salary", "vacation", "expense", "CountSalary"};
+        List<String> processKeys = loadDeployFile(resourceLoader);
         for (String loopProcessKey : processKeys) {
             if (ArrayUtils.isNotEmpty(processKey)) {
             	//部署单个流程
@@ -117,7 +94,7 @@ public class WorkflowProcessDefinitionService {
      * @throws IOException 找不到zip文件时
      */
     private void deploySingleProcess(ResourceLoader resourceLoader, String processKey, String exportDir) throws IOException {
-        String classpathResourceUrl = "classpath:/deploy/" + processKey + ".zip";
+        String classpathResourceUrl = "classpath:/deploy/" + processKey;
         logger.debug("read workflow from: {}", classpathResourceUrl);
         Resource resource = resourceLoader.getResource(classpathResourceUrl);
         logger.info(" resource: "+ resource.exists());
@@ -141,6 +118,25 @@ public class WorkflowProcessDefinitionService {
         }
     }
 
+    /**
+     * 读取资源目录下的流程文件
+     * @param resourceLoader
+     * @return
+     * @throws Exception
+     */
+    public List<String> loadDeployFile(ResourceLoader resourceLoader) throws Exception {
+    	List<String> processKeys = new ArrayList<>();
+    	String classpathResourceUrl = "classpath:/deploy/";
+        Resource resource = resourceLoader.getResource(classpathResourceUrl);
+        File[] listFiles = resource.getFile().listFiles();
+        for(File f : listFiles) {
+			if(f.getName().endsWith(".zip")){
+				processKeys.add(f.getName());
+			}
+		}
+        return processKeys;
+	}
+    
     /**
      * 重新部署单个流程定义
      *
