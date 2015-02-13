@@ -48,7 +48,7 @@ import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
-import com.zml.oa.service.activiti.WorkflowProcessDefinitionService;
+import com.zml.oa.service.activiti.WorkflowDeployService;
 import com.zml.oa.service.activiti.WorkflowService;
 import com.zml.oa.util.UserUtil;
 import com.zml.oa.util.WorkflowUtils;
@@ -77,7 +77,7 @@ public class ProcessAction {
 	private RepositoryService repositoryService;
 	
 	@Autowired
-	private WorkflowProcessDefinitionService workflowProcessDefinitionService;
+	private WorkflowDeployService workflowProcessDefinitionService;
     
     /**
 	 * 查询待办任务
@@ -326,7 +326,6 @@ public class ProcessAction {
     	List<Object[]> objects = new ArrayList<Object[]>();
     	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
     	int[] pageParams = PaginationThreadUtils.setPage(processDefinitionQuery.list().size());
-		logger.info("firstResult: "+pageParams[0]+" maxResult: "+pageParams[1]);
     	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
     	for (ProcessDefinition processDefinition : processDefinitionList) {
             String deploymentId = processDefinition.getDeploymentId();
