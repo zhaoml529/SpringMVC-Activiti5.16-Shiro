@@ -39,7 +39,6 @@ public class PaginationThreadUtils {
 		if (pagination.getTotalSum() == 0) {
 			pagination.setTotalSum(totalSum);
 		}
-		logger.info("currentPage: "+pagination.getCurrentPage()+" pageNum: "+pagination.getPageNum());
 		int firstResult = (pagination.getCurrentPage() - 1) * pagination.getPageNum();
 		int maxResult = pagination.getPageNum();
 		//校验分页情况
