@@ -1,24 +1,33 @@
 package com.zml.oa.action;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.activiti.bpmn.converter.BpmnXMLConverter;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zml.oa.pagination.PaginationThreadUtils;
@@ -80,9 +89,70 @@ public class ProcessModelAction {
             repositoryService.saveModel(modelData);
             repositoryService.addModelEditorSource(modelData.getId(), editorNode.toString().getBytes("utf-8"));
 
-            response.sendRedirect(request.getContextPath() + "/service/editor?id=" + modelData.getId());
+            response.sendRedirect(request.getContextPath() + "/modeler/service/editor?id=" + modelData.getId());
         } catch (Exception e) {
             logger.error("创建模型失败：", e);
         }
+    }
+	
+	/**
+	 * 根据Model部署流程
+	 * @param modelId
+	 * @param redirectAttributes
+	 * @return
+	 */
+    @RequestMapping(value = "deploy/{modelId}")
+    public String deploy(@PathVariable("modelId") String modelId, RedirectAttributes redirectAttributes) {
+        try {
+            Model modelData = repositoryService.getModel(modelId);
+            ObjectNode modelNode = (ObjectNode) new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId()));
+            byte[] bpmnBytes = null;
+
+            BpmnModel model = new BpmnJsonConverter().convertToBpmnModel(modelNode);
+            bpmnBytes = new BpmnXMLConverter().convertToXML(model);
+
+            String processName = modelData.getName() + ".bpmn20.xml";
+            Deployment deployment = repositoryService.createDeployment().name(modelData.getName()).addString(processName, new String(bpmnBytes)).deploy();
+            redirectAttributes.addFlashAttribute("message", "部署成功，部署ID=" + deployment.getId());
+        } catch (Exception e) {
+            logger.error("根据模型部署流程失败：modelId={}" + modelId, e);
+        }
+        return "redirect:/modelAction/listModel_page";
+    }
+
+    /**
+     * 导出model的xml文件
+     * @param modelId
+     * @param response
+     */
+    @RequestMapping(value = "export/{modelId}")
+    public void export(@PathVariable("modelId") String modelId, HttpServletResponse response) {
+        try {
+            Model modelData = repositoryService.getModel(modelId);
+            BpmnJsonConverter jsonConverter = new BpmnJsonConverter();
+            JsonNode editorNode = new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId()));
+            BpmnModel bpmnModel = jsonConverter.convertToBpmnModel(editorNode);
+            BpmnXMLConverter xmlConverter = new BpmnXMLConverter();
+            byte[] bpmnBytes = xmlConverter.convertToXML(bpmnModel);
+
+            ByteArrayInputStream in = new ByteArrayInputStream(bpmnBytes);
+            IOUtils.copy(in, response.getOutputStream());
+            String filename = bpmnModel.getMainProcess().getId() + ".bpmn20.xml";
+            response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+            response.flushBuffer();
+        } catch (Exception e) {
+            logger.error("导出model的xml文件失败：modelId={}" + modelId, e);
+        }
+    }
+
+    /**
+     * 删除模型
+     * @param modelId
+     * @return
+     */
+    @RequestMapping(value = "delete/{modelId}")
+    public String delete(@PathVariable("modelId") String modelId) {
+        repositoryService.deleteModel(modelId);
+        return "redirect:/modelAction/listModel_page";
     }
 }
