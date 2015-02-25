@@ -115,6 +115,7 @@ public class ProcessModelAction {
             Deployment deployment = repositoryService.createDeployment().name(modelData.getName()).addString(processName, new String(bpmnBytes)).deploy();
             redirectAttributes.addFlashAttribute("message", "部署成功，部署ID=" + deployment.getId());
         } catch (Exception e) {
+        	redirectAttributes.addFlashAttribute("message", "根据模型部署流程失败:modelId="+modelId);
             logger.error("根据模型部署流程失败：modelId={}" + modelId, e);
         }
         return "redirect:/modelAction/listModel_page";

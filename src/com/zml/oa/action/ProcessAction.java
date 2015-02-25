@@ -360,7 +360,9 @@ public class ProcessAction {
      * @return
      */
     @RequestMapping(value = "/process/deploy")
-    public String deploy(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, @RequestParam(value = "file", required = false) MultipartFile file) {
+    public String deploy(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, 
+    					  @RequestParam(value = "file", required = false) MultipartFile file,
+    					  RedirectAttributes redirectAttributes) {
     	//@Value("${export.diagram.path}")
     	//@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
         String fileName = file.getOriginalFilename();
@@ -381,8 +383,9 @@ public class ProcessAction {
             for (ProcessDefinition processDefinition : list) {
                 WorkflowUtils.exportDiagramToFile(repositoryService, processDefinition, exportDir);
             }
-
+            redirectAttributes.addFlashAttribute("message", "流程部署成功！");
         } catch (Exception e) {
+        	redirectAttributes.addFlashAttribute("message", "流程部署失败！");
             logger.error("error on deploy process, because of file input stream", e);
         }
 
@@ -425,6 +428,13 @@ public class ProcessAction {
         return "redirect:/processAction/process/listProcess_page";
     }
     
+    /**
+     * 转换为model
+     * @param processDefinitionId
+     * @return
+     * @throws UnsupportedEncodingException
+     * @throws XMLStreamException
+     */
     @RequestMapping(value = "/process/convert_to_model")
     public String convertToModel(@RequestParam("processDefinitionId") String processDefinitionId)
             throws UnsupportedEncodingException, XMLStreamException {
