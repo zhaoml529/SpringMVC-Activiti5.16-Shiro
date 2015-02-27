@@ -9,12 +9,6 @@
 <meta http-equiv="cache-control" content="no-cache"/>
 <meta http-equiv="expires" content="0"/>    
 <title>在线用户列表</title>
-
-<script type="text/javascript">
-	function add() {
-		window.location.href="<c:url value='/userAction/toAdd'/>";
-	}
-</script>
 </head>
 
 <body>

@@ -53,7 +53,7 @@ function doSearch(currentPage)
           </ul>
       </div>
       <div style="text-align: right;padding: 2px 1em 2px">
-		<div id="message" class="info" style="display:inline;"><b>提示：</b>点击xml或者png链接可以查看具体内容！</div>
+		<div id="message" class="tableHue1" style="display:inline;"><b>提示：</b>点击xml或者png链接可以查看具体内容！</div>
 		<input type="button" id="deploy" value="部署流程" class="input_button4"/>
 		<input type="button" id="redeploy" value="重新部署流程" class="input_button4"/>
 	  </div>
