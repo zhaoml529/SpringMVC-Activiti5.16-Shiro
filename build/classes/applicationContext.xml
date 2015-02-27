@@ -4,12 +4,14 @@
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:cache="http://www.springframework.org/schema/cache" 
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
           http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd 
+          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
           
     <!-- 在applicationContext.xml中只加载除表现层之外的所有bean，因此下面一行中不需要加载@Controller -->                       
@@ -19,13 +21,10 @@
     </context:component-scan>
     
     <!-- 引入配置文件 --> 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
-        <property name="locations"> 
-            <list> 
-                <value>classpath:jdbc.properties</value> 
-            </list> 
-        </property> 
-    </bean>
+	<context:property-placeholder ignore-unresolvable="true" local-override="true" location="classpath:application.properties"/>
+    
+    <util:properties id="APP_PROPERTIES" location="classpath:application.properties" local-override="true"/>
+    
 	<!-- 数据源 -->
 	<bean id="dataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource" >
 		<!-- 数据源别名 -->

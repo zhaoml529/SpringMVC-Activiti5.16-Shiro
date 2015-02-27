@@ -4,6 +4,7 @@
     <documentation>薪资调整流程演示</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="applyUserId"></startEvent>
     <userTask id="directorAudit" name="总监审批">
+      <documentation>总监去审批</documentation>
       <extensionElements>
         <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskLintener"></activiti:taskListener>
       </extensionElements>
@@ -15,6 +16,7 @@
       </extensionElements>
     </userTask>
     <callActivity id="callactivity1" name="调整薪资" calledElement="CountSalary">
+      <documentation>更新薪资</documentation>
       <extensionElements>
         <activiti:in sourceExpression="${businessKey}" target="businessKey"></activiti:in>
       </extensionElements>
