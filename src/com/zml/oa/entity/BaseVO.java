@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Transient;
 
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -27,6 +28,12 @@ public class BaseVO implements Serializable{
 	
 	// 受理任务标识
 	public final static String ASSIGNEE = "assignee";
+	
+	// 运行中的流程表示
+	public final static String RUNNING = "running";
+	
+	// 已结束任务标识
+	public final static String FINISHED = "finished";
 	
 	//审批中
 	public static final String PENDING = "PENDING";
@@ -62,6 +69,9 @@ public class BaseVO implements Serializable{
     // 历史的流程实例
     private HistoricProcessInstance historicProcessInstance;
 
+    // 历史任务
+    private HistoricTaskInstance historicTaskInstance;
+    
     // 流程定义
     private ProcessDefinition processDefinition;
 
@@ -165,6 +175,15 @@ public class BaseVO implements Serializable{
 
 	public void setBusinessKey(String businessKey) {
 		this.businessKey = businessKey;
+	}
+
+	@Transient
+	public HistoricTaskInstance getHistoricTaskInstance() {
+		return historicTaskInstance;
+	}
+
+	public void setHistoricTaskInstance(HistoricTaskInstance historicTaskInstance) {
+		this.historicTaskInstance = historicTaskInstance;
 	}
 	
 	

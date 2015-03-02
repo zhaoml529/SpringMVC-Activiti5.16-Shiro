@@ -117,6 +117,23 @@ public class ProcessAction {
 		return "task/list_task";
     }
     
+    /**
+     * 查看已完成任务列表
+     *
+     * @return
+     * @throws Exception 
+     */
+    @RequiresPermissions("user:process:finished")
+    @RequestMapping(value = "/finishedTask_page")
+    public String findFinishedTaskInstances(HttpSession session, Model model) throws Exception {
+    	User user = UserUtil.getUserFromSession(session);
+    	List<BaseVO> tasklist = this.processService.findFinishedTaskInstances(user, model);
+    	model.addAttribute("tasklist", tasklist);
+    	model.addAttribute("taskType", BaseVO.FINISHED);
+    	return "task/end_task";
+    }
+
+	
 	/**
 	 * 签收任务
 	 * @return
@@ -150,11 +167,11 @@ public class ProcessAction {
     /**
      * 显示图片通过部署id，不带流程跟踪(没有乱码问题)
      * @param processDefinitionId
-     * @param resourceType
+     * @param resourceType	资源类型(xml|image)
      * @param response
      * @throws Exception
      */
-    @RequestMapping(value = "/process/resource/process-definition")
+    @RequestMapping(value = "/process/process-definition")
     public void loadByDeployment(@RequestParam("processDefinitionId") String processDefinitionId, @RequestParam("resourceType") String resourceType,
                                  HttpServletResponse response) throws Exception {
     	InputStream resourceAsStream = this.processService.getDiagramByProDefinitionId_noTrace(resourceType, processDefinitionId);
@@ -167,14 +184,14 @@ public class ProcessAction {
     
     
     /**
-     * 显示图片通过流程id，不带流程跟踪(没有乱码问题)-没用作为代码演示
+     * 显示图片通过流程id，不带流程跟踪(没有乱码问题)
      *
      * @param resourceType      资源类型(xml|image)
      * @param processInstanceId 流程实例ID
      * @param response
      * @throws Exception
      */
-    @RequestMapping(value = "/process/resource/process-instance")
+    @RequestMapping(value = "/process/process-instance")
     public void loadByProcessInstance(@RequestParam("type") String resourceType, @RequestParam("pid") String processInstanceId, HttpServletResponse response)
             throws Exception {
         InputStream resourceAsStream = this.processService.getDiagramByProInstanceId_noTrace(resourceType, processInstanceId);
@@ -199,21 +216,6 @@ public class ProcessAction {
     public List<Map<String, Object>> traceProcess(@PathVariable("pid") String processInstanceId) throws Exception {
         List<Map<String, Object>> activityInfos = traceService.traceProcess(processInstanceId);
         return activityInfos;
-    }
-    
-    
-    /**
-     * 读取已结束的流程
-     *
-     * @return
-     * @throws Exception 
-     */
-    @RequiresPermissions("user:process:finished")
-    @RequestMapping(value = "/process/finished")
-    public String findFinishedProcessInstaces(Model model) throws Exception {
-        //待完成，见ProcessService
-    	this.processService.findFinishedProcessInstaces(model);
-        return null;
     }
     
     /**
@@ -258,7 +260,23 @@ public class ProcessAction {
     public String listRuningProcess(Model model) throws Exception{
     	List<ProcessInstance> list = this.processService.listRuningProcess(model);
     	model.addAttribute("list", list);
-		return "workflow/running_manage";
+    	model.addAttribute("taskType", BaseVO.RUNNING);
+		return "workflow/running_process";
+    }
+    
+    /**
+     * 管理已结束的流程
+     *
+     * @return
+     * @throws Exception 
+     */
+    @RequiresPermissions("admin:process:*")
+    @RequestMapping(value = "/process/finishedProcess_page")
+    public String findFinishedProcessInstances(Model model) throws Exception {
+    	List<BaseVO> processList = this.processService.findFinishedProcessInstances(model);
+    	model.addAttribute("processList", processList);
+    	model.addAttribute("taskType", BaseVO.FINISHED);
+    	return "workflow/finished_process";
     }
     
     /**
