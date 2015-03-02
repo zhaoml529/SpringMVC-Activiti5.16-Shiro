@@ -107,11 +107,19 @@ public interface IProcessService {
     public InputStream getDiagramByProDefinitionId_noTrace(String resourceType, String processDefinitionId) throws Exception;
 
     /**
-     * 读取已结束中的流程(待完善)
+     * 读取已结束中的流程-admin查看
      *
      * @return
      */
-    public String findFinishedProcessInstaces(Model model) throws Exception;
+    public List<BaseVO> findFinishedProcessInstances(Model model) throws Exception;
+    
+    /**
+     * 各个审批人员查看自己完成的任务
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    public List<BaseVO> findFinishedTaskInstances(User user, Model model) throws Exception;
     
     /**
      * 查看正在运行的请假流程

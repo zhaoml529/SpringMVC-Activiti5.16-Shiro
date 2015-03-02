@@ -15,6 +15,9 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricTaskInstanceQuery;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -106,7 +109,21 @@ public class ProcessServiceImp implements IProcessService{
     public List<BaseVO> findTodoTask(User user, Model model){
     	// 根据当前用户组查询
 //      TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
-		TaskQuery taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
+//		System.out.println(user.getGroup().getType());
+//		System.out.println("1.Assignee--"+this.taskService.createTaskQuery().taskAssignee(user.getGroup().getType()).count());
+//		System.out.println("2.CandidateGroup--"+this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType()).count());
+//		System.out.println("3.CandidateUser--"+this.taskService.createTaskQuery().taskCandidateUser(user.getGroup().getType()).count());
+//		System.out.println("4.CandidateOrAssigned--"+this.taskService.createTaskQuery().taskCandidateOrAssigned(user.getGroup().getType()).count());
+		//taskCandidateOrAssigned 在设置任务受理人(setAssignee)的时候起作用，设置任务候选组(addCandidateGroup)或者候选人(addCandidateUser)的时候不起作用，什么情况？换个activiti5.17试试
+		TaskQuery taskQuery = null;
+		String groupType = user.getGroup().getType();
+//		if("boss".equals(groupType)){
+//			//boss只有一个，待办任务设置的是setAssignee,见UserTaskListener
+//			taskQuery = this.taskService.createTaskQuery().taskAssignee(groupType);
+//		}else{
+//			taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
+//		}
+		taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
 		Integer totalSum = taskQuery.list().size();
 		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
 		Pagination pagination = PaginationThreadUtils.get();
@@ -134,6 +151,69 @@ public class ProcessServiceImp implements IProcessService{
 		return taskList;
     }
     
+    /**
+     * 读取已结束中的流程(admin查看)
+     *
+     * @return
+     */
+    @Override
+    public List<BaseVO> findFinishedProcessInstances(Model model) {
+        HistoricProcessInstanceQuery historQuery = historyService.createHistoricProcessInstanceQuery().finished();
+        Integer totalSum = historQuery.list().size();
+        int[] pageParams = PaginationThreadUtils.setPage(totalSum);
+    	Pagination pagination = PaginationThreadUtils.get();
+		List<HistoricProcessInstance> list = historQuery.orderByProcessInstanceEndTime().desc().listPage(pageParams[0], pageParams[1]);
+		List<BaseVO> processList = new ArrayList<BaseVO>();
+		
+		for (HistoricProcessInstance historicProcessInstance : list) {
+			String processInstanceId = historicProcessInstance.getId();
+			List<HistoricVariableInstance> listVar = this.historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list();
+			for(HistoricVariableInstance var : listVar){
+				if("serializable".equals(var.getVariableTypeName()) && "entity".equals(var.getVariableName())){
+					BaseVO base = (BaseVO) var.getValue();
+					base.setHistoricProcessInstance(historicProcessInstance);
+					base.setProcessDefinition(getProcessDefinition(historicProcessInstance.getProcessDefinitionId()));
+					processList.add(base);
+					break;
+				}
+			}
+		}
+		
+		model.addAttribute("page", pagination.getPageStr());
+        return processList;
+    }
+	
+    /**
+     * 各个审批人员查看自己完成的任务
+     * @param model
+     * @return
+     * @throws Exception
+     */
+	@Override
+	public List<BaseVO> findFinishedTaskInstances(User user, Model model) throws Exception {
+		HistoricTaskInstanceQuery historQuery = historyService.createHistoricTaskInstanceQuery().taskAssignee(user.getId().toString()).finished();
+		Integer totalSum = historQuery.list().size();
+        int[] pageParams = PaginationThreadUtils.setPage(totalSum);
+    	Pagination pagination = PaginationThreadUtils.get();
+    	List<HistoricTaskInstance> list = historQuery.orderByHistoricTaskInstanceEndTime().desc().listPage(pageParams[0], pageParams[1]);
+    	List<BaseVO> taskList = new ArrayList<BaseVO>();
+    	
+    	for(HistoricTaskInstance historicTaskInstance : list){
+    		String processInstanceId = historicTaskInstance.getProcessInstanceId();
+    		List<HistoricVariableInstance> listVar = this.historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list();
+			for(HistoricVariableInstance var : listVar){
+				if("serializable".equals(var.getVariableTypeName()) && "entity".equals(var.getVariableName())){
+					BaseVO base = (BaseVO) var.getValue();
+					base.setHistoricTaskInstance(historicTaskInstance);
+					base.setProcessDefinition(getProcessDefinition(historicTaskInstance.getProcessDefinitionId()));
+					taskList.add(base);
+					break;
+				}
+			}
+    	}
+    	model.addAttribute("page", pagination.getPageStr());
+		return taskList;
+	}
     
     /**
      * 将Task集合转为BaseVO集合
@@ -275,23 +355,6 @@ public class ProcessServiceImp implements IProcessService{
         return resourceAsStream;
 	}
 
-    
-    /**
-     * 读取已结束中的流程(待完善)
-     *
-     * @return
-     */
-    @Override
-    public String findFinishedProcessInstaces(Model model) {
-        HistoricProcessInstanceQuery historQuery = historyService.createHistoricProcessInstanceQuery().finished();
-        Integer totalSum = historQuery.list().size();
-        int[] pageParams = PaginationThreadUtils.setPage(totalSum);
-    	Pagination pagination = PaginationThreadUtils.get();
-		List<HistoricProcessInstance> list = historQuery.orderByProcessInstanceEndTime().desc().listPage(pageParams[0], pageParams[1]);
-		model.addAttribute("page", pagination.getPageStr());
-        return null;
-    }
-    
     /**
      * 查看正在运行的请假流程
      * @param user
@@ -304,6 +367,9 @@ public class ProcessServiceImp implements IProcessService{
 		List<BaseVO> result = new ArrayList<BaseVO>();
 		if(listVacation != null ){
 			for (Vacation vac : listVacation) {
+				if(vac.getProcessInstanceId() == null){
+					continue;
+				}
 				// 查询流程实例
 				ProcessInstance pi = this.runtimeService
 						.createProcessInstanceQuery()
@@ -336,6 +402,9 @@ public class ProcessServiceImp implements IProcessService{
 		List<BaseVO> result = new ArrayList<BaseVO>();
 		if(listVacation != null ){
 			for (ExpenseAccount expense : listVacation) {
+				if(expense.getProcessInstanceId() == null){
+					continue;
+				}
 				// 查询流程实例
 				ProcessInstance pi = this.runtimeService
 						.createProcessInstanceQuery()
@@ -357,7 +426,7 @@ public class ProcessServiceImp implements IProcessService{
     }
     
     /**
-     * 查看正在运行的薪资跳转流程
+     * 查看正在运行的薪资调整流程
      * @param user
      * @return
      * @throws Exception
@@ -368,6 +437,9 @@ public class ProcessServiceImp implements IProcessService{
     	List<BaseVO> result = new ArrayList<BaseVO>();
     	if(listSalary != null ){
     		for(SalaryAdjust sa : listSalary){
+    			if(sa.getProcessInstanceId() == null){
+    				continue;
+    			}
     			// 查询流程实例
 				ProcessInstance pi = this.runtimeService
 						.createProcessInstanceQuery()
@@ -491,5 +563,6 @@ public class ProcessServiceImp implements IProcessService{
 			throws Exception {
 		runtimeService.suspendProcessInstanceById(processInstanceId);
 	}
+
 
 }
