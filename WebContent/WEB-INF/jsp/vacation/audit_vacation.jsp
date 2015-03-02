@@ -46,7 +46,7 @@ function complete( flag ) {
                         </tr>
                         <tr>
                           <td width="15%" class="title1">请假天数：</td>
-                          <td class="left"><input name="days" value="${vacation.days }" type="text" class="input_text2" size="30" /></td>
+                          <td class="left"><input name="days" value="${vacation.days }" type="text" class="input_text2" size="30" readonly/></td>
 						  </td>
                         </tr>
                         <tr>
