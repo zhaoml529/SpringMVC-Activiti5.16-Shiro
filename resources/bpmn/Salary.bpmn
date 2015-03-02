@@ -6,13 +6,13 @@
     <userTask id="directorAudit" name="总监审批">
       <documentation>总监去审批</documentation>
       <extensionElements>
-        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskLintener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="directorAudit"></sequenceFlow>
     <userTask id="hrAudit" name="人事审批">
       <extensionElements>
-        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskLintener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <callActivity id="callactivity1" name="调整薪资" calledElement="CountSalary">
@@ -23,7 +23,7 @@
     </callActivity>
     <userTask id="bossAudit" name="老板审批">
       <extensionElements>
-        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskLintener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow4" sourceRef="callactivity1" targetRef="bossAudit"></sequenceFlow>
