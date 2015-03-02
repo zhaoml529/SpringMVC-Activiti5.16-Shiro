@@ -10,13 +10,22 @@
 <meta http-equiv="pragma" content="no-cache" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />    
-<title>代办任务列表</title>
+<title>流程管理</title>
 <link href="${ctx }/css/common/jquery.qtip.min.css" type="text/css" rel="stylesheet" />
 <script src="${ctx }/js/workflow.js" type="text/javascript"></script>
 <script src="${ctx }/js/common/jquery.outerhtml.js" type="text/javascript"></script>
 <script src="${ctx }/js/common/jquery.qtip.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		var ctx = "${ctx}";
+		$(function() {
+			var taskType = "${taskType}";
+			$("#" + taskType).attr("class", "selected");
+			if(taskType == "running"){
+				$("#taskForm").attr("action","${ctx}/processAction/process/runningProcess_page");
+			}else if(taskType == "finished"){
+				$("#taskForm").attr("action","${ctx}/processAction/process/finishedProcess_page");
+			}
+		});
 		$(function() {
 			var message = "${message}";
 			if(message != ""){
@@ -49,12 +58,13 @@
 		</div>
       <div class="sort_switch">
           <ul id="TabsNav">
-          	  <li class="selected" id="candidate"><a href="${ctx }/processAction/process/runningProcess_page">管理运行中流程</a></li>
+          	  <li class="" id="running"><a href="${ctx }/processAction/process/runningProcess_page">管理运行中流程</a></li>
+          	  <li class="" id="finished"><a href="${ctx}/processAction/process/finishedProcess_page">已结束的流程</a></li>
           </ul>
       </div>
       
       <div class="sort_content">
-      	<form action="${ctx }/processAction/process/runningProcess_page" method="post">
+      	<form id="taskForm" method="post">
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
 				<tr>
 					<th>执行ID</th>

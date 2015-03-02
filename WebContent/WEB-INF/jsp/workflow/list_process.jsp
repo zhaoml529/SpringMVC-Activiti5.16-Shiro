@@ -95,8 +95,8 @@ function doSearch(currentPage)
 						<td>${process.name }</td>
 						<td>${process.key }</td>
 						<td>${process.version }</td>
-						<td><a target="_blank" href='${ctx }/processAction/process/resource/process-definition?processDefinitionId=${process.id}&resourceType=xml'>${process.resourceName }</a></td>
-						<td><a target="_blank" href='${ctx }/processAction/process/resource/process-definition?processDefinitionId=${process.id}&resourceType=image'>${process.diagramResourceName }</a></td>
+						<td><a target="_blank" href='${ctx }/processAction/process/process-definition?processDefinitionId=${process.id}&resourceType=xml'>${process.resourceName }</a></td>
+						<td><a target="_blank" href='${ctx }/processAction/process/process-definition?processDefinitionId=${process.id}&resourceType=image'>${process.diagramResourceName }</a></td>
 						<td><fmt:formatDate value="${deployment.deploymentTime }"  type="both"/></td>
 						<td>${process.suspended} |
 							<c:if test="${process.suspended }">
