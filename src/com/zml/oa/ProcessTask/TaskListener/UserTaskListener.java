@@ -7,21 +7,26 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.zml.oa.service.IUserService;
+
 /**
  * 动态用户任务分配
  * @author ZML
  *
  */
 @Component
-public class UserTaskLintener implements TaskListener {
+public class UserTaskListener implements TaskListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2190559253653576032L;
 	
-	private static final Logger logger = Logger.getLogger(UserTaskLintener.class);
+	private static final Logger logger = Logger.getLogger(UserTaskListener.class);
     @Autowired
     protected RepositoryService repositoryService;
+    
+	@Autowired
+	protected IUserService userService;
     
 	@Override
 	public void notify(DelegateTask delegateTask) {
@@ -48,9 +53,9 @@ public class UserTaskLintener implements TaskListener {
 			delegateTask.addCandidateGroup("employee");
 		}else if("bossAudit".equals(taskDefinitionKey)){
 //			老板只有一个，这里直接添加任务受理人（setAssignee）为boss就可以，不用再去"抢占"式的领取代办任务。
-//			delegateTask.setAssignee("boss"); //具体boss的Id号
-//			delegateTask.addCandidateGroup("boss");
-			delegateTask.addCandidateUser("boss");
+//			delegateTask.setAssignee("boss"); //具体boss的Id号-16
+			delegateTask.addCandidateGroup("boss");
+//			delegateTask.addCandidateUser("boss");
 		}
 	}
 }
