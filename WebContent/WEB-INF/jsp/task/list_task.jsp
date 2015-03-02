@@ -19,8 +19,10 @@
 		$("#" + taskType).attr("class", "selected");
 		if(taskType == "candidate"){
 			$("#taskForm").attr("action","${ctx}/processAction/todoTaskList_page");
-		}else{
+		}else if(taskType == "assignee"){
 			$("#taskForm").attr("action","${ctx}/processAction/doTaskList_page");
+		}else{
+			$("#taskForm").attr("action","${ctx}/processAction/finishedTask_page");
 		}
 	    // 跟踪
 	    $('.trace').click(graphTrace);
@@ -54,7 +56,7 @@
           <ul id="TabsNav">
           	  <li class="" id="candidate"><a href="${ctx}/processAction/todoTaskList_page">待办的任务</a></li>
           	  <li class="" id="assignee"><a href="${ctx}/processAction/doTaskList_page">受理的任务</a></li>
-          	  <%-- <li class="" id="assignee"><a href="${ctx}/processAction/process/finished">已完成的任务</a></li> --%>
+          	  <li class="" id="finished"><a href="${ctx}/processAction/finishedTask_page">已完成的任务</a></li>
           </ul>
       </div>
       
