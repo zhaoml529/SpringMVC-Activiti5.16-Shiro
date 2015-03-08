@@ -123,7 +123,9 @@ public class ProcessServiceImp implements IProcessService{
 //		}else{
 //			taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
 //		}
-		taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
+//		taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(groupType);
+		taskQuery = this.taskService.createTaskQuery().taskCandidateUser(groupType);
+//		taskQuery = this.taskService.createTaskQuery().taskCandidateOrAssigned(groupType);
 		Integer totalSum = taskQuery.list().size();
 		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
 		Pagination pagination = PaginationThreadUtils.get();
@@ -131,7 +133,7 @@ public class ProcessServiceImp implements IProcessService{
 		List<BaseVO> taskList = getBaseVOList(tasks);
 		model.addAttribute("page", pagination.getPageStr());
 		return taskList;
-    }
+    } 
     
     /**
      * 查询待受理任务
@@ -141,7 +143,8 @@ public class ProcessServiceImp implements IProcessService{
      */
 	@Override
     public List<BaseVO> findDoTask(User user, Model model){
-    	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
+//    	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
+    	TaskQuery taskQuery = this.taskService.createTaskQuery().taskCandidateOrAssigned(user.getId().toString());
     	Integer totalSum = taskQuery.list().size();
     	int[] pageParams = PaginationThreadUtils.setPage(totalSum);
     	Pagination pagination = PaginationThreadUtils.get();

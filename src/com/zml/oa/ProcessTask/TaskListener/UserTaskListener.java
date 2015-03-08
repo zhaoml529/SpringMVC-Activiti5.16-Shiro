@@ -1,5 +1,8 @@
 package com.zml.oa.ProcessTask.TaskListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
@@ -42,9 +45,17 @@ public class UserTaskListener implements TaskListener {
 //		String processDefinitionKey = processDefinition.getKey();	//com.zml.oa.vacation
 		
 		if("directorAudit".equals(taskDefinitionKey)){
-			delegateTask.addCandidateGroup("director");
+			List<String> groups = new ArrayList<String>();
+			groups.add("director");
+			groups.add("finance");
+//			delegateTask.addCandidateGroup("director");
+			delegateTask.addCandidateGroups(groups);
 		}else if("hrAudit".equals(taskDefinitionKey)){
-			delegateTask.addCandidateGroup("hr");
+//			delegateTask.addCandidateGroup("hr");
+			List<String> users = new ArrayList<String>();
+			users.add("17");
+			users.add("18");
+			delegateTask.addCandidateUsers(users);
 		}else if("managerAudit".equals(taskDefinitionKey)){
 			delegateTask.addCandidateGroup("manager");
 		}else if("financeAudit".equals(taskDefinitionKey)){
@@ -53,8 +64,8 @@ public class UserTaskListener implements TaskListener {
 			delegateTask.addCandidateGroup("employee");
 		}else if("bossAudit".equals(taskDefinitionKey)){
 //			老板只有一个，这里直接添加任务受理人（setAssignee）为boss就可以，不用再去"抢占"式的领取代办任务。
-//			delegateTask.setAssignee("boss"); //具体boss的Id号-16
-			delegateTask.addCandidateGroup("boss");
+			delegateTask.setAssignee("4"); //具体boss的Id号-16
+//			delegateTask.addCandidateGroup("boss");
 //			delegateTask.addCandidateUser("boss");
 		}
 	}

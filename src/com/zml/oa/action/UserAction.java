@@ -102,10 +102,13 @@ public class UserAction {
 
 	@RequiresPermissions("admin:user:doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
-	public String doAdd(@ModelAttribute("user") User user) throws Exception{
+	public String doAdd(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) throws Exception{
 		user.setRegisterDate(new Date());
-		Serializable id = this.userService.doAdd(user);
+		user.setLocked(0);
+		String groupId = user.getGroup().getId().toString();
+		Serializable id = this.userService.doAdd(user, groupId, true);
 		logger.info("Serializable id: "+id);
+		redirectAttributes.addFlashAttribute("msg", "添加用户成功！");
 		return "redirect:/userAction/toList_page";
 		
 	}
@@ -122,18 +125,20 @@ public class UserAction {
 	
 	@RequiresPermissions("admin:user:doUpdate")
 	@RequestMapping(value = "/doUpdate", method = RequestMethod.POST)
-	public String doUpdate(@ModelAttribute("user") User user) throws Exception{
+	public String doUpdate(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) throws Exception{
 		this.userService.doUpdate(user);
+		redirectAttributes.addFlashAttribute("msg", "修改用户成功！");
 		return "redirect:/userAction/toList_page";
 	}
 	
 	
 	@RequiresPermissions("admin:user:doDelete")
 	@RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
-	public String delete(@PathVariable("id") Integer id) throws Exception{
+	public String delete(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) throws Exception{
 		User user = new User();
 		user.setId(id);
-		this.userService.doDelete(user);
+		this.userService.doDelete(user, true);
+		redirectAttributes.addFlashAttribute("msg", "删除用户成功！");
 		return "redirect:/userAction/toList_page";
 	}
 	
@@ -159,4 +164,21 @@ public class UserAction {
         redirectAttributes.addFlashAttribute("msg", "强制退出成功！");
         return "redirect:/userAction/listSession";
     }
+	
+	@RequiresPermissions("admin:user:syncUser")
+	@RequestMapping("/syncUserToActiviti")
+	public String syncUserToActiviti(RedirectAttributes redirectAttributes) throws Exception {
+		this.userService.synAllUserAndRoleToActiviti();
+		redirectAttributes.addFlashAttribute("msg", "成功同步用户、角色数据到工作流！");
+		return "redirect:/userAction/toList_page";
+	}
+	
+	//如果执行删除，工作流审批中的代办任务和待签收任务将无法使用。（在act_ru_identitylink将查不到act_id_user、act_id_group和act_id_membership的信息）
+	@RequiresPermissions("admin:user:delAllIdentifyData")
+	@RequestMapping("/delAllIdentifyData")
+	public String delAllIdentifyData(RedirectAttributes redirectAttributes) throws Exception {
+		this.userService.deleteAllActivitiIdentifyData();
+		redirectAttributes.addFlashAttribute("msg", "成功删除工作流引擎Activiti的用户、角色以及关系！");
+		return "redirect:/userAction/toList_page";
+	}   
 }
