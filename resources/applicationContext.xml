@@ -56,10 +56,10 @@
         </property> 
     </bean>   
 	 
-	<!-- 给Dao注入sessionFactory -->    
-<!--   	<bean id="baseDao" class="com.zml.oa.dao.impl.BaseDaoImpl">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean> -->
+	<!-- jdbc模板 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
   	
    	<!-- 开启AOP监听 只对当前配置文件有效 -->
 	<aop:aspectj-autoproxy expose-proxy="true"/>
