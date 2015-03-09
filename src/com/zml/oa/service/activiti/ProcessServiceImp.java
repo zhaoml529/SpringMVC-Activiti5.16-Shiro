@@ -143,6 +143,7 @@ public class ProcessServiceImp implements IProcessService{
      */
 	@Override
     public List<BaseVO> findDoTask(User user, Model model){
+		//taskCandidateOrAssigned查询某个人的待办任务，包含已签收、候选任务<候选人范围和候选组范围>
 //    	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
     	TaskQuery taskQuery = this.taskService.createTaskQuery().taskCandidateOrAssigned(user.getId().toString());
     	Integer totalSum = taskQuery.list().size();
