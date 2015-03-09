@@ -56,7 +56,8 @@
 						<td><a target="_blank" href='${ctx }/processAction/process/process-definition?processDefinitionId=${process.id}&resourceType=xml'>${process.resourceName }</a></td>
 						<td><a target="_blank" href='${ctx }/processAction/process/process-definition?processDefinitionId=${process.id}&resourceType=image'>${process.diagramResourceName }</a></td>
 						<td>
-	                        <a href='${ctx }/permissionAction/setAuthor?id=${process.id }'>设定人员</a>
+	                        <a href='${ctx }/permissionAction/setAuthor?processDefinitionId=${process.id }'>设定人员</a>|
+	                        <a href='${ctx }/permissionAction/loadSingleBpmn?processDefinitionId=${process.id}'>加载</a>
 	                    </td>
 					</tr>
 				  </c:forEach>
