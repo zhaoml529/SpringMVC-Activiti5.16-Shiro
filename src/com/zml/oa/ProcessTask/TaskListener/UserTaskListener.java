@@ -46,8 +46,8 @@ public class UserTaskListener implements TaskListener {
 		
 		if("directorAudit".equals(taskDefinitionKey)){
 			List<String> groups = new ArrayList<String>();
-			groups.add("director");
-			groups.add("finance");
+			groups.add("2");
+			groups.add("4");
 //			delegateTask.addCandidateGroup("director");
 			delegateTask.addCandidateGroups(groups);
 		}else if("hrAudit".equals(taskDefinitionKey)){
