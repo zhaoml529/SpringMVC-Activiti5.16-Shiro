@@ -50,14 +50,6 @@ public interface IProcessService {
 	 */
 	public List<BaseVO> findTodoTask(User user, Model model) throws Exception;
 	
-	/**
-     * 查询待受理任务
-     * @param user
-     * @param model
-     * @return
-     */
-    public List<BaseVO> findDoTask(User user, Model model) throws Exception;
-	 
     /**
      * 签收任务
      * @param user

@@ -107,25 +107,8 @@ public class ProcessServiceImp implements IProcessService{
      */
 	@Override
     public List<BaseVO> findTodoTask(User user, Model model){
-    	// 根据当前用户组查询
-//      TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateOrAssigned(userId);
-//		System.out.println(user.getGroup().getType());
-//		System.out.println("1.Assignee--"+this.taskService.createTaskQuery().taskAssignee(user.getGroup().getType()).count());
-//		System.out.println("2.CandidateGroup--"+this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType()).count());
-//		System.out.println("3.CandidateUser--"+this.taskService.createTaskQuery().taskCandidateUser(user.getGroup().getType()).count());
-//		System.out.println("4.CandidateOrAssigned--"+this.taskService.createTaskQuery().taskCandidateOrAssigned(user.getGroup().getType()).count());
-		//taskCandidateOrAssigned 在设置任务受理人(setAssignee)的时候起作用，设置任务候选组(addCandidateGroup)或者候选人(addCandidateUser)的时候不起作用，什么情况？换个activiti5.17试试
-		TaskQuery taskQuery = null;
-		String groupType = user.getGroup().getType();
-//		if("boss".equals(groupType)){
-//			//boss只有一个，待办任务设置的是setAssignee,见UserTaskListener
-//			taskQuery = this.taskService.createTaskQuery().taskAssignee(groupType);
-//		}else{
-//			taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(user.getGroup().getType());
-//		}
-//		taskQuery = this.taskService.createTaskQuery().taskCandidateGroup(groupType);
-		taskQuery = this.taskService.createTaskQuery().taskCandidateUser(groupType);
-//		taskQuery = this.taskService.createTaskQuery().taskCandidateOrAssigned(groupType);
+		//taskCandidateOrAssigned查询某个人的待办任务，包含已签收、候选任务<候选人范围和候选组范围>
+		TaskQuery taskQuery = this.taskService.createTaskQuery().taskCandidateOrAssigned(user.getId().toString());
 		Integer totalSum = taskQuery.list().size();
 		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
 		Pagination pagination = PaginationThreadUtils.get();
@@ -134,27 +117,7 @@ public class ProcessServiceImp implements IProcessService{
 		model.addAttribute("page", pagination.getPageStr());
 		return taskList;
     } 
-    
-    /**
-     * 查询待受理任务
-     * @param user
-     * @param model
-     * @return
-     */
-	@Override
-    public List<BaseVO> findDoTask(User user, Model model){
-		//taskCandidateOrAssigned查询某个人的待办任务，包含已签收、候选任务<候选人范围和候选组范围>
-//    	TaskQuery taskQuery = this.taskService.createTaskQuery().taskAssignee(user.getId().toString());
-    	TaskQuery taskQuery = this.taskService.createTaskQuery().taskCandidateOrAssigned(user.getId().toString());
-    	Integer totalSum = taskQuery.list().size();
-    	int[] pageParams = PaginationThreadUtils.setPage(totalSum);
-    	Pagination pagination = PaginationThreadUtils.get();
-		List<Task> tasks = taskQuery.orderByTaskCreateTime().desc().listPage(pageParams[0], pageParams[1]);
-		List<BaseVO> taskList = getBaseVOList(tasks);
-		model.addAttribute("page", pagination.getPageStr());
-		return taskList;
-    }
-    
+
     /**
      * 读取已结束中的流程(admin查看)
      *
