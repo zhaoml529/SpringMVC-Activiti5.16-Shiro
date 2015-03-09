@@ -44,9 +44,8 @@ public class PermissionAction {
     @Autowired
     protected IUserTaskService userTaskService;
 	
-    @RequestMapping("/loadBpmn_page")
+    @RequestMapping(value = "/loadBpmn_page")
 	public String loadBpmnInfo(Model model){
-		List<Object> objects = new ArrayList<Object>();
 		ProcessDefinitionQuery proDefQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
 		Integer totalSum = proDefQuery.list().size();
 		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
@@ -57,7 +56,7 @@ public class PermissionAction {
 		return "permission/list_bpmn";
 	}
 	
-	@RequestMapping("/setAuthor")
+	@RequestMapping(value = "/setAuthor")
 	public String setAuthor(@RequestParam("id") String processDefinitionId) {
 		ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
 		List<ActivityImpl> activitiList = processDefinition.getActivities();//获得当前任务的所有节点
@@ -67,37 +66,70 @@ public class PermissionAction {
 		
 		return null;
 	}
-	
-	@RequestMapping("/initialization")
+	/**
+	 * 删除 usertask表中数据，重新初始化节点信息。
+	 * @param redirectAttributes
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/initialization")
 	public String initialization(RedirectAttributes redirectAttributes) throws Exception {
+		this.userTaskService.deleteAll();
 		ProcessDefinitionQuery proDefQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
 		List<ProcessDefinition> processDefinitionList = proDefQuery.list();
 		for(ProcessDefinition processDefinition : processDefinitionList){
-			ProcessDefinitionEntity processDef = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
-			List<ActivityImpl> activitiList = processDef.getActivities();//获得当前任务的所有节点
-			for (ActivityImpl activity : activitiList) {
-				UserTask userTask = new UserTask();
-				userTask.setProcDefId(processDefinition.getId());
-				userTask.setProcDefKey(processDefinition.getKey());
-				userTask.setProcDefName(processDefinition.getName());
-				ActivityBehavior activityBehavior = activity.getActivityBehavior();
-				//是否为用户任务
-				if (activityBehavior instanceof UserTaskActivityBehavior) {
-					UserTaskActivityBehavior userTaskActivityBehavior = (UserTaskActivityBehavior) activityBehavior;
-		            TaskDefinition taskDefinition = userTaskActivityBehavior.getTaskDefinition();
-		            
-		            //任务所属角色
-		            String taskDefKey = taskDefinition.getKey();
-		            Expression taskName = taskDefinition.getNameExpression();
-		            System.out.println("taskDefKey: "+taskDefKey+"-------- :"+taskDefinition.getNameExpression());
-		            userTask.setTaskDefKey(taskDefKey);
-		            userTask.setTaskName(taskName.toString());
-		            this.userTaskService.doAdd(userTask);
-				}
-				
-			}
+			//读取节点信息保存到usertask表
+			packageSingleActivitiInfo(processDefinition);
 		}
 		redirectAttributes.addAttribute("message", "初始化成功！");
 		return "redirect:/permissionAction/loadBpmn_page";
+	}
+	
+	/**
+	 * 初始化单个bpmn文件到usertask表
+	 * @param processDefinitionId
+	 * @param redirectAttributes
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/loadSingleBpmn")
+	public String loadSingleBpmn(@RequestParam("processDefinitionId") String processDefinitionId,
+								RedirectAttributes redirectAttributes) throws Exception{
+		ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
+		//读取节点信息保存到usertask表
+		packageSingleActivitiInfo(processDefinition);
+		redirectAttributes.addAttribute("message", "加载成功！");
+		return "redirect:/permissionAction/loadBpmn_page";
+	}
+
+	private void packageSingleActivitiInfo(ProcessDefinition processDefinition) throws Exception{
+		String proDefKey = processDefinition.getKey();
+		//如果usertask存在现有节点，不需要重新添加--未完成
+		List<UserTask> list = this.userTaskService.findByWhere(proDefKey);
+		ProcessDefinitionEntity processDef = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
+		List<ActivityImpl> activitiList = processDef.getActivities();//获得当前任务的所有节点
+		for (ActivityImpl activity : activitiList) {
+			UserTask userTask = new UserTask();
+			userTask.setProcDefKey(processDefinition.getKey());
+			userTask.setProcDefName(processDefinition.getName());
+			ActivityBehavior activityBehavior = activity.getActivityBehavior();
+			//是否为用户任务
+			if (activityBehavior instanceof UserTaskActivityBehavior) {
+				UserTaskActivityBehavior userTaskActivityBehavior = (UserTaskActivityBehavior) activityBehavior;
+	            TaskDefinition taskDefinition = userTaskActivityBehavior.getTaskDefinition();
+	            
+	            //任务所属角色
+	            String taskDefKey = taskDefinition.getKey();
+	            Expression taskName = taskDefinition.getNameExpression();
+	            System.out.println("taskDefKey: "+taskDefKey+"-------- :"+taskDefinition.getNameExpression());
+	            userTask.setTaskDefKey(taskDefKey);
+	            userTask.setTaskName(taskName.toString());
+	            if(list.size() != 0){
+	            	this.userTaskService.doUpdate(userTask);
+	            }else{
+	            	this.userTaskService.doAdd(userTask);
+	            }
+			}
+		}
 	}
 }
