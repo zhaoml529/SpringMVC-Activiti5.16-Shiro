@@ -15,5 +15,12 @@ public interface IUserTaskService {
 	
 	public List<UserTask> toList(String procDefKey) throws Exception;
 	
-	public UserTask findById(String procDefId) throws Exception;
+	public Integer deleteAll() throws Exception; 
+	
+	public UserTask findById(Integer id) throws Exception;
+	
+	public List<UserTask> findByWhere(String procDefKey) throws Exception;
+	
+	public List<UserTask> getAll() throws Exception;
+	
 }
