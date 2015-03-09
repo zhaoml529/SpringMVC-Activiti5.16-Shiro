@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.zml.oa.dao.IJdbcDao;
 import com.zml.oa.entity.UserTask;
 import com.zml.oa.service.IBaseService;
 import com.zml.oa.service.IUserTaskService;
@@ -15,6 +16,9 @@ public class UserTaskServiceImpl implements IUserTaskService {
 
 	@Autowired 
 	private IBaseService<UserTask> baseService;
+	
+	@Autowired
+	protected IJdbcDao jdbcDao;
 	
 	@Override
 	public Serializable doAdd(UserTask userTask) throws Exception {
@@ -38,8 +42,24 @@ public class UserTaskServiceImpl implements IUserTaskService {
 	}
 
 	@Override
-	public UserTask findById(String procDefId) throws Exception {
-		return this.baseService.getBean(UserTask.class, procDefId);
+	public UserTask findById(Integer id) throws Exception {
+		return this.baseService.getBean(UserTask.class, id);
+	}
+
+	@Override
+	public Integer deleteAll() throws Exception {
+		String sql = "delete from T_USER_TASK";
+		return this.jdbcDao.delete(sql, null);
+	}
+
+	@Override
+	public List<UserTask> findByWhere(String procDefKey) throws Exception {
+		return this.baseService.findByWhere("UserTask", new String[]{"procDefKey"}, new String[]{procDefKey});
+	}
+
+	@Override
+	public List<UserTask> getAll() throws Exception {
+		return this.baseService.getAllList("UserTask");
 	}
 
 }
