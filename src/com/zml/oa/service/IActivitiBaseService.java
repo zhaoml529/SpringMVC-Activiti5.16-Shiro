@@ -2,9 +2,18 @@ package com.zml.oa.service;
 
 public interface IActivitiBaseService {
 
-	public abstract void deleteAllUser();
+	/**
+     * 删除用户和组的关系
+     */
+	public void deleteAllUser() throws Exception;
 	
-	public abstract void deleteAllRole();
-	
-	public abstract void deleteAllMemerShip();
+	/**
+     * 删除用户和组的关系
+     */
+    public void deleteAllRole() throws Exception;
+    
+    /**
+     * 删除用户和组的关系
+     */
+    public void deleteAllMemerShip() throws Exception;
 }
