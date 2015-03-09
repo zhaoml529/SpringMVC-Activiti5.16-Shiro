@@ -32,7 +32,7 @@ public interface IBaseService<T> {
 	 public void saveOrUpdate(T bean) throws Exception;
 
 	 public void delete(T bean) throws Exception;
-
+	 
 	 public void update(T bean) throws Exception;
 	 
 	 public T getBean(final Class<T> obj,final Serializable id) throws Exception;
