@@ -59,7 +59,6 @@ import com.zml.oa.util.WorkflowUtils;
  *
  */
 @Controller
-@RequiresPermissions("admin:*")
 @RequestMapping("/processAction")
 public class ProcessAction {
 	private static final Logger logger = Logger.getLogger(ProcessAction.class);
@@ -98,25 +97,6 @@ public class ProcessAction {
 		return "task/list_task";
 	}
 	
-    
-    /**
-     * 查询受理任务列表
-     * @param session
-     * @param model
-     * @return
-     * @throws NumberFormatException
-     * @throws Exception
-     */
-	@RequiresPermissions("user:task:doTask")
-    @RequestMapping(value="/doTaskList_page", method = {RequestMethod.POST, RequestMethod.GET})
-    public String doTaskList_page(HttpSession session, Model model) throws NumberFormatException, Exception{
-    	User user = UserUtil.getUserFromSession(session);
-    	List<BaseVO> taskList = this.processService.findDoTask(user, model);
-        model.addAttribute("tasklist", taskList);
-		model.addAttribute("taskType", BaseVO.ASSIGNEE);
-		return "task/list_task";
-    }
-    
     /**
      * 查看已完成任务列表
      *
@@ -377,6 +357,7 @@ public class ProcessAction {
      * @param file
      * @return
      */
+    @RequiresPermissions("admin:process:*")
     @RequestMapping(value = "/process/deploy")
     public String deploy(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, 
     					  @RequestParam(value = "file", required = false) MultipartFile file,
@@ -416,6 +397,7 @@ public class ProcessAction {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("admin:process:*")
     @RequestMapping(value = "/process/redeploy/all")
     public String redeployAll(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, RedirectAttributes redirectAttributes) throws Exception {
     	try {
@@ -434,11 +416,15 @@ public class ProcessAction {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("admin:process:*")
     @RequestMapping(value = "/process/redeploy/single")
-    public String redeploySingle(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, RedirectAttributes redirectAttributes) throws Exception {
+    public String redeploySingle(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
+    							@RequestParam("resourceName") String resourceName,
+    							RedirectAttributes redirectAttributes) throws Exception {
         try {
-        	workflowProcessDefinitionService.redeploySingleFrom(exportDir,"com.zml.oa.vacation");
-        	redirectAttributes.addFlashAttribute("message", "已重新部署全部流程！");
+        	String processKey = resourceName.substring(0, resourceName.indexOf('.'))+".zip";
+        	workflowProcessDefinitionService.redeploySingleFrom(exportDir, processKey);
+        	redirectAttributes.addFlashAttribute("message", "已重新部署流程！");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
 			throw e;
@@ -453,6 +439,7 @@ public class ProcessAction {
      * @throws UnsupportedEncodingException
      * @throws XMLStreamException
      */
+    @RequiresPermissions("admin:process:*")
     @RequestMapping(value = "/process/convert_to_model")
     public String convertToModel(@RequestParam("processDefinitionId") String processDefinitionId)
             throws UnsupportedEncodingException, XMLStreamException {
