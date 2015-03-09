@@ -15,7 +15,7 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "T_USERTASK")
+@Table(name = "T_USER_TASK")
 public class UserTask implements Serializable {
 
 	/**
@@ -27,8 +27,7 @@ public class UserTask implements Serializable {
 	@Column(name = "ID", unique = true)
 	private Integer id;
 	
-	@Column(name = "PROC_DEF_ID")
-	private String procDefId;		//com.zml.oa.salary:1:127525
+//	private String procDefId;		//com.zml.oa.salary:1:127525-- 去掉，procDefId重新部署会改变的，保存这个id是无意义的
 	
 	@Column(name = "PROC_DEF_KEY")
 	private String procDefKey;		//com.zml.oa.vacation
@@ -54,12 +53,6 @@ public class UserTask implements Serializable {
 	@Column(name = "CANDIDATE_GROUPS")
 	private String candidateGroups;
 	
-	public String getProcDefId() {
-		return procDefId;
-	}
-	public void setProcDefId(String procDefId) {
-		this.procDefId = procDefId;
-	}
 	public String getProcDefKey() {
 		return procDefKey;
 	}
