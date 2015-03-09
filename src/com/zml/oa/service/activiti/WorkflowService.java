@@ -265,8 +265,6 @@ public class WorkflowService {
         logger.info("assignee: "+assignee);
         if (assignee != null) {
         	User assigneeUser = this.userService.getUserById(new Integer(assignee));
-//            User assigneeUser = identityService.createUserQuery().userId(assignee).singleResult();
-//            String userInfo = assigneeUser.getFirstName() + " " + assigneeUser.getLastName();
         	if(!BeanUtils.isBlank(assigneeUser)){
         		vars.put("当前处理人", assigneeUser.getName());
         	}else{
