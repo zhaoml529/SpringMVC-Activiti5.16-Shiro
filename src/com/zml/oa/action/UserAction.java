@@ -20,6 +20,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -102,11 +103,13 @@ public class UserAction {
 
 	@RequiresPermissions("admin:user:doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
-	public String doAdd(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) throws Exception{
+	public String doAdd(@ModelAttribute("user") User user,
+						@Value("#{APP_PROPERTIES['account.user.add.syntoactiviti']}") Boolean synToActiviti,
+						RedirectAttributes redirectAttributes) throws Exception{
 		user.setRegisterDate(new Date());
 		user.setLocked(0);
 		String groupId = user.getGroup().getId().toString();
-		Serializable id = this.userService.doAdd(user, groupId, true);
+		Serializable id = this.userService.doAdd(user, groupId, synToActiviti);
 		logger.info("Serializable id: "+id);
 		redirectAttributes.addFlashAttribute("msg", "添加用户成功！");
 		return "redirect:/userAction/toList_page";
@@ -134,10 +137,12 @@ public class UserAction {
 	
 	@RequiresPermissions("admin:user:doDelete")
 	@RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
-	public String delete(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) throws Exception{
+	public String delete(@PathVariable("id") Integer id,
+						@Value("#{APP_PROPERTIES['account.user.delete.syntoactiviti']}") Boolean synToActiviti, 
+						RedirectAttributes redirectAttributes) throws Exception{
 		User user = new User();
 		user.setId(id);
-		this.userService.doDelete(user, true);
+		this.userService.doDelete(user, synToActiviti);
 		redirectAttributes.addFlashAttribute("msg", "删除用户成功！");
 		return "redirect:/userAction/toList_page";
 	}
