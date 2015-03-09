@@ -112,7 +112,7 @@
         <!-- 生成流程图的字体 -->
         <property name="activityFontName" value="${diagram.activityFontName}"/>
         <property name="labelFontName" value="${diagram.labelFontName}"/>
-		<property name="deploymentResources" value="classpath*:/bpmn/*" />
+		<!-- <property name="deploymentResources" value="classpath*:/bpmn/*" /> -->
 	</bean>
 	<!-- 流程引擎的bean -->
 	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
