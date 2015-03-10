@@ -42,13 +42,13 @@
 		window.location.href = '${ctx }/permissionAction/initialization';
 	}
 	
-	function chooseUser( multiSelect ){
+	function chooseUser( multiSelect, taskDefKey ){
 			$('#choose-user').dialog({
 			      height: 400,
 			      width: 1000,
 			      modal: true,
 			      open: function () { 
-						$("#choose-user").html('<iframe src="${ctx}/userAction/chooseUser?groupId=-1&flag='+multiSelect+'" frameborder="0" height="100%" width="100%" id="dialogFrame" scrolling="auto"></iframe>'); 
+						$("#choose-user").html('<iframe src="${ctx}/userAction/chooseUser?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" scrolling="auto"></iframe>'); 
 				  }, 
 			      buttons: [
 			        {text: '创建',
@@ -99,8 +99,8 @@
 			<tr>\
 				<td>类型:</td>\
 				<td>\
-					<input type="radio" name="taskType" value="0" id="key" onclick="chooseUser(false);" />人员\
-			        <input type="radio" name="taskType" value="1" id="key" onclick="chooseUser(true);" />候选人\
+					<input type="radio" name="taskType" value="0" id="key" onclick="chooseUser(false,\''+obj.taskDefKey+'\');" />人员\
+			        <input type="radio" name="taskType" value="1" id="key" onclick="chooseUser(true,\''+obj.taskDefKey+'\');" />候选人\
 			        <input type="radio" name="taskType" value="2" id="key" />候选组\
 				</td>\
 			</tr>\
@@ -108,8 +108,8 @@
 			<tr>\
 				<td>选择:</td>\
 				<td>\
-					<input type="text" name="'+obj.taskDefKey+'_name" id="name" class="text ui-widget-content ui-corner-all"/>\
-					<input type="hidden" name="'+obj.taskDefKey+'_id" id="name" class="text ui-widget-content ui-corner-all"/>\
+					<input type="text" id="'+obj.taskDefKey+'_name" name="name" class="text ui-widget-content ui-corner-all"/>\
+					<input type="hidden" id="'+obj.taskDefKey+'_id" name="name" class="text ui-widget-content ui-corner-all"/>\
 				</td>\
 			</tr>\
 			</table>\

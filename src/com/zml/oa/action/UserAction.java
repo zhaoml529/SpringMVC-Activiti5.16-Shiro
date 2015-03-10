@@ -191,6 +191,7 @@ public class UserAction {
 	@RequestMapping(value = "/chooseUser")
 	public String chooseUser(@RequestParam("groupId") String groupId,
 							@RequestParam("flag") boolean flag,
+							@RequestParam("key") String key,
 							Model model) throws Exception{
 		List<User> userList = new ArrayList<>();
 		if("-1".equals(groupId)){
@@ -204,6 +205,7 @@ public class UserAction {
 		model.addAttribute("userList", userList);
 		model.addAttribute("groupList", groupList);
 		model.addAttribute("groupId", groupId);
+		model.addAttribute("key", key);
 		model.addAttribute("flag", flag);
 		return "user/choose_user";
 	}

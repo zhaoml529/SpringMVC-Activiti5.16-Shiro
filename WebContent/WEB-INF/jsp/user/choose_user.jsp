@@ -10,12 +10,17 @@
 <title>选取审批人员</title>
 <script type="text/javascript" src="${ctx}/js/jquery.multiselect.min.js"></script>
 <script type="text/javascript">
-	var api = frameElement.api, W = api.opener;
+	//var api = frameElement.api;
+	//var W = api.opener;
 	
 	function selectUser( userId, userName ){
-		W.document.getElementById("managerId").value = userId ;
-		W.document.getElementById("managerName").value = userName;
-		api.close();
+		var key = "${key }";
+		alert(userId+"---"+userName+"---"+key);
+		$("#"+key+"_id", window.top.document).val(userId);
+		$("#modelTable", window.top.document).find("").val(userName);
+		//W.document.getElementById(key+"_id").value = userId ;
+		//W.document.getElementById(key+"_name").value = userName;
+		//api.close();
 	}
 	
 	function getUserByGroup( groupId, flag ){
@@ -40,7 +45,7 @@
 </head>
 <body>
       <div style="text-align: left;padding: 2px 1em 2px">
-	      <select id="group"  name="subject" onchange="getUserByGroup(this.value,'${flag }')">
+	      用户组：<select id="group"  name="subject" onchange="getUserByGroup(this.value,'${flag }')">
 			<option value="-1"> -- 所有人员 -- </option> 
 			<c:choose>
 				<c:when test="${empty groupList }">
@@ -73,7 +78,7 @@
 	                  	 <input id="check_${user.id }" name="ids" type="checkbox" onchange=''>
 	                  </c:if>
 	                  <c:if test="${!flag }">
-						 <input type="radio" name="id" value="${user.id }" onclick="selectUser(this.value,'${model.name }');" />
+						 <input type="radio" name="id" value="${user.id }" onclick="selectUser(this.value,'${user.name }');" />
 	                  </c:if>
 				  </td>
                   <td>${user.name}</td>
