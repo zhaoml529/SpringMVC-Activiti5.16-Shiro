@@ -1,6 +1,5 @@
 package com.zml.oa.action;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.engine.RepositoryService;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.UserTask;
@@ -66,6 +66,13 @@ public class PermissionAction {
 		
 		return null;
 	}
+	
+	@RequestMapping(value = "/listUserTask")
+	@ResponseBody
+	public List<UserTask> listUserTask(@RequestParam("processKey") String processKey) throws Exception{
+		List<UserTask> list = this.userTaskService.findByWhere(processKey);
+		return list;
+	}
 	/**
 	 * 删除 usertask表中数据，重新初始化节点信息。
 	 * @param redirectAttributes
@@ -81,7 +88,7 @@ public class PermissionAction {
 			//读取节点信息保存到usertask表
 			packageSingleActivitiInfo(processDefinition);
 		}
-		redirectAttributes.addAttribute("message", "初始化成功！");
+		redirectAttributes.addFlashAttribute("message", "初始化成功！");
 		return "redirect:/permissionAction/loadBpmn_page";
 	}
 	
@@ -98,7 +105,7 @@ public class PermissionAction {
 		ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
 		//读取节点信息保存到usertask表
 		packageSingleActivitiInfo(processDefinition);
-		redirectAttributes.addAttribute("message", "加载成功！");
+		redirectAttributes.addFlashAttribute("message", "加载成功！");
 		return "redirect:/permissionAction/loadBpmn_page";
 	}
 
@@ -109,25 +116,38 @@ public class PermissionAction {
 		ProcessDefinitionEntity processDef = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
 		List<ActivityImpl> activitiList = processDef.getActivities();//获得当前任务的所有节点
 		for (ActivityImpl activity : activitiList) {
-			UserTask userTask = new UserTask();
-			userTask.setProcDefKey(processDefinition.getKey());
-			userTask.setProcDefName(processDefinition.getName());
 			ActivityBehavior activityBehavior = activity.getActivityBehavior();
+			boolean isFound = false;
 			//是否为用户任务
 			if (activityBehavior instanceof UserTaskActivityBehavior) {
 				UserTaskActivityBehavior userTaskActivityBehavior = (UserTaskActivityBehavior) activityBehavior;
 	            TaskDefinition taskDefinition = userTaskActivityBehavior.getTaskDefinition();
-	            
 	            //任务所属角色
 	            String taskDefKey = taskDefinition.getKey();
 	            Expression taskName = taskDefinition.getNameExpression();
-	            System.out.println("taskDefKey: "+taskDefKey+"-------- :"+taskDefinition.getNameExpression());
-	            userTask.setTaskDefKey(taskDefKey);
-	            userTask.setTaskName(taskName.toString());
+	            
+	            //判断表中是否存在此节点
 	            if(list.size() != 0){
-	            	this.userTaskService.doUpdate(userTask);
-	            }else{
-	            	this.userTaskService.doAdd(userTask);
+					for(UserTask userTask : list){
+						if(taskDefKey.equals(userTask.getTaskDefKey())){
+							userTask.setProcDefKey(processDefinition.getKey());
+				            userTask.setProcDefName(processDefinition.getName());
+				            userTask.setTaskDefKey(taskDefKey);
+				            userTask.setTaskName(taskName.toString());
+				            this.userTaskService.doUpdate(userTask);
+				            isFound = true;
+				            break;
+						}
+					}
+					
+				}
+	            if(!isFound){
+	            	UserTask userTask = new UserTask();
+		            userTask.setProcDefKey(processDefinition.getKey());
+		            userTask.setProcDefName(processDefinition.getName());
+		            userTask.setTaskDefKey(taskDefKey);
+		            userTask.setTaskName(taskName.toString());
+		            this.userTaskService.doAdd(userTask);
 	            }
 			}
 		}

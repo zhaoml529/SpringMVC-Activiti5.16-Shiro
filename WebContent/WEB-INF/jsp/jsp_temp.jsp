@@ -48,7 +48,7 @@
                 </tr>
               </c:forEach>
               	<tr>
-              		<td class="fun_area" colspan="4" align="center">${page }</td>
+              		<td class="fun_area" colspan="4" align="center"><c:out value="${page }" escapeXml="false"/></td>
               	</tr>
               </tbody>
           </table>

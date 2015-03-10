@@ -8,6 +8,7 @@
 package com.zml.oa.action;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -185,5 +186,25 @@ public class UserAction {
 		this.userService.deleteAllActivitiIdentifyData();
 		redirectAttributes.addFlashAttribute("msg", "成功删除工作流引擎Activiti的用户、角色以及关系！");
 		return "redirect:/userAction/toList_page";
-	}   
+	}  
+	
+	@RequestMapping(value = "/chooseUser")
+	public String chooseUser(@RequestParam("groupId") String groupId,
+							@RequestParam("flag") boolean flag,
+							Model model) throws Exception{
+		List<User> userList = new ArrayList<>();
+		if("-1".equals(groupId)){
+			userList = this.userService.getUserList_page();
+		}else{
+			userList = this.userService.getUserByGroupId(groupId);
+		}
+		Pagination pagination = PaginationThreadUtils.get();
+		model.addAttribute("page", pagination.getPageStr());
+		List<Group> groupList = this.groupService.getGroupList();
+		model.addAttribute("userList", userList);
+		model.addAttribute("groupList", groupList);
+		model.addAttribute("groupId", groupId);
+		model.addAttribute("flag", flag);
+		return "user/choose_user";
+	}
 }

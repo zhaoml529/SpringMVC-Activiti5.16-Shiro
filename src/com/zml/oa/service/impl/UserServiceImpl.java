@@ -63,6 +63,12 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
 	}
 
 	@Override
+	public List<User> getUserByGroupId(String groupId) throws Exception {
+		List<User> list = findByPage("User", new String[]{"group"}, new String[]{groupId});
+		return list;
+	}
+	
+	@Override
 	public List<User> getUserList_page() throws Exception{
 		List<User> list = findByPage("User", new String[]{}, new String[]{});
 		return list;
@@ -105,7 +111,6 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
                 logger.error(errorMsg);
                 throw new RuntimeException(errorMsg);
             } else {
-            	System.out.println(user.getId().toString()+"  id*****************************************");
                 newActivitiUser(user, groupId);
             }
         }
