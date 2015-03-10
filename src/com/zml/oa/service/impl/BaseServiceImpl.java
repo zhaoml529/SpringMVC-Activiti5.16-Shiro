@@ -9,6 +9,7 @@ package com.zml.oa.service.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -48,7 +49,11 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 		StringBuffer sff = new StringBuffer();  
         sff.append("select a from ").append(tableSimpleName).append(" a ");  
         List<T> list = this.baseDao.createQuery(sff.toString());  
-        return list; 
+        if( list.size()>0 ){
+      	   return list;
+         }else{
+      	   return Collections.emptyList();
+         }
 	}
 
 	@Override
@@ -83,9 +88,16 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
                 }  
            }  
            List<T> list = this.baseDao.createQuery(sb.toString());  
-            return list.size()>0?list:null;  
+//         最好用JDK提供的Collections.emptyList()来返回一个空的集合对象 而不是 null
+//         Collections.EMPTY_LIST 是返回一个空集合对象，emptyList()是对EMPTY_LIST做了一个泛型支持，具体看源码
+//         Collections.EMPTY_LIST的返回值是一个不可变的空List，不能进行例如add的各种操作！
+           if( list.size()>0 ){
+        	   return list;
+           }else{
+        	   return Collections.emptyList();
+           }
         }else{  
-            return null;  
+        	return Collections.emptyList();  
         } 
 	}
 
@@ -150,10 +162,14 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 	       }
 	       logger.info("findByPage: HQL: "+hql);
 	       list = this.baseDao.findByPage(hql, pageParams[0], pageParams[1]); 
-	       return list.size()>0?list:null;
+	       if( list.size()>0 ){
+        	   return list;
+           }else{
+        	   return Collections.emptyList();
+           }
         }else{
         	logger.info("findByPage: columns.length != values.length");
-        	return null;
+        	return Collections.emptyList();
         }
 	}
 
