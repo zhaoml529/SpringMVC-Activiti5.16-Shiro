@@ -8,7 +8,7 @@
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />    
 <title>设定审批人员</title>
-
+<script type="text/javascript" src="${ctx}/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
 	function modelDialog(){
 		$('#dialog-form').dialog({
@@ -39,7 +39,45 @@
 		});
 	}
 	function initialization(){
-		window.location.href = '${ctx }/permissionAction/initialization';
+		//window.location.href = '${ctx }/permissionAction/initialization';
+		$.ajax({
+            type: "POST", //使用post方法访问后台
+            url: "${ctx }/permissionAction/initialization", //要访问的后台地址
+            data: {},
+            success: function (data) {
+            	if(data == "success"){
+            		$("#message").html("初始化成功！");
+            	}else{
+            		$("#message").html("初始化失败！");
+            	}
+            	setTimeout(function () {
+       				$( "#dialog-complete" ).dialog({
+           			      modal: true,
+           			      buttons: {
+           			        Ok: function() {
+           			          $( this ).dialog( "close" );
+           			        }
+           			      },
+	           			  close: function() {
+	           				$("#message").html("");
+	           	          },
+           		    	})},
+      		    	500	//延时500ms
+           		 );
+            },
+            beforeSend:function(){
+            	$.blockUI({
+                    theme:     true,              // true to enable jQuery UI CSS support
+                    draggable: true,                  // draggable option requires jquery UI
+                    title:    '提示',             // only used when theme == true
+                    message:  '<p>正在初始化，请稍候...</p>'   // message to display
+                    //timeout:   2000                   // close block after 2 seconds (good for demos, etc)
+            	});
+        	},
+        	complete: function(){
+        		$.unblockUI();
+       		}
+		});
 	}
 	
 	function chooseUser( multiSelect, taskDefKey ){
@@ -124,14 +162,12 @@
 <body>
 
 	<div id="main">
-	  <c:if test="${not empty message}">
-		<div class="ui-widget">
-			<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
-				<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-				<strong>提示：</strong>${message}</p>
-			</div>
-		</div>
-	  </c:if>
+	  <div id="dialog-complete" title="complete" style="display: none;">
+		  <p>
+		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 1px 5px 0;"></span>
+		  	<span id="message"></span>
+		  </p>
+	  </div>
       <div class="sort_switch">
           <ul id="TabsNav">
           	  <li class="selected"><a href="#">审批设定</a></li>
