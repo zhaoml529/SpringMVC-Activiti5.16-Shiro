@@ -21,6 +21,7 @@
 		//W.document.getElementById(key+"_id").value = userId ;
 		//W.document.getElementById(key+"_name").value = userName;
 		//api.close();
+		$("#choose-user").dialog("close");
 	}
 	
 	function getUserByGroup( groupId, flag ){
