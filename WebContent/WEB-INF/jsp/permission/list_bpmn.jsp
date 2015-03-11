@@ -70,7 +70,7 @@
                     theme:     true,              // true to enable jQuery UI CSS support
                     draggable: true,                  // draggable option requires jquery UI
                     title:    '提示',             // only used when theme == true
-                    message:  '<p>正在初始化，请稍候...</p>'   // message to display
+                    message:  '<img src="${ctx }/images/ui-anim_basic_16x16.gif" alt="Loading" />正在初始化，请稍候...'   // message to display
                     //timeout:   2000                   // close block after 2 seconds (good for demos, etc)
             	});
         	},
@@ -163,10 +163,8 @@
 
 	<div id="main">
 	  <div id="dialog-complete" title="complete" style="display: none;">
-		  <p>
 		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 1px 5px 0;"></span>
 		  	<span id="message"></span>
-		  </p>
 	  </div>
       <div class="sort_switch">
           <ul id="TabsNav">

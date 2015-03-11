@@ -1,6 +1,9 @@
 package com.zml.oa.action;
 
+import java.io.PrintWriter;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.delegate.Expression;
@@ -80,16 +83,25 @@ public class PermissionAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/initialization")
-	public String initialization(RedirectAttributes redirectAttributes) throws Exception {
-		this.userTaskService.deleteAll();
-		ProcessDefinitionQuery proDefQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
-		List<ProcessDefinition> processDefinitionList = proDefQuery.list();
-		for(ProcessDefinition processDefinition : processDefinitionList){
-			//读取节点信息保存到usertask表
-			packageSingleActivitiInfo(processDefinition);
+	public void initialization(HttpServletResponse response) throws Exception {
+		PrintWriter out = response.getWriter();
+		try {
+			this.userTaskService.deleteAll();
+			ProcessDefinitionQuery proDefQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
+			List<ProcessDefinition> processDefinitionList = proDefQuery.list();
+			for(ProcessDefinition processDefinition : processDefinitionList){
+				//读取节点信息保存到usertask表
+				packageSingleActivitiInfo(processDefinition);
+			}
+			out.print("success");
+		} catch (Exception e) {
+			out.print("fail");
+			throw e;
 		}
-		redirectAttributes.addFlashAttribute("message", "初始化成功！");
-		return "redirect:/permissionAction/loadBpmn_page";
+		//RedirectAttributes redirectAttributes
+		//redirectAttributes.addFlashAttribute("message", "初始化成功！");
+		//return "redirect:/permissionAction/loadBpmn_page";
+		
 	}
 	
 	/**
