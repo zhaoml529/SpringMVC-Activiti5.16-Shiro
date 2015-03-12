@@ -188,7 +188,7 @@ public class UserAction {
 		return "redirect:/userAction/toList_page";
 	}  
 	
-	@RequestMapping(value = "/chooseUser")
+	@RequestMapping(value = "/chooseUser_page")
 	public String chooseUser(@RequestParam("groupId") String groupId,
 							@RequestParam("flag") boolean flag,
 							@RequestParam("key") String key,

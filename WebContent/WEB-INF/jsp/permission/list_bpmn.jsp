@@ -86,20 +86,14 @@
 			      width: 1000,
 			      modal: true,
 			      open: function () { 
-						$("#choose-user").html('<iframe src="${ctx}/userAction/chooseUser?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" scrolling="auto"></iframe>'); 
+						$("#choose-user").html('<iframe src="${ctx}/userAction/chooseUser_page?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" scrolling="auto"></iframe>'); 
 				  }, 
 			      buttons: [
-			        {text: '创建',
+			        {text: '确定',
 					 click: function() {
-						if (!$('#name').val()) {
-							alert('请填写名称！');
-							$('#name').focus();
-							return;
-						}
-		                setTimeout(function() {
-		                      location.reload();
-		                  }, 1000);
-						$('#modelForm').submit();
+						 //调用子页面方法
+						 dialogFrame.window.getValue();
+						$(this).dialog("close");
 					}},
 					{text:'取消',
 					 click: function() {
@@ -107,6 +101,11 @@
 					}}
 					]
 			});
+	}
+	
+	//子窗口调用-关闭选人或组页面
+	function closeDialogFrame(){
+		$("#choose-user").dialog("close");
 	}
 	
 	function setAuthor( proKey ){
@@ -207,7 +206,6 @@
           </table>
          </form>
       </div>
-      
       <div id="dialog-form" title="设定审批人员" style="display: none;">
 		 <p class="validateTips">请选择各个节点需要审批的人员、候选人和候选组</p>
 		 <form id="modelForm" action="${ctx}/modelAction/create" target="_blank" method="post">
@@ -216,7 +214,7 @@
 				</tr>
 			</table>
 		 </form>
-	</div>
+	  </div>
 	
 	<div id="choose-user" title="选择人员" style="display: none;">
 	</div>

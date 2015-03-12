@@ -10,37 +10,35 @@
 <title>选取审批人员</title>
 <script type="text/javascript" src="${ctx}/js/jquery.multiselect.min.js"></script>
 <script type="text/javascript">
-	//var api = frameElement.api;
-	//var W = api.opener;
-	
+	var key = "${key }";
 	function selectUser( userId, userName ){
-		var key = "${key }";
-		alert(userId+"---"+userName+"---"+key);
-		$("#"+key+"_id", window.top.document).val(userId);
-		$("#modelTable", window.top.document).find("").val(userName);
-		//W.document.getElementById(key+"_id").value = userId ;
-		//W.document.getElementById(key+"_name").value = userName;
-		//api.close();
-		$("#choose-user").dialog("close");
+		$("#"+key+"_id", window.parent.document).val(userId);
+		$("#"+key+"_name", window.parent.document).val(userName);
+		window.parent.closeDialogFrame();
 	}
 	
 	function getUserByGroup( groupId, flag ){
-		window.location.href = '${ctx }/userAction/chooseUser?groupId='+groupId+'&flag='+flag;
+		window.location.href = '${ctx }/userAction/chooseUser_page?groupId='+groupId+'&flag='+flag+'&key='+key;
 	}
 	
-	$(function() {
-	    $(':checkbox').change(function () {
-			var t = ''; 
-			var d = {};
-			$(':checked').each(function () { 
-				if (d[this.value]) return; 
-				d[this.value] = 1;
-				t += (t ? ',' : '') + this.value 
-			});
-			//$('#p').val(t); 
-			alert(t);
-		});
-	});
+	function getValue(){
+        var ids='';
+        var names='';
+        var checked = $("input:checked");//获取所有被选中的标签元素
+        for(i=0;i<checked.length;i++){
+         	//将所有被选中的标签元素的值保存成一个字符串，以逗号隔开
+       	 	var obj = checked[i].value.split("_");
+            if(i<checked.length-1){
+	           ids+=obj[0]+',';
+	           names+=obj[1]+',';
+            }else{
+               ids+=obj[0];
+               names+=obj[1];
+            }
+        }
+        $("#"+key+"_id", window.parent.document).val(ids);
+		$("#"+key+"_name", window.parent.document).val(names); 
+	}
 	
 </script>
 </head>
@@ -61,7 +59,7 @@
 		  </select>
 	  </div>
       <div class="sort_content">
-      	<form action="${ctx }/userAction/toList_page" method="post">
+      	<form action="${ctx }/userAction/chooseUser_page?groupId=${groupId }&flag=${flag }&key=${key}" method="post">
           <table class="tableHue2" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
               <thead>
                 <tr>
@@ -76,7 +74,7 @@
                 <tr>
                   <td align="center">
 	               	  <c:if test="${flag }">
-	                  	 <input id="check_${user.id }" name="ids" type="checkbox" onchange=''>
+	                  	 <input id="check_${user.id }" value="${user.id }_${user.name }" name="ids" type="checkbox" />
 	                  </c:if>
 	                  <c:if test="${!flag }">
 						 <input type="radio" name="id" value="${user.id }" onclick="selectUser(this.value,'${user.name }');" />
