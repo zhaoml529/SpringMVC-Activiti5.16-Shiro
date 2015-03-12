@@ -34,14 +34,8 @@
 
 <body>
 	<div id="main">
-        
-      <div class="sort_switch">
-          <ul id="TabsNav">
-          	  <li class="selected"><a href="#">用户组 </a></li>
-          </ul>
-      </div>
-      
       <div class="sort_content">
+      	<form action="${ctx }/groupAction/chooseGroup_page?key=${key}" method="post">
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
               <thead>
                 <tr>
@@ -63,6 +57,7 @@
               	</tr>
               </tbody>
           </table>
+        </form>
       </div>
       
 	</div>

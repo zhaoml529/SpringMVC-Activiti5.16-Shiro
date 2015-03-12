@@ -178,6 +178,7 @@
     	</td>\
 		';
     	var modal = $(modal).appendTo($("#modelTable"));
+    	$("#modelForm").attr("action","${ctx}/processAction/setPermission?processKey="+obj.procDefKey);
 	}
 </script>
 
@@ -233,7 +234,7 @@
       </div>
       <div id="dialog-form" title="设定审批人员" style="display: none;">
 		 <p class="validateTips">请选择各个节点需要审批的人员、候选人和候选组</p>
-		 <form id="modelForm" action="${ctx}/modelAction/create" target="_blank" method="post">
+		 <form id="modelForm" target="_blank" method="post">
 			<table>
 				<tr id="modelTable">
 				</tr>

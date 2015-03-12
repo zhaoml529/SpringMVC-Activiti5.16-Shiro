@@ -164,4 +164,13 @@ public class PermissionAction {
 			}
 		}
 	}
+	
+	public String setPermission(@RequestParam("processKey") String processKey) throws Exception{
+		List<UserTask> list = this.userTaskService.findByWhere(processKey);
+		for(UserTask userTask : list){
+			
+		}
+		return null;
+	}
+	
 }
