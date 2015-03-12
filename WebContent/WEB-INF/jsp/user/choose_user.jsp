@@ -8,7 +8,6 @@
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />    
 <title>选取审批人员</title>
-<script type="text/javascript" src="${ctx}/js/jquery.multiselect.min.js"></script>
 <script type="text/javascript">
 	var key = "${key }";
 	function selectUser( userId, userName ){

@@ -15,4 +15,5 @@ public interface IGroupService {
 
 	public List<Group> getGroupList() throws Exception;
 	
+	public List<Group> getGroupListPage() throws Exception;
 }

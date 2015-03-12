@@ -41,8 +41,8 @@
 	function initialization(){
 		//window.location.href = '${ctx }/permissionAction/initialization';
 		$.ajax({
-            type: "POST", //使用post方法访问后台
-            url: "${ctx }/permissionAction/initialization", //要访问的后台地址
+            type: "POST",
+            url: "${ctx }/permissionAction/initialization",
             data: {},
             success: function (data) {
             	if(data == "success"){
@@ -80,18 +80,19 @@
 		});
 	}
 	
+	//选择人或候选人
 	function chooseUser( multiSelect, taskDefKey ){
 			$('#choose-user').dialog({
 			      height: 400,
 			      width: 1000,
 			      modal: true,
 			      open: function () { 
-						$("#choose-user").html('<iframe src="${ctx}/userAction/chooseUser_page?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" scrolling="auto"></iframe>'); 
+						$("#choose-user").html('<iframe src="${ctx}/userAction/chooseUser_page?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" name="dialogFrame" scrolling="auto"></iframe>'); 
 				  }, 
 			      buttons: [
 			        {text: '确定',
 					 click: function() {
-						 //调用子页面方法
+						 //调用子页面方法,dialogFrame不能为id，因为在FireFox下id不能获取iframe对象
 						 dialogFrame.window.getValue();
 						$(this).dialog("close");
 					}},
@@ -102,6 +103,30 @@
 					]
 			});
 	}
+	
+	//选择候选组
+	function chooseGroup( taskDefKey ){
+		$('#choose-group').dialog({
+		      height: 400,
+		      width: 1000,
+		      modal: true,
+		      open: function () { 
+					$("#choose-group").html('<iframe src="${ctx}/groupAction/chooseGroup_page?key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogGroupFrame" name="dialogGroupFrame" scrolling="auto"></iframe>'); 
+			  }, 
+		      buttons: [
+		        {text: '确定',
+				 click: function() {
+					 //调用子页面方法
+					 dialogGroupFrame.window.getValue();
+					$(this).dialog("close");
+				}},
+				{text:'取消',
+				 click: function() {
+					 $(this).dialog("close");
+				}}
+				]
+		});
+}
 	
 	//子窗口调用-关闭选人或组页面
 	function closeDialogFrame(){
@@ -138,7 +163,7 @@
 				<td>\
 					<input type="radio" name="taskType" value="0" id="key" onclick="chooseUser(false,\''+obj.taskDefKey+'\');" />人员\
 			        <input type="radio" name="taskType" value="1" id="key" onclick="chooseUser(true,\''+obj.taskDefKey+'\');" />候选人\
-			        <input type="radio" name="taskType" value="2" id="key" />候选组\
+			        <input type="radio" name="taskType" value="2" id="key" onclick="chooseGroup(\''+obj.taskDefKey+'\');" />候选组\
 				</td>\
 			</tr>\
 			<tr><td colspan="2" style="height: 10px"></td></tr>\
@@ -192,7 +217,7 @@
 						<td>${process.key }</td>
 						<td><a target="_blank" href='${ctx }/processAction/process/process-definition?processDefinitionId=${process.id}&resourceType=xml'>${process.resourceName }</a></td>
 						<td><a target="_blank" href='${ctx }/processAction/process/process-definition?processDefinitionId=${process.id}&resourceType=image'>${process.diagramResourceName }</a></td>
-						<td>
+						<td align="center">
 	                        <!-- <a href='javascript:void(0)' id="create">设定人员</a>| -->
 	                        <a href='javascript:void(0)' onclick="setAuthor('${process.key}')">设定人员</a>|
 	                        <a href='${ctx }/permissionAction/loadSingleBpmn?processDefinitionId=${process.id}'>加载 ${name }</a>
@@ -217,6 +242,9 @@
 	  </div>
 	
 	<div id="choose-user" title="选择人员" style="display: none;">
+	</div>
+	
+	<div id="choose-group" title="选择候选组" style="display: none;">
 	</div>
 
 </div>

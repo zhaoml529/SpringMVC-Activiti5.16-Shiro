@@ -7,8 +7,29 @@
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
 <meta http-equiv="expires" content="0">    
-<title></title>
-
+<title>选择候选用户组</title>
+<script type="text/javascript">
+	var key = "${key }";
+	function getValue(){
+        var ids='';
+        var names='';
+        var checked = $("input:checked");//获取所有被选中的标签元素
+        for(i=0;i<checked.length;i++){
+         	//将所有被选中的标签元素的值保存成一个字符串，以逗号隔开
+       	 	var obj = checked[i].value.split("_");
+            if(i<checked.length-1){
+	           ids+=obj[0]+',';
+	           names+=obj[1]+',';
+            }else{
+               ids+=obj[0];
+               names+=obj[1];
+            }
+        }
+        $("#"+key+"_id", window.parent.document).val(ids);
+		$("#"+key+"_name", window.parent.document).val(names); 
+	}
+	
+</script>
 </head>
 
 <body>
@@ -24,19 +45,21 @@
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
               <thead>
                 <tr>
-                  <td width="50%"><strong>名称</strong></td>
+                  <td width="5%"></td>
+                  <td width="45%"><strong>名称</strong></td>
                   <td width="50%"><strong>类型</strong></td>
                 </tr>
               </thead>
               <tbody id="tbody">
               	<c:forEach var="group" items="${groupList}">
-                <tr>
-                  <td>${group.name}</td>
-                  <td>${group.type}</td>
-                </tr>
+	                <tr>
+	                  <td align="center"><input id="check_${user.id }" value="${group.id }_${group.name }" name="ids" type="checkbox" /></td>
+	                  <td>${group.name}</td>
+	                  <td>${group.type}</td>
+	                </tr>
                 </c:forEach>
                 <tr>
-              		<td class="fun_area" colspan="2" align="center"><c:out value="${page }" escapeXml="false" /></td>
+              		<td class="fun_area" colspan="3" align="center"><c:out value="${page }" escapeXml="false" /></td>
               	</tr>
               </tbody>
           </table>
