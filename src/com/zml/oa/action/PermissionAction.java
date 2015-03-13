@@ -176,10 +176,11 @@ public class PermissionAction {
 			String taskDefKey = userTask.getTaskDefKey();
 			String ids = request.getParameter(taskDefKey+"_id");
 			String names = request.getParameter(taskDefKey+"_name");
-			String taskType = request.getParameter("taskType");
+			String taskType = request.getParameter(taskDefKey+"_taskType");
 			userTask.setTaskType(taskType);
 			userTask.setCandidateOrAssignee(names);
-			if("assign".equals(taskType)){
+			System.out.println("taskType: "+taskType);
+			if("assignee".equals(taskType)){
 				userTask.setAssignee(ids);
 			}else if("candidateUser".equals(taskType)){
 				userTask.setCandidateUsers(ids);

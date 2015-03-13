@@ -10,19 +10,23 @@
 <title>设定审批人员</title>
 <script type="text/javascript" src="${ctx}/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
-	function modelDialog(){
+	function modelDialog( data ){
 		$('#dialog-form').dialog({
 		      height: 300,
 		      width: 'auto',
 		      modal: true,
 		      buttons: [
-		        {text: '创建',
+		        {text: '添加',
 				 click: function() {
-					if (!$('#name').val()) {
-						alert('请填写名称！');
-						$('#name').focus();
-						return;
-					}
+	                for(var i=0;i<data.length;i++) {  
+	                   var key = data[i].taskDefKey;
+	                   var taskName = data[i].taskName;
+	                   if (!$('#'+key+"_name").val()) {
+							alert("对不起，您还没设置 \'"+taskName+"\'");
+							$('#'+key+"_name").focus();
+							return;
+						}
+	                }
 	                setTimeout(function() {
 	                      location.reload();
 	                  }, 1000);
@@ -141,10 +145,8 @@
             success: function (data) {
               for(var i=0;i<data.length;i++) {  
                      outputData(data[i]);
-                     //obj.id = data[i].bh;  
-                     //obj.title = data[i].yhtmz==null?'无':data[i].yhtmz +" ( "+data[i].zt+" ) ";  
               }
-              modelDialog();
+              modelDialog( data );
            }
 		});
 	}
@@ -170,7 +172,7 @@
 			<tr>\
 				<td>选择:</td>\
 				<td>\
-					<input type="text" id="'+obj.taskDefKey+'_name" name="name" class="text ui-widget-content ui-corner-all"/>\
+					<input type="text" id="'+obj.taskDefKey+'_name" name="name" readonly class="text ui-widget-content ui-corner-all"/>\
 					<input type="hidden" id="'+obj.taskDefKey+'_id" name="name" class="text ui-widget-content ui-corner-all"/>\
 				</td>\
 			</tr>\
@@ -210,7 +212,7 @@
     		$(modal).appendTo($("#modelTable"));
     	}
     	//var modal = $(modal).appendTo($("#modelTable"));
-    	$("#modelForm").attr("action","${ctx}/processAction/setPermission?processKey="+obj.procDefKey);
+    	$("#modelForm").attr("action","${ctx}/permissionAction/setPermission?processKey="+obj.procDefKey);
 	}
 </script>
 
@@ -266,7 +268,7 @@
       </div>
       <div id="dialog-form" title="设定审批人员" style="display: none;">
 		 <p class="validateTips">请选择各个节点需要审批的人员、候选人和候选组</p>
-		 <form id="modelForm" target="_blank" method="post">
+		 <form id="modelForm" method="post">
 			<table>
 				<tr id="modelTable">
 				</tr>
