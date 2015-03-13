@@ -180,6 +180,8 @@ public class PermissionAction {
 			userTask.setTaskType(taskType);
 			userTask.setCandidateOrAssignee(names);
 			System.out.println("taskType: "+taskType);
+			System.out.println("ids: "+ids);
+			System.out.println("names: "+names);
 			if("assignee".equals(taskType)){
 				userTask.setAssignee(ids);
 			}else if("candidateUser".equals(taskType)){
