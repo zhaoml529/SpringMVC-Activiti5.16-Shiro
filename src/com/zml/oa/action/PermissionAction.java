@@ -3,6 +3,7 @@ package com.zml.oa.action;
 import java.io.PrintWriter;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.RepositoryService;
@@ -121,6 +122,7 @@ public class PermissionAction {
 		return "redirect:/permissionAction/loadBpmn_page";
 	}
 
+	
 	private void packageSingleActivitiInfo(ProcessDefinition processDefinition) throws Exception{
 		String proDefKey = processDefinition.getKey();
 		//如果usertask存在现有节点，不需要重新添加--未完成
@@ -165,12 +167,29 @@ public class PermissionAction {
 		}
 	}
 	
-	public String setPermission(@RequestParam("processKey") String processKey) throws Exception{
+	@RequestMapping(value = "/setPermission")
+	public String setPermission(@RequestParam("processKey") String processKey,
+								HttpServletRequest request,
+								RedirectAttributes redirectAttribute) throws Exception{
 		List<UserTask> list = this.userTaskService.findByWhere(processKey);
 		for(UserTask userTask : list){
-			
+			String taskDefKey = userTask.getTaskDefKey();
+			String ids = request.getParameter(taskDefKey+"_id");
+			String names = request.getParameter(taskDefKey+"_name");
+			String taskType = request.getParameter("taskType");
+			userTask.setTaskType(taskType);
+			userTask.setCandidateOrAssignee(names);
+			if("assign".equals(taskType)){
+				userTask.setAssignee(ids);
+			}else if("candidateUser".equals(taskType)){
+				userTask.setCandidateUsers(ids);
+			}else if("candidateGroup".equals(taskType)){
+				userTask.setCandidateGroups(ids);
+			}
+			this.userTaskService.doUpdate(userTask);
 		}
-		return null;
+		redirectAttribute.addFlashAttribute("message", "设置审批人员成功！");
+		return "redirect:/permissionAction/loadBpmn_page";
 	}
 	
 }

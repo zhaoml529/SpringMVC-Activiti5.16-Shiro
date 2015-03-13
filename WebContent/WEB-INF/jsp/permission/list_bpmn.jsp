@@ -161,9 +161,9 @@
 			<tr>\
 				<td>类型:</td>\
 				<td>\
-					<input type="radio" name="taskType" value="0" id="key" onclick="chooseUser(false,\''+obj.taskDefKey+'\');" />人员\
-			        <input type="radio" name="taskType" value="1" id="key" onclick="chooseUser(true,\''+obj.taskDefKey+'\');" />候选人\
-			        <input type="radio" name="taskType" value="2" id="key" onclick="chooseGroup(\''+obj.taskDefKey+'\');" />候选组\
+					<input type="radio" name="'+obj.taskDefKey+'_taskType" value="assignee" id="key" onclick="chooseUser(false,\''+obj.taskDefKey+'\');" />人员\
+			        <input type="radio" name="'+obj.taskDefKey+'_taskType" value="candidateUser" id="key" onclick="chooseUser(true,\''+obj.taskDefKey+'\');" />候选人\
+			        <input type="radio" name="'+obj.taskDefKey+'_taskType" value="candidateGroup" id="key" onclick="chooseGroup(\''+obj.taskDefKey+'\');" />候选组\
 				</td>\
 			</tr>\
 			<tr><td colspan="2" style="height: 10px"></td></tr>\
@@ -177,7 +177,39 @@
 			</table>\
     	</td>\
 		';
-    	var modal = $(modal).appendTo($("#modelTable"));
+    	var modify = 
+   		'<td>\
+			<table style="border: 2px solid red;padding: 5px;margin: 5px">\
+			<tr>\
+				<td>名称:</td>\
+				<td>'+obj.taskName+'</td>\
+			</tr>\
+			<tr><td colspan="2" style="height: 10px"></td></tr>\
+			<tr>\
+				<td>类型:</td>\
+				<td>\
+					<input type="radio" name="'+obj.taskDefKey+'_taskType" checked value="assignee" id="key" />人员\
+			        <input type="radio" name="'+obj.taskDefKey+'_taskType" value="candidateUser" id="key" />候选人\
+			        <input type="radio" name="'+obj.taskDefKey+'_taskType" value="candidateGroup" id="key" />候选组\
+				</td>\
+			</tr>\
+			<tr><td colspan="2" style="height: 10px"></td></tr>\
+			<tr>\
+				<td>选择:</td>\
+				<td>\
+					<input type="text" id="'+obj.taskDefKey+'_name" value="任务发起人" name="'+obj.taskDefKey+'_name" class="text ui-widget-content ui-corner-all"/>\
+					<input type="hidden" id="'+obj.taskDefKey+'_id" value="0" name="'+obj.taskDefKey+'_id" class="text ui-widget-content ui-corner-all"/>\
+				</td>\
+			</tr>\
+			</table>\
+    	</td>\
+		';
+    	if(obj.taskDefKey == "modifyApply"){
+    		$(modify).appendTo($("#modelTable"));
+    	}else{
+    		$(modal).appendTo($("#modelTable"));
+    	}
+    	//var modal = $(modal).appendTo($("#modelTable"));
     	$("#modelForm").attr("action","${ctx}/processAction/setPermission?processKey="+obj.procDefKey);
 	}
 </script>
@@ -189,7 +221,7 @@
 	<div id="main">
 	  <div id="dialog-complete" title="complete" style="display: none;">
 		    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 1px 5px 0;"></span>
-		  	<span id="message"></span>
+		  	<span id="message">${message }</span>
 	  </div>
       <div class="sort_switch">
           <ul id="TabsNav">

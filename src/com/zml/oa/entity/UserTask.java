@@ -42,7 +42,10 @@ public class UserTask implements Serializable {
 	private String taskName;		//人事审批
 	
 	@Column(name = "TASK_TYPE")
-	private Integer taskType;		//0.受理人(唯一) 1.候选人(多个) 2.候选组（多个）
+	private String taskType;		//1.assignee.受理人(唯一) 1.candidateUser候选人(多个) 2.candidateGroup候选组（多个）
+	
+	@Column(name = "CANDIDATE_OR_ASSIGNEE")
+	private String candidateOrAssignee; 	//人或候选人或组的名称
 	
 	@Column(name = "ASSIGNEE")
 	private String assignee;
@@ -71,10 +74,16 @@ public class UserTask implements Serializable {
 	public void setTaskDefKey(String taskDefKey) {
 		this.taskDefKey = taskDefKey;
 	}
-	public Integer getTaskType() {
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getTaskType() {
 		return taskType;
 	}
-	public void setTaskType(Integer taskType) {
+	public void setTaskType(String taskType) {
 		this.taskType = taskType;
 	}
 	public String getAssignee() {
@@ -100,6 +109,12 @@ public class UserTask implements Serializable {
 	}
 	public void setTaskName(String taskName) {
 		this.taskName = taskName;
+	}
+	public String getCandidateOrAssignee() {
+		return candidateOrAssignee;
+	}
+	public void setCandidateOrAssignee(String candidateOrAssignee) {
+		this.candidateOrAssignee = candidateOrAssignee;
 	}
 	
 	
