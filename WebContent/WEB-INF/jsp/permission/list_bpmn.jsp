@@ -10,6 +10,19 @@
 <title>设定审批人员</title>
 <script type="text/javascript" src="${ctx}/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
+	$(function() {
+		var message = "${message}";
+		if(message != ""){
+			$( "#dialog-complete" ).dialog({
+			      modal: true,
+			      buttons: {
+			        Ok: function() {
+			          $( this ).dialog( "close" );
+			        }
+			      }
+		    });
+		}
+	});
 	function modelDialog( data ){
 		$('#dialog-form').dialog({
 		      height: 300,
@@ -72,10 +85,10 @@
             beforeSend:function(){
             	$.blockUI({
                     theme:     true,              // true to enable jQuery UI CSS support
-                    draggable: true,                  // draggable option requires jquery UI
-                    title:    '提示',             // only used when theme == true
+                    draggable: true,              // draggable option requires jquery UI
+                    title:    '提示',              // only used when theme == true
                     message:  '<img src="${ctx }/images/ui-anim_basic_16x16.gif" alt="Loading" />正在初始化，请稍候...'   // message to display
-                    //timeout:   2000                   // close block after 2 seconds (good for demos, etc)
+                    //timeout:   2000            // close block after 2 seconds (good for demos, etc)
             	});
         	},
         	complete: function(){
@@ -139,19 +152,40 @@
 	
 	function setAuthor( proKey ){
 		$.ajax({
-            type: "POST", //使用post方法访问后台
-            url: "${ctx}/permissionAction/listUserTask", //要访问的后台地址
+            type: "POST", 
+            url: "${ctx}/permissionAction/listUserTask",
             data: {processKey: proKey},
             success: function (data) {
-              for(var i=0;i<data.length;i++) {  
-                     outputData(data[i]);
+              if(data.length == 0){
+            	  $("#message").html("请先初始化流程定义，再设定审批人员！");
+            	  $( "#dialog-complete" ).dialog({
+       			      modal: true,
+       			      buttons: {
+       			        Ok: function() {
+       			          $( this ).dialog( "close" );
+       			        }
+       			      },
+           			  close: function() {
+           				$("#message").html("");
+           	          },
+       		      })
+              }else{
+	              for(var i=0;i<data.length;i++) {  
+	            	  	 //逐个显示审批人员
+	                     outputData(data[i]);
+	              }
+	              //最后显示model
+	              modelDialog( data );
+	              $("#modelForm").attr("action","${ctx}/permissionAction/setPermission?processKey="+data[0].procDefKey);
               }
-              modelDialog( data );
            }
 		});
 	}
 	
 	function outputData( obj ){
+		var taskDefKey = obj.taskDefKey;
+		var taskType = obj.taskType;
+		//普通用户节点
 		var modal = 
 		'<td>\
 			<table style="border: 2px solid red;padding: 5px;margin: 5px">\
@@ -163,22 +197,23 @@
 			<tr>\
 				<td>类型:</td>\
 				<td>\
-					<input type="radio" name="'+obj.taskDefKey+'_taskType" value="assignee" id="key" onclick="chooseUser(false,\''+obj.taskDefKey+'\');" />人员\
-			        <input type="radio" name="'+obj.taskDefKey+'_taskType" value="candidateUser" id="key" onclick="chooseUser(true,\''+obj.taskDefKey+'\');" />候选人\
-			        <input type="radio" name="'+obj.taskDefKey+'_taskType" value="candidateGroup" id="key" onclick="chooseGroup(\''+obj.taskDefKey+'\');" />候选组\
+					<input type="radio" name="'+taskDefKey+'_taskType" value="assignee" id="assignee" onclick="chooseUser(false,\''+taskDefKey+'\');" />人员\
+			        <input type="radio" name="'+taskDefKey+'_taskType" value="candidateUser" id="candidateUser" onclick="chooseUser(true,\''+taskDefKey+'\');" />候选人\
+			        <input type="radio" name="'+taskDefKey+'_taskType" value="candidateGroup" id="candidateGroup" onclick="chooseGroup(\''+taskDefKey+'\');" />候选组\
 				</td>\
 			</tr>\
 			<tr><td colspan="2" style="height: 10px"></td></tr>\
 			<tr>\
 				<td>选择:</td>\
 				<td>\
-					<input type="text" id="'+obj.taskDefKey+'_name" name="name" readonly class="text ui-widget-content ui-corner-all"/>\
-					<input type="hidden" id="'+obj.taskDefKey+'_id" name="name" class="text ui-widget-content ui-corner-all"/>\
+					<input type="text" id="'+taskDefKey+'_name" name="'+taskDefKey+'_name" readonly class="text ui-widget-content ui-corner-all"/>\
+					<input type="hidden" id="'+taskDefKey+'_id" name="'+taskDefKey+'_id" class="text ui-widget-content ui-corner-all"/>\
 				</td>\
 			</tr>\
 			</table>\
     	</td>\
 		';
+    	//修改任务的节点已经在配置文件的 initiator 中设置，此处不用选择任务办理人。
     	var modify = 
    		'<td>\
 			<table style="border: 2px solid red;padding: 5px;margin: 5px">\
@@ -190,29 +225,35 @@
 			<tr>\
 				<td>类型:</td>\
 				<td>\
-					<input type="radio" name="'+obj.taskDefKey+'_taskType" checked value="assignee" id="key" />人员\
-			        <input type="radio" name="'+obj.taskDefKey+'_taskType" value="candidateUser" id="key" />候选人\
-			        <input type="radio" name="'+obj.taskDefKey+'_taskType" value="candidateGroup" id="key" />候选组\
+					任务发起人\
+					<input type="hidden" value="modify" name="'+taskDefKey+'_taskType" />\
 				</td>\
 			</tr>\
 			<tr><td colspan="2" style="height: 10px"></td></tr>\
 			<tr>\
 				<td>选择:</td>\
 				<td>\
-					<input type="text" id="'+obj.taskDefKey+'_name" value="任务发起人" name="'+obj.taskDefKey+'_name" class="text ui-widget-content ui-corner-all"/>\
-					<input type="hidden" id="'+obj.taskDefKey+'_id" value="0" name="'+obj.taskDefKey+'_id" class="text ui-widget-content ui-corner-all"/>\
+					<input type="text" id="'+taskDefKey+'_name" value="任务发起人" name="'+taskDefKey+'_name" class="text ui-widget-content ui-corner-all"/>\
+					<input type="hidden" id="'+taskDefKey+'_id" value="0" name="'+taskDefKey+'_id" class="text ui-widget-content ui-corner-all"/>\
 				</td>\
 			</tr>\
 			</table>\
     	</td>\
 		';
-    	if(obj.taskDefKey == "modifyApply"){
+    	if(taskDefKey == "modifyApply"){
     		$(modify).appendTo($("#modelTable"));
     	}else{
-    		$(modal).appendTo($("#modelTable"));
+    		var modal = $(modal).appendTo($("#modelTable"));
+    		if(taskType == "assignee"){
+	    		modal.find("table input[id=assignee]").attr("checked","checked");
+    		}else if(taskType == "candidateUser"){
+    			modal.find("table input[id=candidateUser]").attr("checked","checked");
+    		}else if(taskType == "candidateGroup"){
+    			modal.find("table input[id=candidateGroup]").attr("checked","checked");
+    		}
+    		modal.find("table input[id="+taskDefKey+"_name]").attr("value",obj.candidate_name);
+    		modal.find("table input[id="+taskDefKey+"_id]").attr("value",obj.candidate_ids);
     	}
-    	//var modal = $(modal).appendTo($("#modelTable"));
-    	$("#modelForm").attr("action","${ctx}/permissionAction/setPermission?processKey="+obj.procDefKey);
 	}
 </script>
 
@@ -231,7 +272,8 @@
           </ul>
       </div>
 	  <div style="text-align: right;padding: 2px 1em 2px">
-      	<button onclick="initialization();" class="input_button4">初始化</button>
+	  	<div id="message" class="tableHue1" style="display:inline;"><b>提示：</b>如果bpmn文件结构没有变化，则不需要初始化。哪个文件发生变化则单个加载再设定人员即可。</div>
+      	<button onclick="initialization();" class="input_button4" title="删除user_task表中现有流程定义，全部重新部署">初始化</button>
       </div>
       <div class="sort_content">
       	<form action=" ${ctx }/permissionAction/loadBpmn_page" method="post">
@@ -255,7 +297,7 @@
 						<td align="center">
 	                        <!-- <a href='javascript:void(0)' id="create">设定人员</a>| -->
 	                        <a href='javascript:void(0)' onclick="setAuthor('${process.key}')">设定人员</a>|
-	                        <a href='${ctx }/permissionAction/loadSingleBpmn?processDefinitionId=${process.id}'>加载 ${name }</a>
+	                        <a href='${ctx }/permissionAction/loadSingleBpmn?processDefinitionId=${process.id}' title="加载单个流程文件">加载</a>
 	                    </td>
 					</tr>
 				  </c:forEach>

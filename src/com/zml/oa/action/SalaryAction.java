@@ -152,13 +152,13 @@ public class SalaryAction {
 		        }catch (ActivitiException e) {
 		            if (e.getMessage().indexOf("no processes deployed with key") != -1) {
 		                logger.warn("没有部署流程!", e);
-		                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>-待完成");
+		                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>");
 		            } else {
-		                logger.error("启动报销流程失败：", e);
+		                logger.error("启动薪资调整流程失败：", e);
 		                redirectAttributes.addFlashAttribute("error", "系统内部错误！");
 		            }
 		        } catch (Exception e) {
-		            logger.error("启动报销流程失败：", e);
+		            logger.error("启动薪资调整流程失败：", e);
 		            redirectAttributes.addFlashAttribute("error", "系统内部错误！");
 		        } finally {
 		            identityService.setAuthenticatedUserId(null);

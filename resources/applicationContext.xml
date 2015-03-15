@@ -15,7 +15,7 @@
           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
           
     <!-- 在applicationContext.xml中只加载除表现层之外的所有bean，因此下面一行中不需要加载@Controller -->                       
-    <!-- 扫描注解Bean 不包括@Controller(表现层) 保证@Required、@Autowired的属性被注入-->
+    <!-- 扫描注解Bean 不包括@Controller(表现层) 保证@Service @Repository的属性被注入-->
     <context:component-scan base-package="com.zml.oa">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>

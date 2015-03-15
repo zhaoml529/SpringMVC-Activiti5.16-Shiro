@@ -6,11 +6,13 @@ import java.util.List;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.zml.oa.service.IUserService;
+import com.zml.oa.entity.UserTask;
+import com.zml.oa.service.IUserTaskService;
 
 /**
  * 动态用户任务分配
@@ -27,46 +29,61 @@ public class UserTaskListener implements TaskListener {
 	private static final Logger logger = Logger.getLogger(UserTaskListener.class);
     @Autowired
     protected RepositoryService repositoryService;
-    
+
 	@Autowired
-	protected IUserService userService;
+	private IUserTaskService userTaskService;
     
 	@Override
 	public void notify(DelegateTask delegateTask) {
 
-		//现在写死了，以后完善，用UserTask表来维护 流程 和用户 之间的关系，在流程图中手动设置待办用户或组
-		
+		String processDefinitionId = delegateTask.getProcessDefinitionId();	//com.zml.oa.vacation:8:30012
+		System.out.println("processInstId: "+delegateTask.getProcessInstanceId()+" taskDefKey: "+delegateTask.getTaskDefinitionKey()+" id: "+delegateTask.getId()+" name: "+delegateTask.getName());
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: "+processDefinitionId+" repositoryService: "+repositoryService+" userTaskService: "+userTaskService);
+		ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+//		String processDefinitionName = processDefinition.getName();			//请假流程
+		String processDefinitionKey = processDefinition.getKey();			//com.zml.oa.vacation
 		String taskDefinitionKey = delegateTask.getTaskDefinitionKey();		//directorAudit
-		logger.info("&&&&&&&&&&&&&taskDefinitionKey: "+taskDefinitionKey);
-//		String processDefinitionId = delegateTask.getProcessDefinitionId();	//com.zml.oa.vacation:8:30012
-//		
-//		ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
-//		String processDefinitionName = processDefinition.getName();	//请假流程
-//		String processDefinitionKey = processDefinition.getKey();	//com.zml.oa.vacation
-		
-		if("directorAudit".equals(taskDefinitionKey)){
-			List<String> groups = new ArrayList<String>();
-			groups.add("2");
-			groups.add("4");
-//			delegateTask.addCandidateGroup("director");
-			delegateTask.addCandidateGroups(groups);
-		}else if("hrAudit".equals(taskDefinitionKey)){
-//			delegateTask.addCandidateGroup("hr");
-			List<String> users = new ArrayList<String>();
-			users.add("17");
-			users.add("18");
-			delegateTask.addCandidateUsers(users);
-		}else if("managerAudit".equals(taskDefinitionKey)){
-			delegateTask.addCandidateGroup("manager");
-		}else if("financeAudit".equals(taskDefinitionKey)){
-			delegateTask.addCandidateGroup("finance");
-		}else if("employeeAudit".equals(taskDefinitionKey)){
-			delegateTask.addCandidateGroup("employee");
-		}else if("bossAudit".equals(taskDefinitionKey)){
-//			老板只有一个，这里直接添加任务受理人（setAssignee）为boss就可以，不用再去"抢占"式的领取代办任务。
-			delegateTask.setAssignee("4"); //具体boss的Id号-16
-//			delegateTask.addCandidateGroup("boss");
-//			delegateTask.addCandidateUser("boss");
+		System.out.println(processDefinitionKey+"-------------------------"+taskDefinitionKey);
+		try {
+			List<UserTask> taskList = this.userTaskService.findByWhere(processDefinitionKey);
+			for(UserTask userTask : taskList){
+				String taskKey = userTask.getTaskDefKey();
+				String taskType = userTask.getTaskType();
+				String ids = userTask.getCandidate_ids();
+				if(taskDefinitionKey.equals(taskKey)){
+					switch (taskType){
+						case "assignee" : {
+							delegateTask.setAssignee(ids);
+							logger.info("assignee id: "+ids);
+							break;
+						}
+						case "candidateUser" : {
+							String[] userIds = ids.split(",");
+							List<String> users = new ArrayList<String>();
+							for(int i=0; i<userIds.length;i++){
+								users.add(userIds[i]);
+							}
+							delegateTask.addCandidateUsers(users);
+							logger.info("候选人审批 ids: "+ids);
+							break;
+						}
+						case "candidateGroup" : {
+							String[] groupIds = ids.split(",");
+							List<String> groups = new ArrayList<String>();
+							for(int i=0; i<groupIds.length;i++){
+								groups.add(groupIds[i]);
+							}
+							delegateTask.addCandidateGroups(groups);
+							logger.info("候选组审批 ids: "+ids);
+							break;
+						}
+					}
+				}
+				
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

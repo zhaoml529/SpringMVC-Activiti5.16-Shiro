@@ -44,17 +44,11 @@ public class UserTask implements Serializable {
 	@Column(name = "TASK_TYPE")
 	private String taskType;		//1.assignee.受理人(唯一) 1.candidateUser候选人(多个) 2.candidateGroup候选组（多个）
 	
-	@Column(name = "CANDIDATE_OR_ASSIGNEE")
-	private String candidateOrAssignee; 	//人或候选人或组的名称
+	@Column(name = "CANDIDATE_NAME")
+	private String candidate_name; 	//人或候选人或组的名称
 	
-	@Column(name = "ASSIGNEE")
-	private String assignee;
-	
-	@Column(name = "CANDIDATE_USERS")
-	private String candidateUsers;
-	
-	@Column(name = "CANDIDATE_GROUPS")
-	private String candidateGroups;
+	@Column(name = "CANDIDATE_IDS")
+	private String candidate_ids;
 	
 	public String getProcDefKey() {
 		return procDefKey;
@@ -86,36 +80,22 @@ public class UserTask implements Serializable {
 	public void setTaskType(String taskType) {
 		this.taskType = taskType;
 	}
-	public String getAssignee() {
-		return assignee;
-	}
-	public void setAssignee(String assignee) {
-		this.assignee = assignee;
-	}
-	public String getCandidateUsers() {
-		return candidateUsers;
-	}
-	public void setCandidateUsers(String candidateUsers) {
-		this.candidateUsers = candidateUsers;
-	}
-	public String getCandidateGroups() {
-		return candidateGroups;
-	}
-	public void setCandidateGroups(String candidateGroups) {
-		this.candidateGroups = candidateGroups;
-	}
 	public String getTaskName() {
 		return taskName;
 	}
 	public void setTaskName(String taskName) {
 		this.taskName = taskName;
 	}
-	public String getCandidateOrAssignee() {
-		return candidateOrAssignee;
+	public String getCandidate_name() {
+		return candidate_name;
 	}
-	public void setCandidateOrAssignee(String candidateOrAssignee) {
-		this.candidateOrAssignee = candidateOrAssignee;
+	public void setCandidate_name(String candidate_name) {
+		this.candidate_name = candidate_name;
 	}
-	
-	
+	public String getCandidate_ids() {
+		return candidate_ids;
+	}
+	public void setCandidate_ids(String candidate_ids) {
+		this.candidate_ids = candidate_ids;
+	}
 }

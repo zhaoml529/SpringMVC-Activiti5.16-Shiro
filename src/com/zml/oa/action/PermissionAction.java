@@ -178,17 +178,8 @@ public class PermissionAction {
 			String names = request.getParameter(taskDefKey+"_name");
 			String taskType = request.getParameter(taskDefKey+"_taskType");
 			userTask.setTaskType(taskType);
-			userTask.setCandidateOrAssignee(names);
-			System.out.println("taskType: "+taskType);
-			System.out.println("ids: "+ids);
-			System.out.println("names: "+names);
-			if("assignee".equals(taskType)){
-				userTask.setAssignee(ids);
-			}else if("candidateUser".equals(taskType)){
-				userTask.setCandidateUsers(ids);
-			}else if("candidateGroup".equals(taskType)){
-				userTask.setCandidateGroups(ids);
-			}
+			userTask.setCandidate_name(names);
+			userTask.setCandidate_ids(ids);
 			this.userTaskService.doUpdate(userTask);
 		}
 		redirectAttribute.addFlashAttribute("message", "设置审批人员成功！");
