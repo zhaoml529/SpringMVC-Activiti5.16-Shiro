@@ -19,7 +19,7 @@ import com.zml.oa.service.IUserTaskService;
  * @author ZML
  *
  */
-@Component
+@Component("userTaskListener")
 public class UserTaskListener implements TaskListener {
 	/**
 	 * 

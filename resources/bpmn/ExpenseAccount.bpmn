@@ -5,7 +5,7 @@
     <startEvent id="startevent1" name="Start" activiti:initiator="applyUserId"></startEvent>
     <userTask id="financeAudit" name="财务审批">
       <extensionElements>
-        <activiti:taskListener event="create" class="com.zml.oa.ProcessTask.TaskListener.UserTaskListener"></activiti:taskListener>
+        <activiti:taskListener event="create" delegateExpression="${userTaskListener}"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="financeAudit"></sequenceFlow>
@@ -14,11 +14,11 @@
     <boundaryEvent id="boundaryerror1" name="Error" attachedToRef="servicetask1">
       <errorEventDefinition></errorEventDefinition>
     </boundaryEvent>
-    <userTask id="usertask1" name="现金支付" activiti:candidateGroups="${auditGroup}"></userTask>
-    <sequenceFlow id="flow3" sourceRef="boundaryerror1" targetRef="usertask1"></sequenceFlow>
+    <userTask id="payForMoney" name="现金支付"></userTask>
+    <sequenceFlow id="flow3" sourceRef="boundaryerror1" targetRef="payForMoney"></sequenceFlow>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow4" sourceRef="servicetask1" targetRef="endevent1"></sequenceFlow>
-    <sequenceFlow id="flow5" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="payForMoney" targetRef="endevent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_com.zml.oa.expense">
     <bpmndi:BPMNPlane bpmnElement="com.zml.oa.expense" id="BPMNPlane_com.zml.oa.expense">
@@ -34,7 +34,7 @@
       <bpmndi:BPMNShape bpmnElement="boundaryerror1" id="BPMNShape_boundaryerror1">
         <omgdc:Bounds height="30.0" width="30.0" x="330.0" y="160.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+      <bpmndi:BPMNShape bpmnElement="payForMoney" id="BPMNShape_payForMoney">
         <omgdc:Bounds height="55.0" width="105.0" x="290.0" y="230.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">

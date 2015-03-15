@@ -139,7 +139,7 @@ public class ExpenseAction {
         }catch (ActivitiException e) {
             if (e.getMessage().indexOf("no processes deployed with key") != -1) {
                 logger.warn("没有部署流程!", e);
-                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>-待完成");
+                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>");
             } else {
                 logger.error("启动报销流程失败：", e);
                 redirectAttributes.addFlashAttribute("error", "系统内部错误！");
@@ -196,12 +196,12 @@ public class ExpenseAction {
     	
         ExpenseAccount expense = this.expenseService.findById(expenseId);
 		Map<String, Object> variables = new HashMap<String, Object>();
-		variables.put("auditGroup", "finance");
+//		variables.put("auditGroup", "finance");
 		expense.setStatus(BaseVO.APPROVAL_SUCCESS);
 		this.expenseService.doUpdate(expense);
 		// 完成任务
 		this.processService.complete(taskId, null, user.getId().toString(), variables);
 		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
-    	return "redirect:/processAction/doTaskList_page";
+    	return "redirect:/processAction/todoTaskList_page";
     }
 }

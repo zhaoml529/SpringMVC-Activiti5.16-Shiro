@@ -248,7 +248,7 @@ public class VacationAction {
 		this.processService.complete(taskId, content, user.getId().toString(), variables);
 		
 		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
-    	return "redirect:/processAction/doTaskList_page";
+    	return "redirect:/processAction/todoTaskList_page";
     }
     
     /**
@@ -313,6 +313,6 @@ public class VacationAction {
 		
 		this.processService.complete(taskId, null, user.getId().toString(), variables);
 		
-    	return "redirect:/processAction/doTaskList_page";
+    	return "redirect:/processAction/todoTaskList_page";
     }
 }
