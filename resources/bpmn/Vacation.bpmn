@@ -7,12 +7,18 @@
     <sequenceFlow id="flow2" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
     <userTask id="managerAudit" name="经理审批">
       <documentation>请假天数小于等于3天，由我审批。</documentation>
+      <extensionElements>
+        <activiti:taskListener event="create" delegateExpression="${userTaskListener}"></activiti:taskListener>
+      </extensionElements>
     </userTask>
     <sequenceFlow id="flow3" name="小于等于3天" sourceRef="exclusivegateway1" targetRef="managerAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${entity.days <= 3}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="directorAudit" name="总监审批">
       <documentation>请假天数大于3天，由我审批。</documentation>
+      <extensionElements>
+        <activiti:taskListener event="create" delegateExpression="${userTaskListener}"></activiti:taskListener>
+      </extensionElements>
     </userTask>
     <sequenceFlow id="flow4" name="大于3天" sourceRef="exclusivegateway1" targetRef="directorAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${entity.days > 3}]]></conditionExpression>
@@ -25,7 +31,11 @@
     <sequenceFlow id="flow6" sourceRef="managerAudit" targetRef="exclusivegateway2"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow7" sourceRef="directorAudit" targetRef="exclusivegateway3"></sequenceFlow>
-    <userTask id="hrAudit" name="人力资源审批"></userTask>
+    <userTask id="hrAudit" name="人力资源审批">
+      <extensionElements>
+        <activiti:taskListener event="create" delegateExpression="${userTaskListener}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow8" name="同意" sourceRef="exclusivegateway2" targetRef="hrAudit">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isPass}]]></conditionExpression>
     </sequenceFlow>
