@@ -299,8 +299,6 @@ public class VacationAction {
 	        vacation.setApplyDate(new Date());
 	        vacation.setBusinessKey(vacation.getId().toString());
 	        vacation.setProcessInstanceId(processInstanceId);
-	        this.vacationService.doUpdate(vacation);
-	        variables.put("entity", vacation);
 	        //由userTask自动分配审批权限
 //	        if(vacation.getDays() <= 3){
 //            	variables.put("auditGroup", "manager");
@@ -309,10 +307,12 @@ public class VacationAction {
 //            }
 	        redirectAttributes.addFlashAttribute("message", "任务办理完成，请假申请已重新提交！");
         }else{
+        	vacation.setTitle(user.getName()+" 的请假申请已取消！");
         	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的请假申请！");
         }
-		variables.put("reApply", reApply);
-		
+        this.vacationService.doUpdate(vacation);
+        variables.put("entity", vacation);
+        variables.put("reApply", reApply);
 		this.processService.complete(taskId, null, user.getId().toString(), variables);
 		
     	return "redirect:/processAction/todoTaskList_page";
