@@ -455,11 +455,12 @@ public class ProcessServiceImp implements IProcessService{
         identityService.setAuthenticatedUserId(vacation.getUserId().toString());
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.put("entity", vacation);
-        if(vacation.getDays() <= 3){
-        	variables.put("auditGroup", "manager");
-        }else{
-        	variables.put("auditGroup", "director");
-        }
+        //由userTask自动分配审批权限
+//        if(vacation.getDays() <= 3){
+//        	variables.put("auditGroup", "manager");
+//        }else{
+//        	variables.put("auditGroup", "director");
+//        }
         String businessKey = vacation.getBusinessKey();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("com.zml.oa.vacation", businessKey, variables);
         String processInstanceId = processInstance.getId();

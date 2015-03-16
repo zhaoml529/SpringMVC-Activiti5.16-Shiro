@@ -234,7 +234,8 @@ public class VacationAction {
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("isPass", completeFlag);
 		if(completeFlag){
-			variables.put("auditGroup", "hr");
+			//由userTask自动分配审批权限
+//			variables.put("auditGroup", "hr");
 			if("hr".equals(groupType)){
 				vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
 			}
@@ -300,11 +301,12 @@ public class VacationAction {
 	        vacation.setProcessInstanceId(processInstanceId);
 	        this.vacationService.doUpdate(vacation);
 	        variables.put("entity", vacation);
-	        if(vacation.getDays() <= 3){
-            	variables.put("auditGroup", "manager");
-            }else{
-            	variables.put("auditGroup", "director");
-            }
+	        //由userTask自动分配审批权限
+//	        if(vacation.getDays() <= 3){
+//            	variables.put("auditGroup", "manager");
+//            }else{
+//            	variables.put("auditGroup", "director");
+//            }
 	        redirectAttributes.addFlashAttribute("message", "任务办理完成，请假申请已重新提交！");
         }else{
         	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的请假申请！");
