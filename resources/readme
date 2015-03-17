@@ -1,18 +1,41 @@
-bpmn文件中 用户任务分配的监听器 可以设置  java class 或者 delegateExpression  
-一开始设置的为 java class 选取lintener类所在的目录(如：UserTaskListener)
-但是如果lintener中涉及到其他service去获取相应数据时，获取的Service为空。
-因为每次执行都会为监听器创建一个新的实例，这时的@Component、@Autowired不会起作用。
-所以换成JavaDelegate，让标记了@Component的类实例化到spring容器中，达到让Spring容器管理此类的目的。
-然后换成前面所说的delegateExpression方式调用此监听(如：${userTaskListener})器就不会出现service为空的情况。
 
 使用：
-resources 目录下的 sql 目录有 date.sql初始化 用户、组、资源 的基本数据。
-oa.sql为activiti所需的表，可手动执行也可以启动tomcat时自动创建。
+	resources 目录下的 sql 目录有 date.sql初始化 用户、组、资源 的基本数据。
+	oa.sql为activiti所需的表，可手动执行也可以启动tomcat时自动创建。
+	
+	用admin(所有用户密码默认都为123)进入系统后：
+	1.在用户管理界面点击同步用户按钮，把系统用户和组关系同步到activiti默认的用户表和组表中。
+	
+	2.在流程定义界面点击重新部署全部流程按钮，可以把resources/deploy目录下得所有以.zip或.bar结尾的流程文件部署到系统当中。
+	  只有完成了流程的部署，才可以发布任务和完成任务。如果某一个流程描述文件改变了，也可以单个部署这个文件或者点击加载。
+	
+	3.审批设定界面点击初始化按钮，将每个流程描述文件中的用户任务节点初始化到t_user_task表中，此表是用作管理每个流程审批人员的。
+	  初始化完成后，逐个设定审批人员（点击设定人员按钮即可）。如果某个流程描述文件新增或减少了用户任务，则点击设定人员后面的加载按钮
+	  即可同步节点。
+  
+注：流程描述文件就是系统中resources/bpmn下的所有以.bpmn为后缀名的文件。也是deploy中所有压缩包中的.bpmn文件
 
-用admin(所有用户密码默认都为123)进入系统后：
-1.在用户管理界面点击同步用户按钮，把系统用户和组关系同步到activiti默认的用户表和组表中。
-2.在流程定义界面点击重新部署全部流程按钮，可以把resources/bpmn目录下得所有以.bpmn结尾的流程文件部署到系统当中。
-  只有部署了bpmn文件才可以发布任务和完成任务。如果某一个bpmn文件改变了，也可以单个部署这个文件。
-3.审批设定界面点击初始化按钮，将每个bpmn文件的用户任务节点初始化到t_user_task表中，此表是用作管理每个流程审批人员的。
-  初始化完成后，逐个设定审批人员（点击设定人员按钮即可）。如果某个bpmn文件新增或减少了用户任务，则点击设定人员后面的加载按钮
-  即可同步节点。
+说明： 
+	  一、在classpath:/bpmn/ 下有了流程描述文件和图片，为什么还要用classpath:/deploy/ 下的压缩包？
+	       1.因为在部署流程文件时，直接部署.bpmn后引擎会自动生成流程图，在Activiti Designer里面设计与自动生成的流程图坐标不一致。
+	         会产生乱码、连线错乱或坐标错位 等问题。
+	         解决乱码问题可以在引擎配置中添加：
+	       		<property name="activityFontName" value="宋体"/>
+				<property name="labelFontName" value="宋体"/>
+	       
+	       2.如果用压缩包(.zip或.bar)的形式则会避免这些问题。
+	         一般开发人员设计流程会选择使用Activiti Designer，这个插件会在设计流程时自动创建PNG格式的图片，图片中的组件坐标与bpmn文件里面的坐标一致，
+	         部署时可以把bpmn文件和png图片文件打包成Zip文件部署，这种方式引擎不会自动生成流程图，因为zip包里面存在了同名的图片文件。
+	    	 所以推荐使用这种方式部署，一劳永逸，没有坐标错位问题，流程跟踪也方便。
+
+		   以上两种部署方式在系统里都有延时演示 WorkflowDeployService
+       
+用户忽略：
+	bpmn文件中 用户任务分配的监听器 可以设置  java class 或者 delegateExpression  
+	一开始设置的为 java class 选取lintener类所在的目录(如：UserTaskListener)
+	但是如果lintener中涉及到其他service去获取相应数据时，获取的Service为空。
+	因为每次执行都会为监听器创建一个新的实例，这时的@Component、@Autowired不会起作用。
+	所以换成JavaDelegate，让标记了@Component的类实例化到spring容器中，达到让Spring容器管理此类的目的。
+	然后换成前面所说的delegateExpression方式调用此监听(如：${userTaskListener})器就不会出现service为空的情况。
+       
+       

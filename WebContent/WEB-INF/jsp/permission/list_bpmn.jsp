@@ -73,10 +73,12 @@
            			      buttons: {
            			        Ok: function() {
            			          $( this ).dialog( "close" );
+           			       	  window.location.reload();
            			        }
            			      },
 	           			  close: function() {
 	           				$("#message").html("");
+	           				window.location.reload();
 	           	          },
            		    	})},
       		    	500	//延时500ms

@@ -2,6 +2,7 @@ package com.zml.oa.action;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -340,7 +341,7 @@ public class ProcessAction {
      * 删除部署的流程，级联删除流程实例 true。
      * 不管是否指定级联删除，部署的相关数据均会被删除，这些数据包括流程定义的身份数据（IdentityLink）、流程定义数据（ProcessDefinition）、流程资源（Resource）
      * 部署数据（Deployment）。
-     * 如果设置级联(true)，测绘删除流程实例数据（ProcessInstance）,其中流程实例也包括流程任务（Task）与流程实例的历史数据；如果设置flase 将不会级联删除。
+     * 如果设置级联(true)，则会删除流程实例数据（ProcessInstance）,其中流程实例也包括流程任务（Task）与流程实例的历史数据；如果设置flase 将不会级联删除。
      * 如果数据库中已经存在流程实例数据，那么将会删除失败，因为在删除流程定义时，流程定义数据的ID已经被流程实例的相关数据所引用。
      *
      * @param deploymentId 流程部署ID
@@ -353,6 +354,7 @@ public class ProcessAction {
     
     /**
      * 导入部署
+     * @RequestParam(value = "file", required = false) required = false时可以不用传递这个参数，默认为true
      * @param exportDir
      * @param file
      * @return
@@ -399,15 +401,32 @@ public class ProcessAction {
      */
     @RequiresPermissions("admin:process:*")
     @RequestMapping(value = "/process/redeploy/all")
-    public String redeployAll(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, RedirectAttributes redirectAttributes) throws Exception {
+    public void redeployAll(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, 
+				    		HttpServletResponse response,
+				    		RedirectAttributes redirectAttributes) throws Exception {
+    	PrintWriter out = response.getWriter();
     	try {
+    		List<Deployment> deploymentList = this.repositoryService.createDeploymentQuery().list();
+    		//删除现有所有流程实例
+    		for(Deployment deployment : deploymentList){
+    			String deploymentId = deployment.getId();
+    			this.repositoryService.deleteDeployment(deploymentId, true);
+    		}
+    		//重新部署全部流程实例
+    		//方法一：通过classpath/deploy目录下的.zip或.bar文件部署
     		workflowProcessDefinitionService.deployAllFromClasspath(exportDir);
-    		redirectAttributes.addFlashAttribute("message", "已重新部署全部流程！");
+    		
+    		//方法二：通过classpath/bpmn下的流程描述文件部署-流程图错乱，一直提倡用打包部署没有任何问题。
+//        	workflowProcessDefinitionService.redeployBpmn(exportDir);
+
+//        	redirectAttributes.addFlashAttribute("message", "已重新部署全部流程！");
+        	out.print("success");
 		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
+//			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
+			out.print("fail");
 			throw e;
 		}
-        return "redirect:/processAction/process/listProcess_page";
+//        return "redirect:/processAction/process/listProcess_page";
     }
     
     /**
@@ -420,10 +439,16 @@ public class ProcessAction {
     @RequestMapping(value = "/process/redeploy/single")
     public String redeploySingle(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
     							@RequestParam("resourceName") String resourceName,
+    							@RequestParam(value = "diagramResourceName", required = false) String diagramResourceName,
+    							@RequestParam("deploymentId") String deploymentId,
     							RedirectAttributes redirectAttributes) throws Exception {
         try {
+        	this.repositoryService.deleteDeployment(deploymentId, true);
+        	//方法一：通过classpath/deploy目录下的.zip或.bar文件部署
         	String processKey = resourceName.substring(0, resourceName.indexOf('.'))+".zip";
         	workflowProcessDefinitionService.redeploySingleFrom(exportDir, processKey);
+        	//方法二：通过classpath/bpmn下的流程描述文件部署--流程图错乱，一直提倡用打包部署没有任何问题。
+//        	workflowProcessDefinitionService.redeployBpmn(exportDir, resourceName,diagramResourceName);
         	redirectAttributes.addFlashAttribute("message", "已重新部署流程！");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");

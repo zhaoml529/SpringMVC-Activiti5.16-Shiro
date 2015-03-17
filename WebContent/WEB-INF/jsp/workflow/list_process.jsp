@@ -8,30 +8,85 @@
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />    
 <title>流程定义</title>
-
+<script type="text/javascript" src="${ctx}/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
-$(function() {
-	$('#deploy').click(function() {
-		$('#deployFieldset').toggle('normal');
+	$(function() {
+		$('#deploy').click(function() {
+			$('#deployFieldset').toggle('normal');
+		});
+		$('#redeploy').click(function() {
+			initialization();
+		});
 	});
-	$('#redeploy').click(function() {
-		window.location.href = '${ctx }/processAction/process/redeploy/all';
+	$(function() {
+		var message = "${message}";
+		if(message != ""){
+			$( "#dialog-complete" ).dialog({
+			      modal: true,
+			      buttons: {
+			        Ok: function() {
+			          $( this ).dialog( "close" );
+			        }
+			      }
+		    });
+		}
 	});
-});
-
-function doSearch(currentPage)
-{
-	var pageNum = document.getElementById("pageNum").value;
-	if(isNaN(pageNum))
+	function doSearch(currentPage)
 	{
-		alert("请输入正确的行数!");
+		var pageNum = document.getElementById("pageNum").value;
+		if(isNaN(pageNum))
+		{
+			alert("请输入正确的行数!");
+		}
+		else
+		{
+			document.getElementById('currentPage').value = currentPage;
+			document.forms[1].submit();
+		}
 	}
-	else
-	{
-		document.getElementById('currentPage').value = currentPage;
-		document.forms[1].submit();
+	
+	function initialization(){
+		$.ajax({
+	        type: "POST",
+	        url: "${ctx }/processAction/process/redeploy/all",
+	        data: {},
+	        success: function (data) {
+	        	if(data == "success"){
+	        		$("#message").html("已重新部署全部流程！");
+	        	}else{
+	        		$("#message").html("重新部署流程失败！");
+	        	}
+	        	setTimeout(function () {
+	   				$( "#dialog-complete" ).dialog({
+	       			      modal: true,
+	       			      buttons: {
+	       			        Ok: function() {
+	       			          $( this ).dialog( "close" );
+	       			       	  window.location.reload();
+	       			        }
+	       			      },
+	           			  close: function() {
+	           				$("#message").html("");
+	           				window.location.reload();
+	           	          },
+	       		    	})},
+	  		    	500	//延时500ms
+	       		 );
+	        },
+	        beforeSend:function(){
+	        	$.blockUI({
+	                theme:     true,              // true to enable jQuery UI CSS support
+	                draggable: true,              // draggable option requires jquery UI
+	                title:    '提示',              // only used when theme == true
+	                message:  '<img src="${ctx }/images/ui-anim_basic_16x16.gif" alt="Loading" />正在重新部署，请稍候...'   // message to display
+	                //timeout:   2000            // close block after 2 seconds (good for demos, etc)
+	        	});
+	    	},
+	    	complete: function(){
+	    		$.unblockUI();
+	   		}
+		});
 	}
-}
 </script>
 
 </head>
@@ -39,14 +94,10 @@ function doSearch(currentPage)
 <body>
 
 	<div id="main">
-	  <c:if test="${not empty message}">
-		<div class="ui-widget">
-			<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
-				<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-				<strong>提示：</strong>${message}</p>
-			</div>
-		</div>
-	  </c:if>
+  	  <div id="dialog-complete" title="complete" style="display: none;">
+	    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 1px 5px 0;"></span>
+	  	<span id="message">${message }</span>
+	  </div>
       <div class="sort_switch">
           <ul id="TabsNav">
           	  <li class="selected"><a href="#">流程定义</a></li>
@@ -108,6 +159,8 @@ function doSearch(currentPage)
 						</td>
 						<td>
 	                        <a href='${ctx }/processAction/process/delete?deploymentId=${process.deploymentId}'>删除</a>|
+	                        <a href='${ctx }/processAction/process/redeploy/single?resourceName=${process.resourceName }&deploymentId=${process.deploymentId}'>加载</a>|
+	                        <%-- <a href='${ctx }/processAction/process/redeploy/single?resourceName=${process.resourceName }&diagramResourceName=${process.diagramResourceName }&deploymentId=${process.deploymentId}'>加载</a>| --%>
 	                        <a href='${ctx }/processAction/process/convert_to_model?processDefinitionId=${process.id}'>转换为Model</a>
 	                    </td>
 					</tr>
