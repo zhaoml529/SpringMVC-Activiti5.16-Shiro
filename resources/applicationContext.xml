@@ -89,8 +89,10 @@
            	<tx:method name="doDelete*" propagation="REQUIRED" />  
            	<tx:method name="doRemove*" propagation="REQUIRED" />  
            	<tx:method name="delete" propagation="REQUIRED" />  
-           	<tx:method name="doPut*" propagation="REQUIRED" />  
-
+           	<tx:method name="doPut*" propagation="REQUIRED" />
+           	<!-- workflowService.bankTransfer 需要回滚，但是传播行为设置为REQUIRES_NEW 相应的 act_ru_identitylink表中又不能保存task_id_   -->
+			<!-- 先记下来，待解决 -->
+			<tx:method name="bankTransfer*" propagation="REQUIRES_NEW" />
             <!--hibernate4必须配置为开启事务 否则 getCurrentSession()获取不到-->
             <tx:method name="get*" propagation="REQUIRED" read-only="true"/>
             <tx:method name="count*" propagation="REQUIRED" read-only="true"/>

@@ -56,71 +56,73 @@
 		});
 	}
 	function initialization(){
-		//window.location.href = '${ctx }/permissionAction/initialization';
-		$.ajax({
-            type: "POST",
-            url: "${ctx }/permissionAction/initialization",
-            data: {},
-            success: function (data) {
-            	if(data == "success"){
-            		$("#message").html("初始化成功！");
-            	}else{
-            		$("#message").html("初始化失败！");
-            	}
-            	setTimeout(function () {
-       				$( "#dialog-complete" ).dialog({
-           			      modal: true,
-           			      buttons: {
-           			        Ok: function() {
-           			          $( this ).dialog( "close" );
-           			       	  window.location.reload();
-           			        }
-           			      },
-	           			  close: function() {
-	           				$("#message").html("");
-	           				window.location.reload();
-	           	          },
-           		    	})},
-      		    	500	//延时500ms
-           		 );
-            },
-            beforeSend:function(){
-            	$.blockUI({
-                    theme:     true,              // true to enable jQuery UI CSS support
-                    draggable: true,              // draggable option requires jquery UI
-                    title:    '提示',              // only used when theme == true
-                    message:  '<img src="${ctx }/images/ui-anim_basic_16x16.gif" alt="Loading" />正在初始化，请稍候...'   // message to display
-                    //timeout:   2000            // close block after 2 seconds (good for demos, etc)
-            	});
-        	},
-        	complete: function(){
-        		$.unblockUI();
-       		}
-		});
-	}
-	
-	//选择人或候选人
-	function chooseUser( multiSelect, taskDefKey ){
-			$('#choose-user').dialog({
-			      height: 400,
-			      width: 1000,
-			      modal: true,
-			      open: function () { 
-						$("#choose-user").html('<iframe src="${ctx}/userAction/chooseUser_page?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" name="dialogFrame" scrolling="auto"></iframe>'); 
-				  }, 
-			      buttons: [
-			        {text: '确定',
-					 click: function() {
-						 //调用子页面方法,dialogFrame不能为id，因为在FireFox下id不能获取iframe对象
-						 dialogFrame.window.getValue();
-						$(this).dialog("close");
-					}},
-					{text:'取消',
-					 click: function() {
-						 $(this).dialog("close");
-					}}
-					]
+		if(window.confirm("此操作将会删除所有已设定审批人员，确定吗？")){
+			$.ajax({
+	            type: "POST",
+	            url: "${ctx }/permissionAction/initialization",
+	            data: {},
+	            success: function (data) {
+	            	if(data == "success"){
+	            		$("#message").html("初始化成功！");
+	            	}else{
+	            		$("#message").html("初始化失败！");
+	            	}
+	            	setTimeout(function () {
+	       				$( "#dialog-complete" ).dialog({
+	           			      modal: true,
+	           			      buttons: {
+	           			        Ok: function() {
+	           			          $( this ).dialog( "close" );
+	           			       	  window.location.reload();
+	           			        }
+	           			      },
+		           			  close: function() {
+		           				$("#message").html("");
+		           				window.location.reload();
+		           	          },
+	           		    	})},
+	      		    	500	//延时500ms
+	           		 );
+	            },
+	            beforeSend:function(){
+	            	$.blockUI({
+	                    theme:     true,              // true to enable jQuery UI CSS support
+	                    draggable: true,              // draggable option requires jquery UI
+	                    title:    '提示',              // only used when theme == true
+	                    message:  '<img src="${ctx }/images/ui-anim_basic_16x16.gif" alt="Loading" />正在初始化，请稍候...'   // message to display
+	                    //timeout:   2000            // close block after 2 seconds (good for demos, etc)
+	            	});
+	        	},
+	        	complete: function(){
+	        		$.unblockUI();
+	       		}
 			});
+		}
+			
+	}
+		
+		//选择人或候选人
+	function chooseUser( multiSelect, taskDefKey ){
+		$('#choose-user').dialog({
+		      height: 400,
+		      width: 1000,
+		      modal: true,
+		      open: function () { 
+					$("#choose-user").html('<iframe src="${ctx}/userAction/chooseUser_page?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" name="dialogFrame" scrolling="auto"></iframe>'); 
+			  }, 
+		      buttons: [
+		        {text: '确定',
+				 click: function() {
+					 //调用子页面方法,dialogFrame不能为id，因为在FireFox下id不能获取iframe对象
+					 dialogFrame.window.getValue();
+					$(this).dialog("close");
+				}},
+				{text:'取消',
+				 click: function() {
+					 $(this).dialog("close");
+				}}
+				]
+		});
 	}
 	
 	//选择候选组
@@ -274,7 +276,7 @@
           </ul>
       </div>
 	  <div style="text-align: right;padding: 2px 1em 2px">
-	  	<div id="message" class="tableHue1" style="display:inline;"><b>提示：</b>如果bpmn文件结构没有变化，则不需要初始化。哪个文件发生变化则单个加载再设定人员即可。</div>
+	  	<div class="tableHue1" style="display:inline;"><b>提示：</b>如果bpmn文件结构没有变化，则不需要初始化。哪个文件发生变化则单个加载再设定人员即可。</div>
       	<button onclick="initialization();" class="input_button4" title="删除user_task表中现有流程定义，全部重新部署">初始化</button>
       </div>
       <div class="sort_content">

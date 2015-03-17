@@ -125,7 +125,6 @@ public class PermissionAction {
 	
 	private void packageSingleActivitiInfo(ProcessDefinition processDefinition) throws Exception{
 		String proDefKey = processDefinition.getKey();
-		//如果usertask存在现有节点，不需要重新添加--未完成
 		List<UserTask> list = this.userTaskService.findByWhere(proDefKey);
 		ProcessDefinitionEntity processDef = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
 		List<ActivityImpl> activitiList = processDef.getActivities();//获得当前任务的所有节点
