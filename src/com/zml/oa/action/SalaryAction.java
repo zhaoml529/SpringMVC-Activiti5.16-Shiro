@@ -266,15 +266,22 @@ public class SalaryAction {
         }
 		
 		User currentUser = UserUtil.getUserFromSession(session);
-        
-        // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
-        if (currentUser == null || currentUser.getId() == null) {
-        	model.addAttribute("msg", "登录超时，请重新登录!");
-            return "redirect:/userAction/login_view";
-        }
         String userName = salary.getUser_name();
         User user = this.userService.getUserByName(userName);
+        
         Map<String, Object> variables = new HashMap<String, Object>();
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         if(reApply){
         	if(!BeanUtils.isBlank(user)){
         		if(user.getName().equals(currentUser.getName())){
@@ -287,8 +294,6 @@ public class SalaryAction {
 		        	salary.setStatus(BaseVO.PENDING);
 		        	salary.setApplyDate(new Date());
 		        	salary.setBusinessKey(salary.getId().toString());
-			        this.saService.doUpdate(salary);
-			        variables.put("entity", salary);
 	//		        variables.put("auditGroup", "director");//返回总监重新审批
 			        redirectAttributes.addFlashAttribute("message", "任务办理完成，薪资调整申请已重新提交！");
         		}else{
@@ -300,8 +305,18 @@ public class SalaryAction {
             	return "redirect:/salaryAction/toApproval/"+taskId;
             }
         }else{
+        	salary.setUserId(user.getId());
+        	salary.setUser_id(currentUser.getId());
+        	salary.setUser_name(currentUser.getName());
+        	salary.setTitle(user.getName()+" 的薪资调整申请已取消！");
+        	salary.setBusinessType(BaseVO.SALARY);
+        	salary.setStatus(BaseVO.APPROVAL_FAILED);
+        	salary.setApplyDate(new Date());
+        	salary.setBusinessKey(salary.getId().toString());
         	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的薪资调整申请！");
         }
+        this.saService.doUpdate(salary);
+        variables.put("entity", salary);
         variables.put("reApply", reApply);
         //完成任务
         this.processService.complete(taskId, null, user.getId().toString(), variables);

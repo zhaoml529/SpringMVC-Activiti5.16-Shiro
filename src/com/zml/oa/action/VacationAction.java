@@ -283,22 +283,18 @@ public class VacationAction {
 		
 		User user = UserUtil.getUserFromSession(session);
         
-        // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
-        if (user == null || user.getId() == null) {
-        	model.addAttribute("msg", "登录超时，请重新登录!");
-            return "login";
-        }
+
         Map<String, Object> variables = new HashMap<String, Object>();
+        vacation.setUserId(user.getId());
+        vacation.setUser_name(user.getName());
+        vacation.setBusinessType(BaseVO.VACATION);
+        vacation.setApplyDate(new Date());
+        vacation.setBusinessKey(vacation.getId().toString());
+        vacation.setProcessInstanceId(processInstanceId);
         if(reApply){
         	//修改请假申请
-	        vacation.setUserId(user.getId());
-	        vacation.setUser_name(user.getName());
 	        vacation.setTitle(user.getName()+" 的请假申请！");
-	        vacation.setBusinessType(BaseVO.VACATION);
 	        vacation.setStatus(BaseVO.PENDING);
-	        vacation.setApplyDate(new Date());
-	        vacation.setBusinessKey(vacation.getId().toString());
-	        vacation.setProcessInstanceId(processInstanceId);
 	        //由userTask自动分配审批权限
 //	        if(vacation.getDays() <= 3){
 //            	variables.put("auditGroup", "manager");
@@ -308,6 +304,7 @@ public class VacationAction {
 	        redirectAttributes.addFlashAttribute("message", "任务办理完成，请假申请已重新提交！");
         }else{
         	vacation.setTitle(user.getName()+" 的请假申请已取消！");
+        	vacation.setStatus(BaseVO.APPROVAL_FAILED);
         	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的请假申请！");
         }
         this.vacationService.doUpdate(vacation);
