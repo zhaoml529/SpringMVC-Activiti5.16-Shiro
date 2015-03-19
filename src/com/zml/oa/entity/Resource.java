@@ -8,6 +8,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @ClassName: Resource
@@ -29,21 +33,26 @@ public class Resource implements Serializable {
 	private Integer id; 								//编号
 	
 	@Column(name = "name")
+	@NotBlank(message="{resource.name.not.empty}")
     private String name; 							//资源名称
 	
 	@Column(name = "type")
-    private String type;						//资源类型
+	@NotBlank(message="{resource.type.not.empty}")
+    private String type;							//资源类型
 	
 	@Column(name = "url")
     private String url; 							//资源路径
 	
 	@Column(name = "permission")
+	@NotBlank(message="{resource.permission.not.empty}")
     private String permission; 						//权限字符串
 	
 	@Column(name = "parent_id")
-    private Long parentId; 							//父编号
+	@NotNull(message="{resource.parentid.not.empty}")
+    private Integer parentId; 							//父编号
 	
 	@Column(name = "parent_ids")
+	@NotBlank(message="{resource.parentIds.not.empty}")
     private String parentIds; 						//父编号列表
 	
 	@Column(name = "available")
@@ -89,11 +98,11 @@ public class Resource implements Serializable {
 		this.permission = permission;
 	}
 
-	public Long getParentId() {
+	public Integer getParentId() {
 		return parentId;
 	}
 
-	public void setParentId(Long parentId) {
+	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
 	}
 

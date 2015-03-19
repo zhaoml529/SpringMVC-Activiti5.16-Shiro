@@ -20,7 +20,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -46,6 +48,8 @@ public class User implements Serializable{
 	private String name;
 	
 	@Column(name = "USER_PWD")
+	@NotEmpty(message = "{user.password.not.empty}")
+	@Pattern(regexp = "[A-Za-z0-9]{5,20}", message = "{user.password.illegal}") 
 	private String passwd;
 	
 	@Column(name = "USER_SALT")

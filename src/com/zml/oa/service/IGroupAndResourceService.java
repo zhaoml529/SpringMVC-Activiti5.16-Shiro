@@ -7,5 +7,10 @@ import com.zml.oa.entity.GroupAndResource;
 public interface IGroupAndResourceService {
 
 	public List<GroupAndResource> getResource(Integer groupId) throws Exception;
+	
+	public void doAdd(GroupAndResource gar) throws Exception;
+	
+	public void doDelete(GroupAndResource gar) throws Exception;
+	
 }
 

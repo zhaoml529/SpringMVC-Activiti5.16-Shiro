@@ -1,7 +1,9 @@
 package com.zml.oa.action;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,14 +21,19 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.zml.oa.entity.GroupAndResource;
+import com.zml.oa.entity.Resource;
 import com.zml.oa.entity.UserTask;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
+import com.zml.oa.service.IGroupAndResourceService;
+import com.zml.oa.service.IResourceService;
 import com.zml.oa.service.IUserTaskService;
 
 /**
@@ -47,6 +54,12 @@ public class PermissionAction {
     
     @Autowired
     protected IUserTaskService userTaskService;
+    
+    @Autowired
+    protected IGroupAndResourceService garService;
+    
+    @Autowired
+    protected IResourceService resourceService;
 	
     @RequestMapping(value = "/loadBpmn_page")
 	public String loadBpmnInfo(Model model){
@@ -92,7 +105,7 @@ public class PermissionAction {
 			List<ProcessDefinition> processDefinitionList = proDefQuery.list();
 			for(ProcessDefinition processDefinition : processDefinitionList){
 				//读取节点信息保存到usertask表
-				packageSingleActivitiInfo(processDefinition);
+				setSingleActivitiInfo(processDefinition);
 			}
 			out.print("success");
 		} catch (Exception e) {
@@ -117,13 +130,13 @@ public class PermissionAction {
 								RedirectAttributes redirectAttributes) throws Exception{
 		ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
 		//读取节点信息保存到usertask表
-		packageSingleActivitiInfo(processDefinition);
+		setSingleActivitiInfo(processDefinition);
 		redirectAttributes.addFlashAttribute("message", "加载成功！");
 		return "redirect:/permissionAction/loadBpmn_page";
 	}
 
 	
-	private void packageSingleActivitiInfo(ProcessDefinition processDefinition) throws Exception{
+	private void setSingleActivitiInfo(ProcessDefinition processDefinition) throws Exception{
 		String proDefKey = processDefinition.getKey();
 		List<UserTask> list = this.userTaskService.findByWhere(proDefKey);
 		ProcessDefinitionEntity processDef = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
@@ -183,6 +196,54 @@ public class PermissionAction {
 		}
 		redirectAttribute.addFlashAttribute("message", "设置审批人员成功！");
 		return "redirect:/permissionAction/loadBpmn_page";
+	}
+	
+	@RequestMapping(value = "/listPermission_page")
+	public String listPermission(@RequestParam("groupId") Integer groupId, Model model) throws Exception{
+		List<Resource> resList = this.resourceService.getResourceListPage();
+		Pagination pagination = PaginationThreadUtils.get();
+		
+		List<GroupAndResource> garList = this.garService.getResource(groupId);
+		Map<Integer, Integer> garMap = new HashMap<Integer, Integer>();
+		for(GroupAndResource gar : garList){
+			garMap.put(gar.getResourceId(), gar.getId());
+		}
+		model.addAttribute("resList", resList);
+		model.addAttribute("garMap", garMap);
+		model.addAttribute("groupId", groupId);
+		model.addAttribute("page", pagination.getPageStr());
+		return "permission/list_permission";
+	}
+	
+	@RequestMapping(value = "/addPermission")
+	public void addPermission(@RequestParam("resourceId") Integer resourceId,
+								@RequestParam("groupId") Integer groupId,
+								HttpServletResponse response) throws Exception {
+		PrintWriter print = response.getWriter();
+		try {
+			GroupAndResource gar = new GroupAndResource();
+			gar.setGroupId(groupId);
+			gar.setResourceId(resourceId);
+			this.garService.doAdd(gar);
+			print.print("success");
+		} catch (Exception e) {
+			print.print("fail");
+			throw e;
+		}
+	}
+	
+	@RequestMapping(value = "/delPermission")
+	public void delPermission(@RequestParam("id") Integer id, HttpServletResponse response) throws Exception {
+		PrintWriter print = response.getWriter();
+		try {
+			GroupAndResource gar = new GroupAndResource();
+			gar.setId(id);
+			this.garService.doDelete(gar);
+			print.print("success");
+		} catch (Exception e) {
+			print.print("fail");
+			throw e;
+		}
 	}
 	
 }

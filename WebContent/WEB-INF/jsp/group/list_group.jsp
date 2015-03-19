@@ -24,8 +24,9 @@
           <table class="tableHue1" width="100%" border="1" bordercolor="#a4d5e3" cellspacing="0" cellpadding="0">
               <thead>
                 <tr>
-                  <td width="50%"><strong>名称</strong></td>
-                  <td width="50%"><strong>类型</strong></td>
+                  <td width="45%"><strong>名称</strong></td>
+                  <td width="45%"><strong>类型</strong></td>
+                  <td width="10%"><strong>操作</strong></td>
                 </tr>
               </thead>
               <tbody id="tbody">
@@ -33,10 +34,11 @@
                 <tr>
                   <td>${group.name}</td>
                   <td>${group.type}</td>
+                  <td align="center"><a href="${ctx }/permissionAction/listPermission_page?groupId=${group.id}">权限设置</a></td>
                 </tr>
                 </c:forEach>
                 <tr>
-              		<td class="fun_area" colspan="2" align="center"><c:out value="${page }" escapeXml="false" /></td>
+              		<td class="fun_area" colspan="3" align="center"><c:out value="${page }" escapeXml="false" /></td>
               	</tr>
               </tbody>
           </table>

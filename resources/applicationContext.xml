@@ -82,6 +82,7 @@
             <tx:method name="doSave*" propagation="REQUIRED" />  
            	<tx:method name="doAdd*" propagation="REQUIRED" />  
            	<tx:method name="add*" propagation="REQUIRED" />  
+           	<tx:method name="set*" propagation="REQUIRED" />  
            	<tx:method name="doCreate*" propagation="REQUIRED" />  
           	<tx:method name="doInsert*" propagation="REQUIRED" />  
            	<tx:method name="doUpdate*" propagation="REQUIRED" />  
