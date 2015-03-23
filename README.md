@@ -21,8 +21,8 @@ Shiro实现登录认证和权限控制，结合Ehcache缓存权限列表，毕�
 <li>Spring-4.0.0.RELEASE</li>
 <li>Shiro-all-1.2.3</li>
 <li>Hibernate-4.2.2.Final</li>
-<li>Hibernate-validator-4.2.0.Final</li>
-<li>validation-api-1.0.0.GA</li>
+<li>Hibernate-validator-5.1.3.Final</li>
+<li>validation-api-1.1.0.GA</li>
 </ul>
 
 数据库
@@ -36,7 +36,7 @@ Shiro实现登录认证和权限控制，结合Ehcache缓存权限列表，毕�
 --------
 1.加入安全框架Shiro. ---已实现<br>
 2.加入缓存 ehcache. --已实现<br>
-3.前端页面Extjs.<br>
+3.前端页面jquery mini ui.<br>
 
 首页
 --------
