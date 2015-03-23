@@ -21,7 +21,11 @@
 			      }
 		    });
 		}
-	});
+	})
+	
+	function toAdd(){
+		window.location.href="${ctx}/resourceAction/toAdd";
+	}
 </script>
 </head>
 
@@ -38,7 +42,7 @@
           </ul>
       </div>
       <div style="text-align: right;padding: 2px 1em 2px">
-      	<button onclick="initialization();" class="input_button4">添加</button>
+      	<button onclick="toAdd();" class="input_button4">添加</button>
       </div>
       <div class="sort_content">
       	<form action=" ${ctx }/resourceAction/listResource_page" method="post">
