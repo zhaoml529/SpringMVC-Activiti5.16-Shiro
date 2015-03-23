@@ -18,6 +18,7 @@ import com.zml.oa.entity.Resource;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IResourceService;
+import com.zml.oa.util.Constants;
 
 @Controller
 @RequiresPermissions("admin:*")
@@ -38,22 +39,36 @@ public class ResourceAction {
 	
 	@RequestMapping(value = "/toAdd")
 	public String toAdd(Model model) throws Exception {
-		if(!model.containsAttribute("resource")){
-			model.addAttribute("resource", new Resource());
+		if(!model.containsAttribute("res")){
+			model.addAttribute("res", new Resource());
 		}
-		return "resource/add_reoustce";
+		List<Resource> menuList = this.resourceService.getResourceByType();
+		model.addAttribute("list", menuList);
+		return "resource/add_resource";
 	}
 	
+
+	/**
+	 * 此方法会在其他方法之前执行，并将其自动添加到模型对象中，
+	 * 在功能处理方法中调用Model 入参的containsAttribute("list")将会返回true。
+	 * @return
+	 * @throws Exception
+	 */
+//	@ModelAttribute("list")
+//	public List<Resource> getResource() throws Exception{
+//		return this.resourceService.getResourceByType();
+//	}
+	
 	@RequestMapping(value = "/doAdd")
-	public String doAdd(@ModelAttribute("resource") @Valid Resource resource, 
+	public String doAdd(@Valid @ModelAttribute("res") Resource res, 
 						 BindingResult results,
 						 Model model) throws Exception {
 		if(results.hasErrors()){
-			model.addAttribute("resource", resource);
 			return toAdd(model);
 		}
 		
-		resource.setAvailable(1);
+		res.setAvailable(1);
+		this.resourceService.doAdd(res);
 		return "redirect:/resourceAction/listResource_page";
 	}
 	
@@ -62,29 +77,29 @@ public class ResourceAction {
 		if(!model.containsAttribute("resource")){
 			if(id != null){
 				Resource resource = this.resourceService.getPermissions(id);
-				List<Resource> menuList = this.resourceService.getResourceByType();
-				model.addAttribute("list", menuList);
 				model.addAttribute("resource", resource);
 			}else{
-				
+				model.addAttribute(Constants.MESSAGE, "出错，id为空！");
+				return toAdd(model);
 			}
 		}
+		List<Resource> menuList = this.resourceService.getResourceByType();
+		model.addAttribute("list", menuList);
 		return "resource/update_resource";
 	}
 	
 	@RequestMapping(value = "/doUpdate")
-	public String doUpdate(@ModelAttribute("resource") @Valid Resource resource, 
-							BindingResult results,
-							RedirectAttributes model) throws Exception{
+	public String doUpdate(@Valid Resource resource, BindingResult results,
+							Model model,
+							RedirectAttributes redirectAttribute) throws Exception{
 		if(results.hasErrors()){
-			model.addAttribute("resource", resource);
 			return toUpdate(resource.getId(), model);
 		}
 		try {
 			this.resourceService.doUpdate(resource);
-			model.addFlashAttribute("message", "修改成功！");
+			redirectAttribute.addFlashAttribute(Constants.MESSAGE, "修改成功！");
 		} catch (Exception e) {
-			model.addFlashAttribute("message", "修改失败！");
+			redirectAttribute.addFlashAttribute(Constants.MESSAGE, "修改失败！");
 			throw e;
 		}
 		return "redirect:/resourceAction/toUpdate/"+resource.getId();
@@ -96,9 +111,9 @@ public class ResourceAction {
 			Resource resource = this.resourceService.getPermissions(id);
 			resource.setAvailable(0);
 			this.resourceService.doUpdate(resource);
-			redirectAttribute.addFlashAttribute("message", "删除成功！");
+			redirectAttribute.addFlashAttribute(Constants.MESSAGE, "删除成功！");
 		} catch (Exception e) {
-			redirectAttribute.addFlashAttribute("message", "删除失败！");
+			redirectAttribute.addFlashAttribute(Constants.MESSAGE, "删除失败！");
 			throw e;
 		}
 		return "redirect:/resourceAction/listResource_page";
