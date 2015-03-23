@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -33,26 +34,26 @@ public class Resource implements Serializable {
 	private Integer id; 								//编号
 	
 	@Column(name = "name")
-	@NotBlank(message="{resource.name.not.empty}")
+	@NotEmpty(message = "{resource.name.not.empty}")
     private String name; 							//资源名称
 	
 	@Column(name = "type")
-	@NotBlank(message="{resource.type.not.empty}")
     private String type;							//资源类型
 	
 	@Column(name = "url")
     private String url; 							//资源路径
 	
 	@Column(name = "permission")
-	@NotBlank(message="{resource.permission.not.empty}")
+	@NotEmpty(message = "{resource.permission.not.empty}")
     private String permission; 						//权限字符串
 	
 	@Column(name = "parent_id")
-	@NotNull(message="{resource.parentid.not.empty}")
+	@NotNull(message = "{resource.parentId.not.empty}")
     private Integer parentId; 							//父编号
 	
 	@Column(name = "parent_ids")
-	@NotBlank(message="{resource.parentIds.not.empty}")
+	@NotEmpty(message="{resource.parentIds.not.empty}")
+	@Length(min = 5, max = 20, message = "{resource.parentIds.length.illegal}")
     private String parentIds; 						//父编号列表
 	
 	@Column(name = "available")
