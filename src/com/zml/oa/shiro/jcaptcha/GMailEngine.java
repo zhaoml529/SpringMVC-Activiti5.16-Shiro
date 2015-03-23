@@ -33,9 +33,9 @@ public class GMailEngine extends ListImageCaptchaEngine {
         // 图片和字体大小设置
         int minWordLength = 4;
         int maxWordLength = 5;
-        int fontSize = 20;
-        int imageWidth = 100;
-        int imageHeight = 36;
+        int fontSize = 19;
+        int imageWidth = 85;
+        int imageHeight = 31;
 
         WordGenerator dictionnaryWords = new ComposeDictionaryWordGenerator(
                 new FileDictionary("toddlist"));
@@ -46,7 +46,7 @@ public class GMailEngine extends ListImageCaptchaEngine {
                 new Color(23, 170, 27), new Color(220, 34, 11),
                 new Color(23, 67, 172)}), new TextDecorator[]{});
         BackgroundGenerator background = new UniColorBackgroundGenerator(
-                imageWidth, imageHeight, Color.white);
+                imageWidth, imageHeight, Color.WHITE);
         FontGenerator font = new RandomFontGenerator(fontSize, fontSize,
                 new Font[]{new Font("nyala", Font.BOLD, fontSize),
                         new Font("Bell MT", Font.PLAIN, fontSize),

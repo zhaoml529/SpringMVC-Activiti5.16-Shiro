@@ -46,7 +46,11 @@
 	height: 40px;
 	margin-left: 40px;
 }
-
+.jcaptcha-img {
+	text-align: center;
+	margin-left: 15px;
+	margin-bottom: -10px;
+}
 </style>
 
 </HEAD>
