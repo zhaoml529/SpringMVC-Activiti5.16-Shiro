@@ -18,11 +18,19 @@
        http://www.springframework.org/schema/aop/spring-aop.xsd">
 	<!-- springMVC.XML 表现层配置文件，只应加装表现层Bean -->
 	
-	<!-- 对包进行扫描，实现注释驱动Bean定义，同时将bean自动注入容器中使用。即解决了@Controller标识的类的bean的注入和使用。  -->
-	<!-- <context:annotation-config/> -->
- 
+	
+	<!--开启controller注解支持,把标记了@Controller注解的类转换为bean -->    
+	<!-- 使用了 context:component-scan 标签 上面的 context:annotation-config 就不需要配置了 -->
+	<!-- 注：如果base-package=cn.zml 则注解事务不起作用 TODO 读源码 -->
+	<!-- 因为此处只应该加载表现层组件，如果此处还加载dao层或service层的bean会将之前容器加载的替换掉 -->
+	<!-- 而且此处不会进行AOP织入，所以会造成AOP失效问题（如事务不起作用） -->
+	<context:component-scan base-package="com.zml.oa.action">
+	    <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
     <!-- 指定自己定义的validator -->
     <mvc:annotation-driven validator="validator"/>
+    
 
     <!-- 以下 validator  ConversionService 在使用 mvc:annotation-driven 会 自动注册-->
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
@@ -36,8 +44,8 @@
         <property name="basenames">
             <list>
                 <!-- 在web环境中一定要定位到classpath 否则默认到当前web应用下找  -->
-                <value>classpath:message</value>
-                <value>classpath:org/hibernate/validator/ValidationMessages</value><!-- 默认的错误消息文件 -->
+                <value>classpath:message/messages</value>
+                <value>classpath:message/ValidationMessages</value><!-- 默认的错误消息文件 -->
             </list>
         </property>
         <property name="useCodeAsDefaultMessage" value="false"/>
@@ -52,20 +60,16 @@
         <property name="defaultLocale" value="zh_CN"/>
     </bean>
 	
-	<!--开启controller注解支持,把标记了@Controller注解的类转换为bean -->    
-	<!-- 使用了 context:component-scan 标签 上面的 context:annotation-config 就不需要配置了 -->
-	<!-- 注：如果base-package=cn.zml 则注解事务不起作用 TODO 读源码 -->
-	<!-- 因为此处只应该加载表现层组件，如果此处还加载dao层或service层的bean会将之前容器加载的替换掉 -->
-	<!-- 而且此处不会进行AOP织入，所以会造成AOP失效问题（如事务不起作用） -->
-	<context:component-scan base-package="com.zml.oa.action">
-	    <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
-	</context:component-scan>
-	
+    <mvc:interceptors>
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="language"/>
+        </bean>
+    </mvc:interceptors>
 	<!-- 当访问主页时自动转发到/userAction/login_view控制器。 -->
 	<!-- <mvc:view-controller path="/" view-name="forward:/userAction/login_view"/> -->
 	
 	<!-- restful -->
-	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
+	<!-- <bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/> -->
 	
 	<!-- 视图处理器 -->
 	<bean id="jspViewResolver"  
@@ -108,12 +112,12 @@
 	    	<bean class="com.zml.oa.interceptor.PaginationInterceptor" />
     	</mvc:interceptor>
     	<!-- 设置国际化信息的拦截器 -->
-    	<mvc:interceptor>
+<!--     	<mvc:interceptor>
 	    	<mvc:mapping path="/**" />
 	    	<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
 	           <property name="paramName" value="language"/>
 	       </bean>
-    	</mvc:interceptor>
+    	</mvc:interceptor> -->
     	
     </mvc:interceptors>
 
