@@ -2,21 +2,27 @@
 <%@ attribute name="successMessage" type="java.lang.String" required="false" description="成功消息" %>
 <%@ attribute name="errorMessage" type="java.lang.String" required="false" description="失败消息" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<script type="text/javascript">
+	$(function() {
+		$( "#dialog-complete" ).dialog({
+		      modal: true,
+		      buttons: {
+		        Ok: function() {
+		          $( this ).dialog( "close" );
+		        }
+		      }
+	    });
+	});
+</script>
 <c:if test="${not empty successMessage}">
     <c:set var="message" value="${successMessage}"/>
 </c:if>
 <c:if test="${not empty errorMessage}">
-    <c:set var="error" value="${errorMessage}"/>
+    <c:set var="message" value="${errorMessage}"/>
 </c:if>
 <c:if test="${not empty message}">
-    <div class="alert alert-success">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <span class="icon-ok-sign icon-large"></span>&nbsp;${message}
-    </div>
-</c:if>
-<c:if test="${not empty error}">
-    <div class="alert alert-error">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <span class="icon-remove-sign icon-large"></span>&nbsp;${error}
-    </div>
+   <div id="dialog-complete" title="Message">
+ 	 <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 1px 5px 0;"></span>
+	 <span id="message">${message }</span>
+   </div>
 </c:if>
