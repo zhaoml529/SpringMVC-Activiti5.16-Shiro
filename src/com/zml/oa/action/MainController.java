@@ -35,24 +35,24 @@ public class MainController {
     @Autowired
     private IResourceService resourceService;
 	
-    @RequestMapping(value = "/top")
+    @RequestMapping(value = "/north")
     public String index() {
-        return "main/top";
+        return "layout/north";
     }
 
-    @RequestMapping(value = "/welcome")
+    @RequestMapping(value = "/main")
     public String welcome() {
-        return "main/welcome";
+        return "layout/main";
     }
     
-    @RequestMapping(value = "/nav")
+    @RequestMapping(value = "/south")
     public String nav(HttpSession session, Model model) throws Exception {
     	String username = (String) SecurityUtils.getSubject().getPrincipal();
     	User user = this.userService.getUserByName(username);
         List<GroupAndResource> grList = this.grService.getResource(user.getGroup().getId());
         List<Resource> menus = this.resourceService.getMenus(grList);
         model.addAttribute("menuList", menus);
-    	return "main/nav";
+    	return "layout/south";
     }
 
     @RequestMapping("/")
