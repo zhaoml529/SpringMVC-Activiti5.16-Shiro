@@ -72,12 +72,12 @@
 	</style>
   </head>
  <body class="easyui-layout">
-	<div data-options="region:'north',border:false" style="height:40px;background:#EEE;padding:10px;overflow: hidden;"  href="${ctx }/layout/north.jsp"></div>
+	<div data-options="region:'north',border:false" style="height:40px;background:#EEE;padding:10px;overflow: hidden;"  href="${ctx }/north.jsp"></div>
 	<div data-options="region:'west',split:true,title:'主要菜单'" style="width:200px;">
 			<div id="menuAccordion"></div>
 	</div> 
-	<div data-options="region:'south',border:false" style="height:25px;background:#EEE;padding:5px;" href="${ctx }/layout/south.jsp"></div>
-	<div data-options="region:'center',plain:true,title:'欢迎使用OA'" style="overflow: hidden;"  href="${ctx }/layout/center.jsp"></div>
+	<div data-options="region:'south',border:false" style="height:25px;background:#EEE;padding:5px;" href="${ctx }/south.jsp"></div>
+	<div data-options="region:'center',plain:true,title:'欢迎使用OA'" style="overflow: hidden;"  href="${ctx }/center.jsp"></div>
 <%--	<jsp:include page="user/loginAndReg.jsp"></jsp:include>--%>
 </body>
 </html>

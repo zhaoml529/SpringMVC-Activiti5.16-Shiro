@@ -86,6 +86,7 @@
     <mvc:resources mapping="/css/**" location="/WEB-INF/css/" cache-period="31556926"/>
 	<mvc:resources mapping="/images/**" location="/WEB-INF/images/" cache-period="31556926"/>
 	<mvc:resources mapping="/modeler/**" location="/modeler/" cache-period="31556926"/>
+	<mvc:resources mapping="/fonts/**" location="/fonts/" cache-period="31556926"/>
 	<!-- 全局异常配置 -->  
      <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
          <property name="exceptionMappings">  
