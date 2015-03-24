@@ -74,7 +74,7 @@
 	<!-- 视图处理器 -->
 	<bean id="jspViewResolver"  
 	    class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
-	        <property name="prefix" value="/WEB-INF/jsp/" />  
+	        <property name="prefix" value="/WEB-INF/easyui/" />  
 	        <property name="suffix" value=".jsp" />  
 	        <property name="contentType" value="text/html;charset=utf-8" />
 	        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" /> 
