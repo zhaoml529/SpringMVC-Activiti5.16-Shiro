@@ -77,6 +77,7 @@
 		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
 	
+	<!-- 配置事务增强处理Bean，指定事务管理器 -->
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>
             <tx:method name="doSave*" propagation="REQUIRED" />  
@@ -104,6 +105,7 @@
         </tx:attributes>
     </tx:advice>
 
+	<!-- Spring aop事务管理 -->
     <aop:config expose-proxy="true" proxy-target-class="true">
         <!-- 只对业务逻辑层实施事务 -->
         <aop:pointcut id="txPointcut" expression="execution(* com.zml.oa..service..*.*(..))"/>
