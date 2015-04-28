@@ -49,7 +49,7 @@ public class User implements Serializable{
 	
 	@Column(name = "USER_PWD")
 	@NotEmpty(message = "{user.password.not.empty}")
-	@Pattern(regexp = "[A-Za-z0-9]{5,20}", message = "{user.password.illegal}") 
+	//@Pattern(regexp = "[A-Za-z0-9]{5,20}", message = "{user.password.illegal}") 
 	private String passwd;
 	
 	@Column(name = "USER_SALT")

@@ -18,4 +18,9 @@ public class Constants {
     
 	/***************** default password (123456) *****************/
 	public static final String DEFAULT_PASSWORD = "14e1b600b1fd579f47433b88e8d85291";
+	
+	/***************** activiti *****************/
+	public static final String ASSIGNEE = "assignee";
+	public static final String CANDIDATE_USER = "candidateUser";
+	public static final String CANDIDATE_GROUP = "candidateGroup";
 }

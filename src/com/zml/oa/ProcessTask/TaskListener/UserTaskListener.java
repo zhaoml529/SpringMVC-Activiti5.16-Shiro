@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.zml.oa.entity.UserTask;
 import com.zml.oa.service.IUserTaskService;
+import com.zml.oa.util.Constants;
 
 /**
  * 动态用户任务分配
@@ -52,12 +53,12 @@ public class UserTaskListener implements TaskListener {
 				String ids = userTask.getCandidate_ids();
 				if(taskDefinitionKey.equals(taskKey)){
 					switch (taskType){
-						case "assignee" : {
+						case Constants.ASSIGNEE : {
 							delegateTask.setAssignee(ids);
 							logger.info("assignee id: "+ids);
 							break;
 						}
-						case "candidateUser" : {
+						case Constants.CANDIDATE_USER : {
 							String[] userIds = ids.split(",");
 							List<String> users = new ArrayList<String>();
 							for(int i=0; i<userIds.length;i++){
@@ -67,7 +68,7 @@ public class UserTaskListener implements TaskListener {
 							logger.info("候选人审批 ids: "+ids);
 							break;
 						}
-						case "candidateGroup" : {
+						case Constants.CANDIDATE_GROUP: {
 							String[] groupIds = ids.split(",");
 							List<String> groups = new ArrayList<String>();
 							for(int i=0; i<groupIds.length;i++){

@@ -225,6 +225,7 @@ public class ProcessServiceImp implements IProcessService{
      */
 	@Override
     public void doClaim(User user, String taskId){
+		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
     	this.identityService.setAuthenticatedUserId(user.getId().toString());
         this.taskService.claim(taskId, user.getId().toString());
     }
