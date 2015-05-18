@@ -41,8 +41,13 @@ public class MainController {
     }
 
     @RequestMapping(value = "/main")
-    public String welcome() {
+    public String main() {
         return "layout/main";
+    }
+    
+    @RequestMapping(value = "/center")
+    public String center() {
+    	return "layout/center";
     }
     
     @RequestMapping(value = "/south")

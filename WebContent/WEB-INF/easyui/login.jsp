@@ -1,90 +1,144 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%@ include file="/WEB-INF/taglibs/taglibs.jsp"%>
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
-  <title>OA System</title>
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-  <meta name="viewport" content="width=device-width"> 
-</head>
-<body>
-  <div id="main-wrapper">
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="navbar-header">
-        <div class="logo"><h1>OA系统演示</h1></div>
-      </div>   
-    </div>
-    <div class="template-page-wrapper">
-      <form class="form-horizontal templatemo-signin-form" role="form" action="${ctx }/loginAction/login" method="post">
-        <div id="username" class="form-group">
-          <div class="col-md-12">
-            <label for="username" class="col-sm-2 control-label">用户名</label>
-            <div class="col-sm-10">
-              <label id="errorUserName" class="control-label sr-only">${msg }</label>
-              <input type="text" class="form-control" name="name" value="${username }" placeholder="Username">
-              <span id="username_sr" class="glyphicon glyphicon-remove form-control-feedback sr-only"></span>
-            </div>
-          </div>              
-        </div>
-        <div id="password" class="form-group">
-          <div class="col-md-12">
-            <label for="password" class="col-sm-2 control-label">密&nbsp;&nbsp;码</label>
-            <div class="col-sm-10">
-              <label id="errorPassWord" class="control-label sr-only">${msg }</label>
-              <input type="password" class="form-control" name="passwd" placeholder="Password">
-              <span id="password_sr" class="glyphicon glyphicon-remove form-control-feedback sr-only"></span>
-            </div>
-          </div>
-        </div>
-        <div id="password" class="form-group">
-          <div class="col-md-12">
-            <label for="password" class="col-sm-6 control-label">验证码:</label>
-            <div class="col-sm-6">
-             	<input type="text" name="jcaptchaCode" style="width: 100px"> 
-				<img class="jcaptcha-btn jcaptcha-img" src="${ctx}/jcaptcha.jpg" title="点击更换验证码"> 
-				<a class="jcaptcha-btn" href="javascript:;">换一张</a> 
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-md-12">
-            <div class="col-sm-offset-2 col-sm-10">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" style="width: 50px" name="rememberMe" value="true">Remember me
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-md-12">
-            <div class="col-sm-offset-2 col-sm-10">
-              <input type="submit" value="登录" class="btn btn-default">
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-  <script type="text/javascript">
-  	var msg = '${msg}';
-  	if(msg != ''){
-  		if(msg == '用户名不存在'){
-  			$("#username").removeClass().addClass('form-group has-error has-feedback');
-  			$("#errorUserName").removeClass("sr-only");
-  			$("#username_sr").removeClass("sr-only");
-  			$("#username").focus();
-  		}
-  		if(msg == '密码不正确'){
-  			$("#password").removeClass().addClass('form-group has-error has-feedback');
-  			$("#errorPassWord").removeClass("sr-only");
-  			$("#password_sr").removeClass("sr-only");
-  			$("#password").focus();
-  		}
-  	}
-  </script>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+	/*response.setHeader("Pragma","No-cache"); 
+	response.setHeader("Cache-Control","no-cache"); 
+	response.setDateHeader("Expires", 0); 
+	response.flushBuffer();*/
+%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <base href="<%=basePath%>">
+    <title>欢迎登陆</title>
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">    
+	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+	<meta http-equiv="description" content="This is my page">
+	<script type="text/javascript" src="js/xheditor/jquery-1.8.0.min.js"></script>
+	<script type="text/javascript" src="js/easyui/login/jquery.cookie.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/easyui/login/zice.style.css">
+	<link rel="stylesheet" type="text/css" href="css/easyui/login/tipsy.css">
+	<link rel="stylesheet" type="text/css" href="css/easyui/login/icon.css">
+	<link rel="stylesheet" type="text/css" href="css/easyui/login/buttons.css">
+	<script type="text/javascript" src="js/easyui/login/iphone.check.js"></script>
+	<script type="text/javascript" src="js/easyui/login/jquery-jrumble.js"></script>
+	<script type="text/javascript" src="js/easyui/login/jquery.tipsy.js"></script>
+	<script type="text/javascript" src="js/easyui/login/login.js"></script>
+	<script type="text/javascript">
+		if(top!=self){
+			if(top.location != self.location)
+			 top.location=self.location; 
+		}
+	</script>
+	 <style type="text/css">
+html {
+	background-image: none;
+}
+
+label.iPhoneCheckLabelOn span {
+	padding-left: 0px
+}
+
+#versionBar {
+	background-color: #212121;
+	position: fixed;
+	width: 100%;
+	height: 35px;
+	bottom: 0;
+	left: 0;
+	text-align: center;
+	line-height: 35px;
+	z-index: 11;
+	-webkit-box-shadow: black 0px 10px 10px -10px inset;
+	-moz-box-shadow: black 0px 10px 10px -10px inset;
+	box-shadow: black 0px 10px 10px -10px inset;
+}
+
+.copyright {
+	text-align: center;
+	font-size: 10px;
+	color: #CCC;
+}
+
+.copyright a {
+	color: #A31F1A;
+	text-decoration: none
+}
+
+/*update-begin--Author:tanghong  Date:20130419 for：【是否】按钮错位*/
+.on_off_checkbox{
+	width:0px;
+}
+/*update-end--Author:tanghong  Date:20130419 for：【是否】按钮错位*/
+#login .logo {
+	width: 500px;
+	height: 51px;
+}
+#cap{
+margin-left: 88px;
+}
+</style>
+  </head>
+  <body>
+	<div id="alertMessage"></div>
+	<div id="successLogin"></div>
+	<div class="text_success">
+		<img src="extend/loader_green.gif" alt="Please wait" /> <span>登陆成功!请稍后....</span>
+	</div>
+	<div id="login">
+		<div class="ribbon" style="background-image:url(extend/typelogin.png);"></div>
+		<div class="inner">
+			<div class="logo">
+				<img src="extend/toplogo-jeecg.png" />
+			</div>
+			<div class="formLogin">
+				<form name="formLogin" action="" id="formLogin" method="post">
+					<div class="tip">
+						<input class="userName"  type="text" name="name" id="userName" title="用户名" value="<shiro:principal/>" nullmsg="请输入用户名!" iscookie="true" />
+					</div>
+					<div class="tip">
+						<input class="password" name="passwd" type="password" id="password" title="密码" nullmsg="请输入密码!" />
+					</div>
+					<div id="cap" class="tip">
+						<c:if test="${jcaptchaEbabled}">
+							<input class="captcha" name="captcha" type="text" id="captcha"  nullmsg="请输入验证码!" />
+							<img style="width:85px;height:35px;margin-top: -10px;" align="absmiddle" id="jcaptcha" src="jcaptcha.jpg"/>
+						</c:if>
+					</div>
+					<div class="loginButton">
+						<div style="float: left; margin-left: -9px;">
+							<input type="checkbox" id="on_off" name="rememberMe" checked="ture" class="on_off_checkbox" value="0" /> <span class="f_help">下次自动登录?</span>
+						</div>
+						<div style="float: right; padding: 3px 0; margin-right: -12px;">
+							<div>
+								<ul class="uibutton-group">
+									<li><a class="uibutton normal" href="javascript:void(0);" id="but_login">登陆</a>
+									</li>
+									<li><a class="uibutton normal" href="javascript:void(0);" id="forgetpass">重置</a>
+									</li>
+								</ul>
+							</div>
+							<div style="float: left; margin-left: 30px;">
+								<a href="javascript:void(0);"><span class="f_help">是否初始化admin的密码</span></a>
+							</div>
+						</div>
+						<div class="clear"></div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="shadow"></div>
+	</div>
+	<!--Login div-->
+	<div class="clear"></div>
+	<div id="versionBar">
+		<div class="copyright">&copy; 版权所有 <span class="tip"><a href="javascript:void(0);" title="sysErp">oa</a>
+				(推荐使用IE9+,谷歌浏览器可以获得更快,更安全的页面响应速度)技术支持:<a href="javascript:void(0);" title="sysErp">sy</a> </span>
+		</div>
+	</div>
 </body>
 </html>

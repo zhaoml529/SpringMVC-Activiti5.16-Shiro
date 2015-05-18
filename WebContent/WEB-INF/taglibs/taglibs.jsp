@@ -4,8 +4,24 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="oa" %>
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%
+	String easyuiThemeName="metro";
+	Cookie cookies[] =request.getCookies();
+	if(cookies!=null&&cookies.length>0){
+		for(Cookie cookie : cookies){
+			if (cookie.getName().equals("cookiesColor")) {
+				easyuiThemeName = cookie.getValue();
+				break;
+			}
+		}
+	}
+%>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+
+<link rel="stylesheet" type="text/css" href="${ctx}/css/themes/<%=easyuiThemeName %>/easyui.css">
+
 <link rel="stylesheet" type="text/css" href="${ctx}/css/themes/icon.css">
 <link rel="stylesheet" type="text/css" href="${ctx}/css/easyui/common.css">
 <link rel="stylesheet" type="text/css" href="${ctx}/css/bootstrap.min.css">
@@ -23,3 +39,11 @@
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine.js"></script>
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine-zh_CN.js"></script>
 
+<style type="text/css">
+	body {
+	    font-family:helvetica,tahoma,verdana,sans-serif;
+	    font-size:13px;
+	    margin:0px 0px 0px 0px;
+	    padding:0px 0px 0px 0px;
+	}
+</style>
