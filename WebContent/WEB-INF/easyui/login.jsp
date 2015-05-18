@@ -1,112 +1,88 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-	/*response.setHeader("Pragma","No-cache"); 
-	response.setHeader("Cache-Control","no-cache"); 
-	response.setDateHeader("Expires", 0); 
-	response.flushBuffer();*/
-%>
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/taglibs/login_tags.jsp"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
   <head>
-    <base href="<%=basePath%>">
     <title>欢迎登陆</title>
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
 	<meta http-equiv="expires" content="0">    
 	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 	<meta http-equiv="description" content="This is my page">
-	<script type="text/javascript" src="js/xheditor/jquery-1.8.0.min.js"></script>
-	<script type="text/javascript" src="js/easyui/login/jquery.cookie.js"></script>
-	<link rel="stylesheet" type="text/css" href="css/easyui/login/zice.style.css">
-	<link rel="stylesheet" type="text/css" href="css/easyui/login/tipsy.css">
-	<link rel="stylesheet" type="text/css" href="css/easyui/login/icon.css">
-	<link rel="stylesheet" type="text/css" href="css/easyui/login/buttons.css">
-	<script type="text/javascript" src="js/easyui/login/iphone.check.js"></script>
-	<script type="text/javascript" src="js/easyui/login/jquery-jrumble.js"></script>
-	<script type="text/javascript" src="js/easyui/login/jquery.tipsy.js"></script>
-	<script type="text/javascript" src="js/easyui/login/login.js"></script>
-	<script type="text/javascript">
-		if(top!=self){
-			if(top.location != self.location)
-			 top.location=self.location; 
-		}
-	</script>
-	 <style type="text/css">
-html {
-	background-image: none;
-}
+	<style type="text/css">
+	html {
+		background-image: none;
+	}
+	
+	label.iPhoneCheckLabelOn span {
+		padding-left: 0px
+	}
 
-label.iPhoneCheckLabelOn span {
-	padding-left: 0px
-}
-
-#versionBar {
-	background-color: #212121;
-	position: fixed;
-	width: 100%;
-	height: 35px;
-	bottom: 0;
-	left: 0;
-	text-align: center;
-	line-height: 35px;
-	z-index: 11;
-	-webkit-box-shadow: black 0px 10px 10px -10px inset;
-	-moz-box-shadow: black 0px 10px 10px -10px inset;
-	box-shadow: black 0px 10px 10px -10px inset;
-}
-
-.copyright {
-	text-align: center;
-	font-size: 10px;
-	color: #CCC;
-}
-
-.copyright a {
-	color: #A31F1A;
-	text-decoration: none
-}
-
-/*update-begin--Author:tanghong  Date:20130419 for：【是否】按钮错位*/
-.on_off_checkbox{
-	width:0px;
-}
-/*update-end--Author:tanghong  Date:20130419 for：【是否】按钮错位*/
-#login .logo {
-	width: 500px;
-	height: 51px;
-}
-#cap{
-margin-left: 88px;
-}
-</style>
+	#versionBar {
+		background-color: #212121;
+		position: fixed;
+		width: 100%;
+		height: 35px;
+		bottom: 0;
+		left: 0;
+		text-align: center;
+		line-height: 35px;
+		z-index: 11;
+		-webkit-box-shadow: black 0px 10px 10px -10px inset;
+		-moz-box-shadow: black 0px 10px 10px -10px inset;
+		box-shadow: black 0px 10px 10px -10px inset;
+	}
+	
+	.copyright {
+		text-align: center;
+		font-size: 10px;
+		color: #CCC;
+	}
+	
+	.copyright a {
+		color: #A31F1A;
+		text-decoration: none
+	}
+	
+	/*update-begin--Author:tanghong  Date:20130419 for：【是否】按钮错位*/
+	.on_off_checkbox{
+		width:0px;
+	}
+	/*update-end--Author:tanghong  Date:20130419 for：【是否】按钮错位*/
+	#login .logo {
+		width: 500px;
+		height: 51px;
+	}
+	#cap{
+	margin-left: 88px;
+	}
+	</style>
   </head>
   <body>
 	<div id="alertMessage"></div>
 	<div id="successLogin"></div>
 	<div class="text_success">
-		<img src="extend/loader_green.gif" alt="Please wait" /> <span>登陆成功!请稍后....</span>
+		<img src="../extend/loader_green.gif" alt="Please wait" /> <span>登陆成功!请稍后....</span>
 	</div>
 	<div id="login">
-		<div class="ribbon" style="background-image:url(extend/typelogin.png);"></div>
+		<div class="ribbon" style="background-image:url(../extend/typelogin.png);"></div>
 		<div class="inner">
 			<div class="logo">
-				<img src="extend/toplogo-jeecg.png" />
+				<img src="../extend/toplogo-jeecg.png" />
 			</div>
 			<div class="formLogin">
 				<form name="formLogin" action="" id="formLogin" method="post">
 					<div class="tip">
-						<input class="userName"  type="text" name="name" id="userName" title="用户名" value="<shiro:principal/>" nullmsg="请输入用户名!" iscookie="true" />
+						<input class="userName"  type="text" name="name" id="userName" title="用户名" nullmsg="请输入用户名!" iscookie="true" />
 					</div>
 					<div class="tip">
 						<input class="password" name="passwd" type="password" id="password" title="密码" nullmsg="请输入密码!" />
 					</div>
 					<div id="cap" class="tip">
 						<c:if test="${jcaptchaEbabled}">
-							<input class="captcha" name="captcha" type="text" id="captcha"  nullmsg="请输入验证码!" />
-							<img style="width:85px;height:35px;margin-top: -10px;" align="absmiddle" id="jcaptcha" src="jcaptcha.jpg"/>
+							<input class="captcha" name="jcaptchaCode" type="text" nullmsg="请输入验证码!" />
+							<img style="width:85px;height:35px;margin-top: -10px;" align="absmiddle" id="jcaptcha" src="${ctx }/jcaptcha.jpg"/>
 						</c:if>
 					</div>
 					<div class="loginButton">
@@ -140,5 +116,12 @@ margin-left: 88px;
 				(推荐使用IE9+,谷歌浏览器可以获得更快,更安全的页面响应速度)技术支持:<a href="javascript:void(0);" title="sysErp">sy</a> </span>
 		</div>
 	</div>
+	<script>
+	    $(function() {
+	        $("#jcaptcha").click(function() {
+	            $("#jcaptcha").attr("src", '${ctx}/jcaptcha.jpg?'+new Date().getTime());
+	        });
+	    });
+	</script>
 </body>
 </html>

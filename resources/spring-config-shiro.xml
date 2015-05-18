@@ -149,6 +149,7 @@
             <value>
                 /loginAction/login = jCaptchaValidate,authc
                 /taglibs.jsp = anon
+                /login_tags.jsp = anon
                 /logout = logout
                 /userAction/toAdd = anon
                 /userAction/doAdd = anon
@@ -156,6 +157,7 @@
                 /images/**=anon 
              	/js/**=anon
             	/css/**=anon
+                /extend/**=anon 
                 /** = user,forceLogout,kickout
             </value>
         </property>

@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <script type="text/javascript" charset="utf-8">
 	var centerTabs;
 	var tabsMenu;
@@ -174,6 +175,7 @@
 	}
 	
 </script>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <div id="centerTabs">
 	<div iconCls="icon-home" title="首页" border="false" style="overflow: hidden;">
 		<iframe src="${ctx }/main" frameborder="0" style="border:0;width:100%;height:99.4%;"></iframe>

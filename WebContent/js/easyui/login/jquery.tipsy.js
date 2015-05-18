@@ -9,6 +9,13 @@
         return (typeof thing == 'function') ? (thing.call(ctx)) : thing;
     };
     
+    function isElementInDOM(ele) {
+      while (ele = ele.parentNode) {
+        if (ele == document) return true;
+      }
+      return false;
+    };
+    
     function Tipsy(element, options) {
         this.$element = $(element);
         this.options = options;
@@ -104,6 +111,7 @@
         tip: function() {
             if (!this.$tip) {
                 this.$tip = $('<div class="tipsy"></div>').html('<div class="tipsy-arrow"></div><div class="tipsy-inner"></div>');
+                this.$tip.data('tipsy-pointee', this.$element[0]);
             }
             return this.$tip;
         },
@@ -186,9 +194,18 @@
         html: false,
         live: false,
         offset: 0,
-        opacity: 1,
+        opacity: 0.8,
         title: 'title',
         trigger: 'hover'
+    };
+    
+    $.fn.tipsy.revalidate = function() {
+      $('.tipsy').each(function() {
+        var pointee = $.data(this, 'tipsy-pointee');
+        if (!pointee || !isElementInDOM(pointee)) {
+          $(this).remove();
+        }
+      });
     };
     
     // Overwrite this method to provide options on a per-element basis.
@@ -204,7 +221,7 @@
     };
     
     $.fn.tipsy.autoWE = function() {
-        return $(this).offset().left > ($(document).scrollLeft() + $(window).width()/ 2 ) ? 'e' : 'w';
+        return $(this).offset().left > ($(document).scrollLeft() + $(window).width() / 2) ? 'e' : 'w';
     };
     
     /**
@@ -237,10 +254,5 @@
 			return dir.ns + (dir.ew ? dir.ew : '');
 		}
 	};
-	
-     $.fn.tipsy.autoHide = function() {
-        return $(this).tip().stop().fadeOut(function() { $(this).remove(); });
-    };
-
     
 })(jQuery);

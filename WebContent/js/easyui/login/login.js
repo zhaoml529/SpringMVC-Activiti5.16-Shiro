@@ -54,11 +54,6 @@ $(document).keydown(function(e){
 		submit();
 	}
 });
-
-$('#jcaptcha').click(     
-        function() {     
-           $(this).hide().attr('src','jcaptcha.jpg?' + Math.floor(Math.random() * 100)).fadeIn();     
-    });
 });
 //表单提交
 function submit()
@@ -85,30 +80,7 @@ function submit()
 function Login() {
 	setCookie();
 	var actionurl=$('form').attr('action');//提交路径
-	//var checkurl=$('form').attr('check');
-	 var formData = new Object();
-	var data=$(":input").each(function() {
-		 formData[this.name] =$("#"+this.name ).val();
-	});
-	$.ajax({
-		async : false,
-		cache : false,
-		type : 'POST',
-		url : actionurl,// 请求的action路径
-		data : formData,
-		error : function() {// 请求失败处理函数
-		},
-		success : function(data) {
-			//var d = $.parseJSON(data);
-			var d=eval('('+data+')');
-			if (d.status) {
-				loginsuccess();
-				setTimeout("window.location.href='index.jsp'", 1000);
-			} else {
-				showError(d.message);
-			}
-		}
-	});
+	document.getElementById("formLogin").submit();
 }
 //设置cookie
 function setCookie()

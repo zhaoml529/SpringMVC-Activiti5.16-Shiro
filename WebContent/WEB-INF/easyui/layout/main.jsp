@@ -9,7 +9,7 @@
 
 <body>
 
-	<div id="main">
+	<div id="main" style="text-align: center;">
        
 		<h1 style="margin-top:80px;font-size:30px;"><strong>欢迎使用OA系统</strong></h1>
     

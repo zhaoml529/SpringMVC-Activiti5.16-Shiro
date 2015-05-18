@@ -35,6 +35,7 @@
 <script type="text/javascript" src="${ctx}/js/easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="${ctx}/js/easyui/easyui-lang-zh_CN.js"></script>
 <script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/easyui/jqueryUtil.js"></script>
 
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine.js"></script>
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine-zh_CN.js"></script>
