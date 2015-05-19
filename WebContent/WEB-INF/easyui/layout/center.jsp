@@ -107,62 +107,26 @@
 		});
 		
 	});
-	var d =$("#dataTree").tree({
-					animate:true,
-					checkbox:false,
-					onlyLeafCheck:true,
-					url:'data/tree_data2.json',
-					onClick: function(node){
-							addTab(node);  // alert node text property when clicked
-					}
-					
-					
-				});
-	function addTab(node) {
-		var nodes=node.split("||");
-		if (centerTabs.tabs('exists', nodes[0])) {
-			centerTabs.tabs('select', nodes[0]);
+
+	function addTab(title, url) {
+		alert(url);
+		if (centerTabs.tabs('exists', title)) {
+			centerTabs.tabs('select', title);
 		} else {
-			/*if (node.attributes.url && node.attributes.url.length > 0) {
-				if (node.attributes.url.indexOf('!druid.action') == -1) {//数据源监控页面不需要开启等待提示
-					$.messager.progress({
-						text : '页面加载中....',
-						interval : 100
-					});
-					window.setTimeout(function() {
-						try {
-							$.messager.progress('close');
-						} catch (e) {
-						}
-					}, 5000);
-				}
-				centerTabs.tabs('add', {
-					title : node.text,
-					closable : true,
-					iconCls : node.iconCls,
-					content : '<iframe src="' + node.attributes.url + '" frameborder="0" style="border:0;width:100%;height:99.4%;"></iframe>',
-					tools : [ {
-						iconCls : 'icon-mini-refresh',
-						handler : function() {
-							refreshTab(node.text);
-						}
-					} ]
-				});
-			} else {}*/
-				centerTabs.tabs('add', {
-					title : nodes[0],
-					closable : true,
-					//border:false,
-					iconCls : nodes[1],
-					//href : 'error/error.jsp',
-					content : "<iframe src="+nodes[2]+" frameborder=\"0\" style=\"border:0;width:100%;height:99.4%;\"></iframe>",
-					tools : [ {
-						iconCls : 'icon-mini-refresh',
-						handler : function() {
-							refreshTab(nodes[0]);
-						}
-					} ]
-				});
+			centerTabs.tabs('add', {
+				title : title,
+				closable : true,
+				//border:false,
+				//iconCls : nodes[1],
+				//href : 'error/error.jsp',
+				content : "<iframe src="+url+" frameborder=\"0\" style=\"border:0;width:100%;height:99.4%;\"></iframe>",
+				tools : [ {
+					iconCls : 'icon-mini-refresh',
+					handler : function() {
+						refreshTab(title);
+					}
+				} ]
+			});
 			
 		}
 	}

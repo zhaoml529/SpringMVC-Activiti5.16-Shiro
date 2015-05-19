@@ -52,16 +52,16 @@ public class MainController {
     
     @RequestMapping(value = "/south")
     public String nav(HttpSession session, Model model) throws Exception {
-    	String username = (String) SecurityUtils.getSubject().getPrincipal();
-    	User user = this.userService.getUserByName(username);
-        List<GroupAndResource> grList = this.grService.getResource(user.getGroup().getId());
-        List<Resource> menus = this.resourceService.getMenus(grList);
-        model.addAttribute("menuList", menus);
     	return "layout/south";
     }
 
     @RequestMapping("/")
     public String index(Model model) throws Exception {
+    	String username = (String) SecurityUtils.getSubject().getPrincipal();
+    	User user = this.userService.getUserByName(username);
+        List<GroupAndResource> grList = this.grService.getResource(user.getGroup().getId());
+        List<Resource> menus = this.resourceService.getMenus(grList);
+        model.addAttribute("menuList", menus);
         return "index";
     }
 }

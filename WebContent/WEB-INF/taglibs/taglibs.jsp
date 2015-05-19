@@ -21,20 +21,19 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <link rel="stylesheet" type="text/css" href="${ctx}/css/themes/<%=easyuiThemeName %>/easyui.css">
-
+<script type="text/javascript" src="${ctx}/js/jquery-1.8.0.min.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx}/css/themes/icon.css">
 <link rel="stylesheet" type="text/css" href="${ctx}/css/easyui/common.css">
-<link rel="stylesheet" type="text/css" href="${ctx}/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="${ctx}/css/easyui/templatemo_main.css">
+<%-- <link rel="stylesheet" type="text/css" href="${ctx}/css/bootstrap.min.css"> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${ctx}/css/easyui/templatemo_main.css"> --%>
 
 <link rel="stylesheet" href="${ctx}/css/jquery_validation_engine/validationEngine.jquery.css" type="text/css" />
 <link rel="stylesheet" href="${ctx}/css/jquery_validation_engine/template.css" type="text/css" />
 
 <script type="text/javascript" src="${ctx}/js/util.js"></script>
-<script type="text/javascript" src="${ctx}/js/jquery-1.10.2.min.js"></script>
-<script type="text/javascript" src="${ctx}/js/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="${ctx}/js/easyui/easyui-lang-zh_CN.js"></script>
-<script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script>
+<%-- <script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script> --%>
 <script type="text/javascript" src="${ctx}/js/easyui/jqueryUtil.js"></script>
 
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine.js"></script>
