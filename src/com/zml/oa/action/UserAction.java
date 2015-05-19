@@ -29,9 +29,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.Group;
+import com.zml.oa.entity.Message;
 import com.zml.oa.entity.User;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
@@ -70,6 +72,13 @@ public class UserAction {
 		model.addAttribute("page", pagination.getPageStr());
 		model.addAttribute("listUser", listUser);
 		return "user/list_user";
+	}
+	
+	@RequestMapping("/toList")
+	@ResponseBody
+	public List<User> userList(HttpServletRequest request, Model model) throws Exception{
+		List<User> listUser = this.userService.getUserList_page();
+		return listUser;
 	}
 	
 	//此方法没用到，用Shiro提供的授权和认证服务
@@ -118,7 +127,7 @@ public class UserAction {
 	}
 	
 	@RequiresPermissions("admin:user:toUpdate")
-	@RequestMapping(value = "/toUpdate/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/toUpdate/{id}", method = RequestMethod.POST)
 	public String toUpdate(@PathVariable("id") Integer id,Model model) throws Exception{
 		List<Group> list = this.groupService.getGroupList();
 		User user = this.userService.getUserById(id);
@@ -129,10 +138,13 @@ public class UserAction {
 	
 	@RequiresPermissions("admin:user:doUpdate")
 	@RequestMapping(value = "/doUpdate", method = RequestMethod.POST)
-	public String doUpdate(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) throws Exception{
+	@ResponseBody
+	public Message doUpdate(@ModelAttribute("user") User user) throws Exception{
 		this.userService.doUpdate(user);
-		redirectAttributes.addFlashAttribute("msg", "修改用户成功！");
-		return "redirect:/userAction/toList_page";
+		
+//		redirectAttributes.addFlashAttribute("msg", "修改用户成功！");
+//		return "redirect:/userAction/toList_page";
+		return new Message(Boolean.TRUE, "修改成功！");
 	}
 	
 	
