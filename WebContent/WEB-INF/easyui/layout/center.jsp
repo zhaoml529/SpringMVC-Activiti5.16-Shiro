@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <script type="text/javascript" charset="utf-8">
 	var centerTabs;
 	var tabsMenu;
@@ -41,60 +42,60 @@
 		});
 
 		centerTabs = $('#centerTabs').tabs({
-						tools : [ {
-								iconCls : 'icon-reload',
-								handler : function() {
-									var href = $('#centerTabs').tabs('getSelected').panel('options').href;
-									if (href) {/*说明tab是以href方式引入的目标页面*/
-										var index = $('#centerTabs').tabs('getTabIndex', $('#centerTabs').tabs('getSelected'));
-										$('#centerTabs').tabs('getTab', index).panel('refresh');
-									} else {   /*说明tab是以content方式引入的目标页面*/
-										var panel = $('#centerTabs').tabs('getSelected').panel('panel');
-										var frame = panel.find('iframe');
-										try {
-											if (frame.length > 0) {
-												for ( var i = 0; i < frame.length; i++) {
-													frame[i].contentWindow.document.write('');
-													frame[i].contentWindow.close();
-													frame[i].src = frame[i].src;
-												}
-												if ($.browser.msie) {
-													CollectGarbage();
-												}
-											}
-										} catch (e) {
-										}
+			tools : [ {
+					iconCls : 'icon-reload',
+					handler : function() {
+						var href = $('#centerTabs').tabs('getSelected').panel('options').href;
+						if (href) {/*说明tab是以href方式引入的目标页面*/
+							var index = $('#centerTabs').tabs('getTabIndex', $('#centerTabs').tabs('getSelected'));
+							$('#centerTabs').tabs('getTab', index).panel('refresh');
+						} else {   /*说明tab是以content方式引入的目标页面*/
+							var panel = $('#centerTabs').tabs('getSelected').panel('panel');
+							var frame = panel.find('iframe');
+							try {
+								if (frame.length > 0) {
+									for ( var i = 0; i < frame.length; i++) {
+										frame[i].contentWindow.document.write('');
+										frame[i].contentWindow.close();
+										frame[i].src = frame[i].src;
+									}
+									if ($.browser.msie) {
+										CollectGarbage();
 									}
 								}
-							}, {
-								iconCls : 'icon-cancel',
-								handler : function() {
-									var index = $('#centerTabs').tabs('getTabIndex', $('#centerTabs').tabs('getSelected'));
-									var tab = $('#centerTabs').tabs('getTab', index);
-									if (tab.panel('options').closable) {
-										$('#centerTabs').tabs('close', index);
-									} else {
-										$.messager.alert('提示', '[' + tab.panel('options').title + ']不可以被关闭', 'error');
-									}
-                     			}
-                    		},{
-                    		   iconCls:'icon-color',
-			                   handler:function(){
-				                   $('#theme').menu({   
-										onClick:function(item){   
-				                        var cookiesColor1=jqueryUtil.cookies.get("cookiesColor");
-				                        	if(cookiesColor1!=item.id){
-												jqueryUtil.cookies.set("cookiesColor",item.id,30);
-												jqueryUtil.chgSkin(item.id,cookiesColor1);
-				                            }
-										}   
-										});
-				                    $('#theme').menu('show', {   
-											 left: '91%',   
-											 top: 97   
-									});
-				                    }
-                    		}],
+							} catch (e) {
+							}
+						}
+					}
+				}, {
+					iconCls : 'icon-cancel',
+					handler : function() {
+						var index = $('#centerTabs').tabs('getTabIndex', $('#centerTabs').tabs('getSelected'));
+						var tab = $('#centerTabs').tabs('getTab', index);
+						if (tab.panel('options').closable) {
+							$('#centerTabs').tabs('close', index);
+						} else {
+							$.messager.alert('提示', '[' + tab.panel('options').title + ']不可以被关闭', 'error');
+						}
+                  			}
+                 		},{
+                   iconCls:'icon-color',
+                   handler:function(){
+	                   $('#theme').menu({   
+							onClick:function(item){   
+	                        var cookiesColor1=jqueryUtil.cookies.get("cookiesColor");
+	                        	if(cookiesColor1!=item.id){
+									jqueryUtil.cookies.set("cookiesColor",item.id,30);
+									jqueryUtil.chgSkin(item.id,cookiesColor1);
+	                            }
+							}   
+							});
+	                    $('#theme').menu('show', {   
+								 left: '91%',   
+								 top: 97   
+						});
+	                    }
+            }],
 			fit : true,
 			border : false,
 			onContextMenu : function(e, title) {
@@ -109,7 +110,6 @@
 	});
 
 	function addTab(title, url) {
-		alert(url);
 		if (centerTabs.tabs('exists', title)) {
 			centerTabs.tabs('select', title);
 		} else {
@@ -139,7 +139,7 @@
 	}
 	
 </script>
-<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
 <div id="centerTabs">
 	<div iconCls="icon-home" title="首页" border="false" style="overflow: hidden;">
 		<iframe src="${ctx }/main" frameborder="0" style="border:0;width:100%;height:99.4%;"></iframe>
@@ -154,7 +154,7 @@
 </div>
 <div id="theme" class="easyui-menu" style="width:120px;display: none">  
 		    <div id="default" data-options="iconCls:'icon-save'">default</div>  
-		    <div id="black">black</div> 
+		    <div id="black" data-options="iconCls:'icon-save'">black</div> 
 		    <div id="bootstrap" data-options="iconCls:'icon-save'">bootstrap</div>  
 		    <div id="gray" data-options="iconCls:'icon-save'">gray</div>  
 		    <div id="metro" data-options="iconCls:'icon-save'">metro</div>  

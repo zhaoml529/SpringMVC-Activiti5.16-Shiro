@@ -1,19 +1,13 @@
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <script type="text/javascript" charset="utf-8">
 	function logout(b) {
+		alert("${ctx}");
 		$.messager.confirm("提示", "确认退出吗?",function(r){
 			if(r){
-				$.ajax({
-					async : false,
-					cache : false,
-					type : "POST",
-					url : "${ctx}/logout",
-					error : function() {
-					},
-					success : function(json) {
-						location.replace("login.jsp");
-					}
-				});
+				window.location.href="${ctx}/logout";
 			}
 		});
 		
@@ -37,7 +31,7 @@
 	}
 </script>
 <div style="position: absolute; right: 0px; bottom: 0px; ">
-	<shiro:principal/>&nbsp;&nbsp;你好，欢迎登录！&nbsp;&nbsp;[&nbsp;<a href="${ctx}/logout" target="_parent" class="white underline">退出</a>&nbsp;]
+	<shiro:principal/>&nbsp;&nbsp;你好，欢迎登录！&nbsp;&nbsp;
 	<a href="javascript:void(0);" class="easyui-menubutton" menu="#layout_north_kzmbMenu" iconCls="icon-help">控制面板</a> 
 	<a href="javascript:void(0);" class="easyui-menubutton" menu="#layout_north_zxMenu" iconCls="icon-logout">注销</a>
 </div>

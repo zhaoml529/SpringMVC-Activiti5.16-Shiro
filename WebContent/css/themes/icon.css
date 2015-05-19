@@ -22,6 +22,9 @@
 .icon-ok{
 	background:url('icons/ok.png') no-repeat center center;
 }
+.icon-color{
+	background:url('icons/color.png') no-repeat center center;
+}
 .icon-no{
 	background:url('icons/no.png') no-repeat center center;
 }

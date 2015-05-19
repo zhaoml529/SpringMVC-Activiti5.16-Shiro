@@ -12,7 +12,6 @@
 	<meta http-equiv="description" content="This is my page">
 	<script type="text/javascript">
 		$(function(){
-			//initMenu();
 			if (jqueryUtil.isLessThanIe8()) {
 				$.messager.show({
 					title : '警告',
