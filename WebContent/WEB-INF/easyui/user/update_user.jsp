@@ -3,9 +3,10 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <script type="text/javascript">
 	$(function() {
-		$("#form").form({
+	user_form = $('#form').form({
 			url :"${ctx}/userAction/doUpdate",
 			onSubmit : function() {
+				//在表单提交之前触发，返回false将阻止表单提交
 				parent.$.messager.progress({
 					title : '提示',
 					text : '数据处理中，请稍后....'
@@ -94,7 +95,7 @@
 
 <div class="easyui-layout" data-options="fit:true,border:false">
 <div data-options="region:'center',border:false" title="" style="overflow: hidden;padding: 10px;">
-	<form id="form" method="post">
+	<form id="form" method="post" novalidate>
 		<fieldset>
 			<legend><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 用户编辑</legend>
 			<input type="hidden" name="id" id="id" />

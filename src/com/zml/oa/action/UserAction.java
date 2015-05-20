@@ -136,14 +136,16 @@ public class UserAction {
 		return "user/update_user";
 	}
 	
-	@RequiresPermissions("admin:user:doUpdate")
-	@RequestMapping(value = "/doUpdate", method = RequestMethod.POST)
-	@ResponseBody
-	public Message doUpdate(@ModelAttribute("user") User user) throws Exception{
+	//@RequiresPermissions("admin:user:doUpdate")
+    @RequestMapping(value = {"doUpdate"})
+    @ResponseBody
+	public Message doUpdate(HttpServletRequest request) throws Exception{
+		String name = request.getParameter("name");
+		String passwd = request.getParameter("passwd");
+		String id = request.getParameter("id");
+		User user = new User();
+		System.out.println(name+"---"+passwd);
 		this.userService.doUpdate(user);
-		
-//		redirectAttributes.addFlashAttribute("msg", "修改用户成功！");
-//		return "redirect:/userAction/toList_page";
 		return new Message(Boolean.TRUE, "修改成功！");
 	}
 	
