@@ -137,16 +137,25 @@ public class UserAction {
 	}
 	
 	//@RequiresPermissions("admin:user:doUpdate")
-    @RequestMapping(value = {"doUpdate"})
-    @ResponseBody
-	public Message doUpdate(HttpServletRequest request) throws Exception{
-		String name = request.getParameter("name");
-		String passwd = request.getParameter("passwd");
-		String id = request.getParameter("id");
-		User user = new User();
-		System.out.println(name+"---"+passwd);
-		this.userService.doUpdate(user);
+//    @RequestMapping(value = {"doUpdate"})
+//    @ResponseBody
+//	public Message doUpdate(HttpServletRequest request) throws Exception{
+//		String name = request.getParameter("name");
+//		String passwd = request.getParameter("passwd");
+//		String id = request.getParameter("id");
+//		User user = new User();
+//		System.out.println(name+"---"+passwd);
+//		this.userService.doUpdate(user);
+//		return new Message(Boolean.TRUE, "修改成功！");
+//	}
+	
+	@RequestMapping(value = {"doUpdate"})
+	@ResponseBody
+	public Message doUpdate(@ModelAttribute User user) throws Exception{
+		
+		System.out.println(user.getName());
 		return new Message(Boolean.TRUE, "修改成功！");
+		
 	}
 	
 	
