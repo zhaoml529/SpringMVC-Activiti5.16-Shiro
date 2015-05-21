@@ -11,7 +11,6 @@
 	<meta http-equiv="expires" content="0">    
 	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 	<meta http-equiv="description" content="This is my page">
-	<script type="text/javascript" src="${ctx}/js/app/user.js" charset="utf-8"></script>
 	<script type="text/javascript">
 			var $dg;
 			var $temp;
@@ -252,24 +251,7 @@
 		</p>
 	</div>
 	
-	<%-- 列表右键 --%>
-	<div id="user_datagrid_menu" class="easyui-menu" style="width:120px;display: none;">
-	    <div onclick="showDialog();" data-options="iconCls:'easyui-icon-add'">新增</div>
-	    <div onclick="edit();" data-options="iconCls:'easyui-icon-edit'">编辑</div>
-	    <div onclick="del();" data-options="iconCls:'easyui-icon-remove'">删除</div>
-	    <div onclick="editPassword();" data-options="iconCls:'eu-icon-lock'">修改密码</div>
-	    <div onclick="editUserOrgan();" data-options="iconCls:'eu-icon-group'">设置机构</div>
-	    <div onclick="editUserPost();" data-options="iconCls:'eu-icon-group'">设置岗位</div>
-	    <div onclick="editUserRole();" data-options="iconCls:'eu-icon-group'">设置角色</div>
-	    <div onclick="editUserResource();" data-options="iconCls:'eu-icon-folder'">设置资源</div>
-	    <div onclick="move(true);" data-options="iconCls:'eu-icon-up'">上移</div>
-	    <div onclick="move();" data-options="iconCls:'eu-icon-down'">下移</div>
-	    <div onclick="lock(false);" data-options="iconCls:'eu-icon-user'">启用</div>
-	    <div onclick="lock(true);" data-options="iconCls:'eu-icon-lock'">停用</div>
-	</div>
-	
-	
-	<div id="toolbar" style="padding:2px 0">
+	<div id="tb" style="padding:2px 0">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td style="padding-left:2px">
@@ -303,7 +285,7 @@
 		<div name="organizeName">组织</div>
 		<div name="description">描述</div>
 	</div>
-	<table id="dgg" title="用户管理"></table>
+	<table id="dg" title="用户管理"></table>
 	
 <%-- 	<table class="easyui-datagrid" width="100%" border="1"
 			url="${ctx }/userAction/toList"
@@ -321,6 +303,5 @@
         </thead>
     </table> --%>
     
-    <table id="user_datagrid" title="用户管理"></table>
   </body>
 </html>

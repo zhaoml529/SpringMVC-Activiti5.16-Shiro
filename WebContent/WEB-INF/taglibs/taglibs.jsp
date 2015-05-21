@@ -48,3 +48,12 @@
     var ctxStatic = "${ctxStatic}";
 </script>
 
+<style type="text/css">
+	body {
+	    font-family:helvetica,tahoma,verdana,sans-serif;
+	    font-size:13px;
+	    margin:0px 0px 0px 0px;
+	    padding:0px 0px 0px 0px;
+	}
+</style>
+

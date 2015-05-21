@@ -88,7 +88,7 @@
 
 <div class="easyui-layout" data-options="fit:true,border:false">
 <div data-options="region:'center',border:false" title="" style="overflow: hidden;padding: 10px;">
-	<form id="user_form" method="post" novalidate>
+	<form id="form" method="post" novalidate>
 		<fieldset>
 			<legend><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 用户编辑</legend>
 			<input type="hidden" name="id" id="id" />
