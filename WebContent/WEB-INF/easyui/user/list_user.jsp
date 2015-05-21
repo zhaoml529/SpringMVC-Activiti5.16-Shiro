@@ -1,6 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/taglibs/taglibs.jsp"%>
-<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -11,7 +10,7 @@
 	<meta http-equiv="expires" content="0">    
 	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 	<meta http-equiv="description" content="This is my page">
-	<script type="text/javascript" src="${ctx}/js/app/user.js" charset="utf-8"></script>
+	<script type="text/javascript" src="${ctx}/js/app/user.js?_=${sysInitTime}"></script>
   </head>
   <body>
  		<div class="well well-small" style="margin-left: 5px;margin-top: 5px">
@@ -22,7 +21,7 @@
 	</div>
 	
 	<%-- 列表右键 --%>
-	<div id="user_datagrid_menu" class="easyui-menu" style="width:120px;display: none;">
+	<div id="user_datagrid_menu" class="easyui-menu" style="width:120px; display: none;">
 	    <div onclick="showDialog();" data-options="iconCls:'easyui-icon-add'">新增</div>
 	    <div onclick="edit();" data-options="iconCls:'easyui-icon-edit'">编辑</div>
 	    <div onclick="del();" data-options="iconCls:'easyui-icon-remove'">删除</div>

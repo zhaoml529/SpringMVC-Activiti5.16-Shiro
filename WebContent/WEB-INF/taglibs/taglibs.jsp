@@ -5,6 +5,7 @@
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="oa" %>
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ page import="com.zml.oa.util.Constants" %>
 <%
 	String easyuiThemeName="metro";
 	Cookie cookies[] =request.getCookies();
@@ -16,8 +17,11 @@
 			}
 		}
 	}
+	
+	long sysInitTime = Constants.SYSY_INIT_TIME;
+    //系统启动时间
+    request.setAttribute("sysInitTime",sysInitTime);
 %>
-
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <link rel="stylesheet" type="text/css" href="${ctx}/css/themes/<%=easyuiThemeName %>/easyui.css">
@@ -39,11 +43,8 @@
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine.js"></script>
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine-zh_CN.js"></script>
 
-<style type="text/css">
-	body {
-	    font-family:helvetica,tahoma,verdana,sans-serif;
-	    font-size:13px;
-	    margin:0px 0px 0px 0px;
-	    padding:0px 0px 0px 0px;
-	}
-</style>
+<script type="text/javascript" charset="utf-8">
+    var ctx = "${ctx}";
+    var ctxStatic = "${ctxStatic}";
+</script>
+

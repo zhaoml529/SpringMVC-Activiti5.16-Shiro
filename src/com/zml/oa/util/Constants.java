@@ -1,5 +1,7 @@
 package com.zml.oa.util;
 
+import java.util.Date;
+
 
 /**
  * <p>User: Zhang Kaitao
@@ -18,4 +20,6 @@ public class Constants {
     
 	/***************** default password (123456) *****************/
 	public static final String DEFAULT_PASSWORD = "14e1b600b1fd579f47433b88e8d85291";
+	
+	public static long SYSY_INIT_TIME = new Date().getTime();
 }

@@ -8,14 +8,14 @@ var user_dialog;
 
 
 $(function() {
-	alert("${ctx}/userAction/toList");
 	//数据列表
     user_datagrid = $('#user_datagrid').datagrid({
-        url: "${ctx}/userAction/toList",
+        url: ctx+"/userAction/toList",
         fit: true,
         pagination: true,//底部分页
         rownumbers: true,//显示行数
         fitColumns: false,//自适应列宽
+        singleSelect:true,
         striped: true,//显示条纹
         pageSize: 10,//每页记录数
         remoteSort: false,//是否通过远程服务器对数据排序
@@ -166,7 +166,7 @@ $(function() {
 	//初始化表单
     function formInit() {
         user_form = $('#user_form').form({
-            url: '${ctx}/userAction/doUpdate',
+            url: ctx+'/userAction/doUpdate',
             onSubmit: function (param) {
                 $.messager.progress({
                     title: '提示信息！',
@@ -209,9 +209,9 @@ $(function() {
     function showUser(row) {
         var inputUrl;
         if (row != undefined && row.id) {
-            inputUrl = "${ctx}/userAction/toUpdate/"+row.id;
+            inputUrl = ctx+"/userAction/toUpdate/"+row.id;
         }else{
-        	inputUrl = "${ctx}/userAction/toAdd/";
+        	inputUrl = ctx+"/userAction/toAdd/";
         }
 
         //弹出对话窗口
