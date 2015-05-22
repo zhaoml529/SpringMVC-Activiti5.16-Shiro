@@ -20,10 +20,10 @@ $(function() {
 		striped:true,
         columns : [ 
             [ 
-              {field : 'name',title : '用户名',width : 20,align : 'left',sortable: true, editor : {type:'validatebox',options:{required:true}}},
-              {field : 'passwd',title : '密码',width : 20,align : 'left',editor : {type:'validatebox',options:{required:true}}},
-              {field : 'registerDate', title : '注册时间', width : 20, editor : "datebox"},
-              {field : 'locked',title : '状态',width : 20,
+              {field : 'name',title : '用户名',width : 200,align : 'left',sortable: true, editor : {type:'validatebox',options:{required:true}}},
+              {field : 'passwd',title : '密码',width : 200,align : 'left',editor : {type:'validatebox',options:{required:true}}},
+              {field : 'registerDate', title : '注册时间', width : 200, editor : "datebox"},
+              {field : 'locked',title : '状态',width : 200,
             	  formatter:function(value,row){
             		  if("0"==row.locked){
 						return "<font color=green>正常<font>";
@@ -32,7 +32,7 @@ $(function() {
             		  }
 				  },
             	  editor : "text"},
-              {field : 'group_name',title : '用户组',width : 20,editor : "text"}
+              {field : 'group_name',title : '用户组',width : 200,editor : "text"}
     	    ] 
         ],
         toolbar: "#toolbar"
@@ -106,7 +106,6 @@ function formInit() {
 
 //显示弹出窗口 新增：row为空 编辑:row有值
 function showUser(row) {
-	alert("showUserDialog");
     //弹出对话窗口
     user_dialog = $('<div/>').dialog({
     	title : "用户信息",
@@ -181,7 +180,6 @@ function showUser(row) {
 
 //编辑
 function edit() {
-	alert("edit...");
     //选中的行（第一次选择的行）
     var row = user_datagrid.datagrid('getSelected');
     if (row) {

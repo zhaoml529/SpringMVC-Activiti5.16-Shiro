@@ -15,7 +15,7 @@
           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
           
     <!-- 在applicationContext.xml中只加载除表现层之外的所有bean，因此下面一行中不需要加载@Controller -->                       
-    <!-- 扫描注解Bean 不包括@Controller(表现层) 保证@Required、@Autowired的属性被注入-->
+    <!-- 扫描注解Bean 不包括@Controller(表现层) 保证@Service @Repository的属性被注入-->
     <context:component-scan base-package="com.zml.oa">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
@@ -56,10 +56,15 @@
         </property> 
     </bean>   
 	 
-	<!-- 给Dao注入sessionFactory -->    
-<!--   	<bean id="baseDao" class="com.zml.oa.dao.impl.BaseDaoImpl">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean> -->
+	<!-- jdbc模板 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+  	
+	<!-- jdbc命名参数模板 -->
+	<bean id="namedParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
   	
    	<!-- 开启AOP监听 只对当前配置文件有效 -->
 	<aop:aspectj-autoproxy expose-proxy="true"/>
@@ -77,6 +82,7 @@
             <tx:method name="doSave*" propagation="REQUIRED" />  
            	<tx:method name="doAdd*" propagation="REQUIRED" />  
            	<tx:method name="add*" propagation="REQUIRED" />  
+           	<tx:method name="set*" propagation="REQUIRED" />  
            	<tx:method name="doCreate*" propagation="REQUIRED" />  
           	<tx:method name="doInsert*" propagation="REQUIRED" />  
            	<tx:method name="doUpdate*" propagation="REQUIRED" />  
@@ -84,8 +90,10 @@
            	<tx:method name="doDelete*" propagation="REQUIRED" />  
            	<tx:method name="doRemove*" propagation="REQUIRED" />  
            	<tx:method name="delete" propagation="REQUIRED" />  
-           	<tx:method name="doPut*" propagation="REQUIRED" />  
-
+           	<tx:method name="doPut*" propagation="REQUIRED" />
+           	<!-- workflowService.bankTransfer 需要回滚，但是传播行为设置为REQUIRES_NEW 相应的 act_ru_identitylink表中又不能保存task_id_   -->
+			<!-- 先记下来，待解决 -->
+			<tx:method name="bankTransfer*" propagation="REQUIRES_NEW" />
             <!--hibernate4必须配置为开启事务 否则 getCurrentSession()获取不到-->
             <tx:method name="get*" propagation="REQUIRED" read-only="true"/>
             <tx:method name="count*" propagation="REQUIRED" read-only="true"/>
@@ -112,7 +120,7 @@
         <!-- 生成流程图的字体 -->
         <property name="activityFontName" value="${diagram.activityFontName}"/>
         <property name="labelFontName" value="${diagram.labelFontName}"/>
-		<property name="deploymentResources" value="classpath*:/bpmn/*" />
+		<!-- <property name="deploymentResources" value="classpath*:/deploy/*" /> -->
 	</bean>
 	<!-- 流程引擎的bean -->
 	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">

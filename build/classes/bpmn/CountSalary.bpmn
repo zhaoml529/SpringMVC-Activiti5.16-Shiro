@@ -10,21 +10,21 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_CountSalary">
     <bpmndi:BPMNPlane bpmnElement="CountSalary" id="BPMNPlane_CountSalary">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="160.0" y="140.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="390.0" y="220.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="countSalary" id="BPMNShape_countSalary">
-        <omgdc:Bounds height="55.0" width="105.0" x="240.0" y="130.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="210.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="390.0" y="140.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="620.0" y="220.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="195.0" y="157.0"></omgdi:waypoint>
-        <omgdi:waypoint x="240.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="425.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="237.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-        <omgdi:waypoint x="345.0" y="157.0"></omgdi:waypoint>
-        <omgdi:waypoint x="390.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="237.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
