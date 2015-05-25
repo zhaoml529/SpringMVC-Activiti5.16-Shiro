@@ -20,31 +20,6 @@
 				});
 			}
 		});
-		function initMenu(){
-			var $ma=$("#menuAccordion");
-			$ma.accordion({animate:true,fit:true,border:false});
-			$.post("systemAction!findAllFunctionList.action", {userName:"1"}, function(rsp) {
-				$.each(rsp,function(i,e){
-					var menulist ="<div class=\"well well-small\">";
-					if(e.child && e.child.length>0){
-						$.each(e.child,function(ci,ce){
-							var effort=ce.name+"||"+ce.iconCls+"||"+ce.url;
-							menulist+="<a href=\"javascript:void(0);\" class=\"easyui-linkbutton\" data-options=\"plain:true,iconCls:'"+ce.iconCls+"'\" onclick=\"addTab('"+effort+"');\">"+ce.name+"</a><br/>";
-						});
-					}
-					menulist+="</div>";
-					$ma.accordion('add', {
-			            title: e.name,
-			            content: menulist,
-						border:false,
-			            iconCls: e.iconCls,
-			            selected: false
-			        });
-				});
-			}, "JSON").error(function() {
-				$.messager.alert("提示", "获取菜单出错,请重新登陆!");
-			});
-		}
 	</script>
 	<style type="text/css">
 	#menuAccordion a.l-btn span span.l-btn-text {

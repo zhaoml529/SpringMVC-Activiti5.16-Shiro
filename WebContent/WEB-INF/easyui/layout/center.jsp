@@ -83,11 +83,14 @@
                    handler:function(){
 	                   $('#theme').menu({   
 							onClick:function(item){   
-	                        var cookiesColor1=jqueryUtil.cookies.get("cookiesColor");
+	                        	var cookiesColor1=jqueryUtil.cookies.get("cookiesColor");
 	                        	if(cookiesColor1!=item.id){
 									jqueryUtil.cookies.set("cookiesColor",item.id,30);
 									jqueryUtil.chgSkin(item.id,cookiesColor1);
 	                            }
+	                        	/* var curTabTitle = $(this).data('tabTitle');
+	                        	alert(curTabTitle);
+	                        	refreshTab(curTabTitle); */
 							}   
 							});
 	                    $('#theme').menu('show', {   

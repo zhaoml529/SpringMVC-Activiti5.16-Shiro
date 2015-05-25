@@ -3,7 +3,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <script type="text/javascript">
 $(function(){
-	$("#group1").combobox({
+	$("#group").combobox({
 		width:160,
 		url:"${ctx }/groupAction/getGroupList",
 		valueField: 'id',
@@ -13,8 +13,7 @@ $(function(){
 		},
 		required: true,
 		onLoadSuccess: function (data) {
-			var groupId = $("#group_id").val();
-            $("#group").combobox('setValue',groupId);
+            $("#group").combobox('setValue',data[0].id);
         }
 	});
 })
@@ -46,9 +45,6 @@ $(function(){
 <div id="dlg" class="easyui-layout" style="padding:10px 20px">
     <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 用户信息</div>
     <form id="user_form" method="post" >
-		<input type="hidden" name="id" id="id" />
-		<input type="hidden" name="salt" id="salt" />
-		<input type="hidden" name="registerDate" id="registerDate" />
         <div class="fitem">
             <label>用户名:</label>
             <input id="name" name="name" class="easyui-textbox easyui-validatebox" required="true">
@@ -72,12 +68,13 @@ $(function(){
 				<c:forEach var="group" items="${groupList}">
 					<option value="${group.id}" >${group.name}-${group.type}</option>
 				</c:forEach>
-			</select> --%>
+			</select> 
 			<select id="group" name="group.id">
 				<c:forEach var="group" items="${groupList}">
 					<option value="${group.id}" ${user.group.id == group.id?'selected':'' }>${group.name}-${group.type}</option>
 				</c:forEach>
-			</select>
+			</select>--%>
+			<input id="group" name="group.id" class="easyui-textbox easyui-validatebox" />
 			<input name="group_name" id="group_name" type="hidden" />
         </div>
         <div class="fitem">

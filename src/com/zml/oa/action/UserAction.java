@@ -76,6 +76,7 @@ public class UserAction {
 //		return "user/list_user";
 //	}
 	
+	@RequiresPermissions("admin:*")
 	@RequestMapping(value = "/userDatagrid")
 	public String toList_page() throws Exception{
 		return "user/list_user";
@@ -111,25 +112,23 @@ public class UserAction {
 	}
 
 	@RequiresPermissions("admin:user:toAdd")
-	@RequestMapping(value = "/toAdd", method = RequestMethod.GET)
-	public String toAdd(Model model) throws Exception{
-		List<Group> list = this.groupService.getGroupList();
-		model.addAttribute("groupList", list);
+	@RequestMapping(value = "/toAdd")
+	public String toAdd() throws Exception{
+//		List<Group> list = this.groupService.getGroupList();
+//		model.addAttribute("groupList", list);
 		return "user/add_user";
 	}
 
 	@RequiresPermissions("admin:user:doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
-	public String doAdd(@ModelAttribute("user") User user,
-						@Value("#{APP_PROPERTIES['account.user.add.syntoactiviti']}") Boolean synToActiviti,
-						RedirectAttributes redirectAttributes) throws Exception{
+	@ResponseBody
+	public Message doAdd(@ModelAttribute("user") User user,
+						@Value("#{APP_PROPERTIES['account.user.add.syntoactiviti']}") Boolean synToActiviti) throws Exception{
 		user.setRegisterDate(new Date());
-		user.setLocked(0);
+		//user.setLocked(0);
 		String groupId = user.getGroup().getId().toString();
 		Serializable id = this.userService.doAdd(user, groupId, synToActiviti);
-		logger.info("Serializable id: "+id);
-		redirectAttributes.addFlashAttribute("msg", "添加用户成功！");
-		return "redirect:/userAction/toList_page";
+		return new Message(Boolean.TRUE, "添加成功！");
 		
 	}
 	
@@ -157,14 +156,14 @@ public class UserAction {
 		String locked = request.getParameter("locked");
 		Message message = new Message();
 		User user = new User();
-		if(StringUtils.isNotEmpty(id.trim())){
+		if(StringUtils.isNotEmpty(id)){
 			user.setId(new Integer(id));
 			user.setName(name);
 			user.setSalt(salt);
 			user.setPasswd(passwd);
 			user.setLocked(new Integer(locked));
 			user.setGroup_name(groupName);
-			if(StringUtils.isNotEmpty(groupId.trim())){
+			if(StringUtils.isNotEmpty(groupId)){
 				user.setGroup(new Group(new Integer(groupId)));
 			}else{
 				message.setStatus(Boolean.FALSE);
@@ -186,15 +185,18 @@ public class UserAction {
 	
 	
 	@RequiresPermissions("admin:user:doDelete")
-	@RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
-	public String delete(@PathVariable("id") Integer id,
-						@Value("#{APP_PROPERTIES['account.user.delete.syntoactiviti']}") Boolean synToActiviti, 
-						RedirectAttributes redirectAttributes) throws Exception{
-		User user = new User();
-		user.setId(id);
-		this.userService.doDelete(user, synToActiviti);
-		redirectAttributes.addFlashAttribute("msg", "删除用户成功！");
-		return "redirect:/userAction/toList_page";
+	@RequestMapping(value = "/delete/{id}")
+	@ResponseBody
+	public Message delete(@PathVariable("id") Integer id,
+						@Value("#{APP_PROPERTIES['account.user.delete.syntoactiviti']}") Boolean synToActiviti) throws Exception{
+		if(!BeanUtils.isBlank(id)){
+			User user = new User();
+			user.setId(id);
+			this.userService.doDelete(user, synToActiviti);
+			return new Message(Boolean.TRUE, "删除成功！");
+		}else{
+			return new Message(Boolean.FALSE, "删除失败！ID为空！");
+		}
 	}
 	
 	@RequiresPermissions("admin:*")

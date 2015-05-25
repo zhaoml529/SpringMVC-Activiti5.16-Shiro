@@ -10,7 +10,7 @@
 	<meta http-equiv="expires" content="0">    
 	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 	<meta http-equiv="description" content="This is my page">
-	<script type="text/javascript" src="${ctx}/js/app/user.js"></script>
+	<script type="text/javascript" src="${ctx}/js/app/user.js?_=${sysInitTime}"></script>
   </head>
   <body>
 	<div class="well well-small" style="margin-left: 5px;margin-top: 5px">
@@ -25,9 +25,9 @@
 			<tr>
 				<td style="padding-left:2px">
 					<shiro:hasRole name="admin">
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addRowsOpenDlg();">添加</a>
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showUser();">添加</a>
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit();">编辑</a>
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="delRows();">删除</a>
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="del();">删除</a>
 					</shiro:hasRole>
 				<!--  	<shiro:hasPermission name="userEndEdit">
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-cancel" plain="true" onclick="endEdit();">结束编辑</a>

@@ -481,8 +481,8 @@
                 docchgskin(dc,selectId,cookiesColor);
             });
             function docchgskin(dc,selectId,cookiesColor){
-						removejscssfile(dc,"themes/"+cookiesColor+"/easyui.css", "css");
-                        createLink(dc,"themes/"+selectId+"/easyui.css");
+						removejscssfile(dc,ctx+"/css/themes/"+cookiesColor+"/easyui.css", "css");
+                        createLink(dc,ctx+"/css/themes/"+selectId+"/easyui.css");
         	}
             function createLink(dc,url){
 		    	var urls = url.replace(/[,]\s*$/ig,"").split(",");

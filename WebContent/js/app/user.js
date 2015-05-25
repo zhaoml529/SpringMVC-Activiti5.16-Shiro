@@ -12,7 +12,7 @@ $(function() {
     user_datagrid = $('#user_datagrid').datagrid({
         url: ctx+"/userAction/toList",
         width : 'auto',
-		height :  $(this).height()-120,
+		height :  $(this).height()-85,
 		pagination:true,
 		rownumbers:true,
 		border:false,
@@ -63,9 +63,13 @@ $(function() {
 });
 
 //初始化表单
-function formInit() {
+function formInit(row) {
+	var _url = ctx+"/userAction/doAdd";
+	if (row != undefined && row.id) {
+		_url = ctx+"/userAction/doUpdate";
+	}
     user_form = $('#user_form').form({
-        url: ctx+'/userAction/doUpdate',
+        url: _url,
         onSubmit: function (param) {
             $.messager.progress({
                 title: '提示信息！',
@@ -102,6 +106,10 @@ function formInit() {
 
 //显示弹出窗口 新增：row为空 编辑:row有值
 function showUser(row) {
+	var _url = ctx+"/userAction/toAdd";
+	if (row != undefined && row.id) {
+		_url = ctx+"/userAction/toUpdate/"+row.id;
+	}
     //弹出对话窗口
     user_dialog = $('<div/>').dialog({
     	title : "用户信息",
@@ -111,13 +119,13 @@ function showUser(row) {
         modal: true,
         minimizable: true,
         maximizable: true,
-        href: ctx+"/userAction/toUpdate/"+row.id,
+        href: _url,
         onLoad: function () {
-            formInit();
+            formInit(row);
             if (row) {
             	user_form.form('load', row);
             } else {
-                alert("这个是多行吗？");
+            	$("input[name=locked]:eq(0)").attr("checked", 'checked');//状态 初始化值
             }
 
         },
@@ -156,3 +164,38 @@ function edit() {
     }
 }
 
+//删除用户
+function del() {
+    var row = user_datagrid.datagrid('getSelected');
+    if (row) {
+        $.messager.confirm('确认提示！', '您确定要删除选中的所有行?', function (result) {
+            if (result) {
+                var id = row.id;
+                $.ajax({
+                    url: ctx + '/userAction/delete/'+id,
+                    type: 'post',
+                    dataType: 'json',
+                    data: {id: id},
+                    success: function (data) {
+                        if (data.status) {
+                            user_datagrid.datagrid('load');	// reload the user data
+                            $.messager.show({
+            					title : data.title,
+            					msg : data.message,
+            					timeout : 1000 * 2
+            				});
+                        } else {
+                        	$.messager.show({
+            					title : data.title,
+            					msg : data.message,
+            					timeout : 1000 * 2
+            				});
+                        }
+                    }
+                });
+            }
+        });
+    } else {
+    	$.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
+    }
+}
