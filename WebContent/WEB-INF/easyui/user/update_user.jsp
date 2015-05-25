@@ -1,7 +1,24 @@
 ﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
-
+<<script type="text/javascript">
+$(function(){
+	$("#group1").combobox({
+		width:160,
+		url:"${ctx }/groupAction/getGroupList",
+		valueField: 'id',
+		textField: 'name',
+		onSelect:function(value){
+			$("#group_name").val(value.name);
+		},
+		required: true,
+		onLoadSuccess: function (data) {
+			var groupId = $("#group_id").val();
+            $("#group").combobox('setValue',groupId);
+        }
+	});
+})
+</script>
 <style type="text/css">
     #fm{
         margin:0;
@@ -28,7 +45,7 @@
 
 <div id="dlg" class="easyui-layout" style="padding:10px 20px">
     <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 用户信息</div>
-    <form id="user_form" method="post" class="dialog-form" novalidate>
+    <form id="user_form" method="post" >
 		<input type="hidden" name="id" id="id" />
 		<input type="hidden" name="salt" id="salt" />
 		<input type="hidden" name="registerDate" id="registerDate" />
@@ -51,11 +68,17 @@
         </div>
         <div class="fitem">
             <label>用户组:</label>
-            <select id="group" class="easyui-combobox" name="group.id" style="width:160px;" data-options="required:true">
+<%--             <select id="group" class="easyui-combobox" name="group" style="width:160px;" data-options="required:true">
 				<c:forEach var="group" items="${groupList}">
 					<option value="${group.id}" >${group.name}-${group.type}</option>
 				</c:forEach>
+			</select> --%>
+			<select name="group.id">
+				<c:forEach var="group" items="${groupList}">
+					<option value="${group.id}" ${user.group.id == group.id?'selected':'' }>${group.name}-${group.type}</option>
+				</c:forEach>
 			</select>
+			<input name="group_name" id="group_name" type="hidden" />
         </div>
         <div class="fitem">
             <label>状态:</label>

@@ -16,6 +16,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.session.Session;
@@ -41,6 +42,7 @@ import com.zml.oa.service.IGroupService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.util.BeanUtils;
 import com.zml.oa.util.Constants;
+import com.zml.oa.util.DateUtil;
 import com.zml.oa.util.UserUtil;
 
 /**
@@ -63,14 +65,19 @@ public class UserAction {
 	@Autowired
     private SessionDAO sessionDAO;
 	
-	@RequiresPermissions("admin:*")
-	@RequestMapping("/toList_page")
-	public String userList_page(HttpServletRequest request, Model model) throws Exception{
-		List<User> listUser = this.userService.getUserList_page();
-		Pagination pagination = PaginationThreadUtils.get();
-//		pagination.processTotalPage();
-		model.addAttribute("page", pagination.getPageStr());
-		model.addAttribute("listUser", listUser);
+//	@RequiresPermissions("admin:*")
+//	@RequestMapping("/toList_page")
+//	public String userList_page(HttpServletRequest request, Model model) throws Exception{
+//		List<User> listUser = this.userService.getUserList_page();
+//		Pagination pagination = PaginationThreadUtils.get();
+////		pagination.processTotalPage();
+//		model.addAttribute("page", pagination.getPageStr());
+//		model.addAttribute("listUser", listUser);
+//		return "user/list_user";
+//	}
+	
+	@RequestMapping(value = "/userDatagrid")
+	public String toList_page() throws Exception{
 		return "user/list_user";
 	}
 	
@@ -136,26 +143,45 @@ public class UserAction {
 		return "user/update_user";
 	}
 	
-	//@RequiresPermissions("admin:user:doUpdate")
-//    @RequestMapping(value = {"doUpdate"})
-//    @ResponseBody
-//	public Message doUpdate(HttpServletRequest request) throws Exception{
-//		String name = request.getParameter("name");
-//		String passwd = request.getParameter("passwd");
-//		String id = request.getParameter("id");
-//		User user = new User();
-//		System.out.println(name+"---"+passwd);
-//		this.userService.doUpdate(user);
-//		return new Message(Boolean.TRUE, "修改成功！");
-//	}
-	
-	@RequestMapping(value = {"doUpdate"})
-	@ResponseBody
-	public Message doUpdate(@ModelAttribute User user) throws Exception{
-		
-		System.out.println(user.getName());
-		return new Message(Boolean.TRUE, "修改成功！");
-		
+	@RequiresPermissions("admin:user:doUpdate")
+    @RequestMapping(value = "/doUpdate")
+    @ResponseBody
+	public Message doUpdate(HttpServletRequest request) throws Exception{
+		String id = request.getParameter("id");
+		String salt = request.getParameter("salt");
+		String name = request.getParameter("name");
+		String registerDate = request.getParameter("registerDate");
+		String passwd = request.getParameter("passwd");
+		String groupId = request.getParameter("group.id");
+		String groupName = request.getParameter("group_name");
+		String locked = request.getParameter("locked");
+		Message message = new Message();
+		User user = new User();
+		if(StringUtils.isNotEmpty(id.trim())){
+			user.setId(new Integer(id));
+			user.setName(name);
+			user.setSalt(salt);
+			user.setPasswd(passwd);
+			user.setLocked(new Integer(locked));
+			user.setGroup_name(groupName);
+			if(StringUtils.isNotEmpty(groupId.trim())){
+				user.setGroup(new Group(new Integer(groupId)));
+			}else{
+				message.setStatus(Boolean.FALSE);
+				message.setMessage("group.id 为空！");
+			}
+			Date date = DateUtil.StringToDate(registerDate, "yyyy-MM-dd HH:mm");
+			user.setRegisterDate(date);
+		}else{
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("userId 为空！");
+		}
+		if(message.getStatus()){
+			this.userService.doUpdate(user);
+			message.setStatus(Boolean.TRUE);
+			message.setMessage("修改成功！");
+		}
+		return message;
 	}
 	
 	

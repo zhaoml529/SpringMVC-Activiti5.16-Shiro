@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zml.oa.entity.Group;
 import com.zml.oa.pagination.Pagination;
@@ -26,6 +27,15 @@ public class GroupAction {
 		model.addAttribute("groupList", list);
 		return "group/list_group";
 	}
+	
+	@RequestMapping("/getGroupList")
+	@ResponseBody
+	public List<Group> getList() throws Exception{
+		List<Group> list = this.groupService.getGroupList();
+		return list;
+	}
+	
+	
 	
 	@RequestMapping("/toList_page")
 	public String toListPage(Model model) throws Exception{

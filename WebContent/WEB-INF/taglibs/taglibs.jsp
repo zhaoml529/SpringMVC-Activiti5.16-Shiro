@@ -25,7 +25,8 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <link rel="stylesheet" type="text/css" href="${ctx}/css/themes/<%=easyuiThemeName %>/easyui.css">
-<script type="text/javascript" src="${ctx}/js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/jquery.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/jquery-migrate-1.2.1.min.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx}/css/themes/icon.css">
 <link rel="stylesheet" type="text/css" href="${ctx}/css/easyui/common.css">
 <%-- <link rel="stylesheet" type="text/css" href="${ctx}/css/bootstrap.min.css"> --%>

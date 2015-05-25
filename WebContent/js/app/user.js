@@ -32,7 +32,7 @@ $(function() {
             		  }
 				  },
             	  editor : "text"},
-              {field : 'group_name',title : '用户组',width : 200,editor : "text"}
+              {field : 'group_name',title : '用户组',width : 200}
     	    ] 
         ],
         toolbar: "#toolbar"
@@ -79,26 +79,22 @@ function formInit() {
         },
         success: function (data) {
             $.messager.progress('close');
-            alert(result.status);
             var json = $.parseJSON(data);
-            alert(json)
-            if (json.code == 1) {
+            if (json.status) {
                 user_dialog.dialog('destroy');//销毁对话框
                 user_datagrid.datagrid('reload');//重新加载列表数据
-                parent.$.messager.show({
-					title : result.title,
-					msg : result.message,
+                $.messager.show({
+					title : json.title,
+					msg : json.message,
 					timeout : 1000 * 2
 				});
-            } else if (json.code == 2) {
-                $.messager.alert('提示信息！', json.msg, 'warning', function () {
-                    if (json.obj) {
-                        $('#user_form input[name="' + json.obj + '"]').focus();
-                    }
-                });
             } else {
-                eu.showAlertMsg(json.msg, 'error');
-            }
+				$.messager.show({
+					title :  json.title,
+					msg : json.message,
+					timeout : 1000 * 2
+				});
+            } 
         }
     });
 }
@@ -116,6 +112,15 @@ function showUser(row) {
         minimizable: true,
         maximizable: true,
         href: ctx+"/userAction/toUpdate/"+row.id,
+        onLoad: function () {
+            formInit();
+            if (row) {
+            	user_form.form('load', row);
+            } else {
+                alert("这个是多行吗？");
+            }
+
+        },
         buttons: [
             {
                 text: '保存',
@@ -134,46 +139,8 @@ function showUser(row) {
         ],
         onClose: function () {
             user_dialog.dialog('destroy');
-        },
-        onLoad: function () {
-            formInit();
-            if (row) {
-                user_form.form('load', row);
-            } else {
-                alert("这个是多行吗？");
-            }
-
         }
     });
-
-	
-	/*parent.$.modalDialog({
-		title : "编辑用户",
-		width : 600,
-		height : 300,
-		href : ctx+"/userAction/toUpdate/"+row.id,
-		onLoad:function(){
-			var f = parent.$.modalDialog.handler.find("#form");
-			f.form("load", row);
-		},			
-		buttons : [ {
-			text : '编辑',
-			iconCls : 'icon-ok',
-			handler : function() {
-				parent.$.modalDialog.openner= $grid;
-				var f = parent.$.modalDialog.handler.find("#form");
-				f.submit();
-			}
-		}, {
-			text : '取消',
-			iconCls : 'icon-cancel',
-			handler : function() {
-				parent.$.modalDialog.handler.dialog('destroy');
-				parent.$.modalDialog.handler = undefined;
-			}
-		}
-		]
-	});*/
 }
 
 
@@ -188,3 +155,4 @@ function edit() {
         $.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
     }
 }
+

@@ -3,7 +3,9 @@
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
-<script type="text/javascript" src="${ctx }/js/jquery-1.8.0.min.js"></script>
+<%-- <script type="text/javascript" src="${ctx }/js/jquery-1.8.0.min.js"></script> --%>
+<script type="text/javascript" src="${ctx}/js/jquery.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/jquery-migrate-1.2.1.min.js"></script>
 <script type="text/javascript" src="${ctx }/js/easyui/login/jquery.cookie.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx }/css/zice.style.css">
 <link rel="stylesheet" type="text/css" href="${ctx }/css/tipsy.css">

@@ -3,7 +3,7 @@ package com.zml.oa.entity;
 public class Message {
 	private String title = "提示";
 	private String message;
-	private Boolean status = false;
+	private Boolean status = true;
 	
 	public Message(){
 		
