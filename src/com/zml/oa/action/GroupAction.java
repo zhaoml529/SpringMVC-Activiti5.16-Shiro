@@ -35,8 +35,6 @@ public class GroupAction {
 		return list;
 	}
 	
-	
-	
 	@RequestMapping("/toList_page")
 	public String toListPage(Model model) throws Exception{
 		List<Group> list = this.groupService.getGroupListPage();
@@ -56,4 +54,12 @@ public class GroupAction {
 		return "group/choose_group";
 	}
 	
+	/**
+	 * 跳转组权限管理页面-easyui
+	 * @return
+	 */
+	@RequestMapping(value ="/permissionAssignment")
+	public String permissionAssignment() throws Exception{
+		return "permission/permissionAssignment";
+	}
 }

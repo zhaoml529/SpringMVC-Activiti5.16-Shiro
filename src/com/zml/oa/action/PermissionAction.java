@@ -246,4 +246,28 @@ public class PermissionAction {
 		}
 	}
 	
+	/**
+	 * 获取组权限-easyui
+	 * @return
+	 * @throws Exception 
+	 */
+	@RequestMapping(value ="/getGroupPermission")
+	@ResponseBody
+	public List<GroupAndResource> getGroupPermission(@RequestParam("groupId") Integer groupId) throws Exception{
+		List<GroupAndResource> garList = this.garService.getResource(groupId);
+		return garList;
+	}
+	
+	/**
+	 * 获取所有资源列表
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/getResourceList")
+	@ResponseBody
+	public List<Resource> getResource() throws Exception{
+		List<Resource> resList = this.resourceService.getAllResource();
+		return resList;
+	}
+	
 }
