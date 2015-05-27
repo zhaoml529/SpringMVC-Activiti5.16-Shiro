@@ -134,17 +134,20 @@ function getPermission(rowIndex, rowData){
         dataType: 'json',
         data: {groupId: rowData.id},
         success: function (data) {
-        	if(data.length!=0){
-  	    	    $.each(data,function(i,e){
-  	    		    resource_datagrid.treegrid('select',e.resourceId);
-  	    	    });
-  			}else{
-  				parent.$.messager.show({
-  					title :"提示",
-  					msg :"该角色暂无权限!",
-  					timeout : 1000 * 2
-  				});
-  			}
+        	resource_datagrid.treegrid('reload');
+        	setTimeout(function () { 
+        		if(data.length!=0){
+      	    	    $.each(data,function(i,e){
+      	    		    resource_datagrid.treegrid('select',e.resourceId);
+      	    	    });
+      			}else{
+      				parent.$.messager.show({
+      					title :"提示",
+      					msg :"该角色暂无权限!",
+      					timeout : 1000 * 2
+      				});
+      			}
+            }, 100);
         }
     });
 } 
