@@ -12,5 +12,6 @@ public interface IGroupAndResourceService {
 	
 	public void doDelete(GroupAndResource gar) throws Exception;
 	
+	public Integer doDelByGroup(Integer groupId) throws Exception;
 }
 

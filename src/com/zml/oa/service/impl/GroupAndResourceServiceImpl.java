@@ -1,10 +1,13 @@
 package com.zml.oa.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.zml.oa.dao.IJdbcDao;
 import com.zml.oa.entity.GroupAndResource;
 import com.zml.oa.service.IBaseService;
 import com.zml.oa.service.IGroupAndResourceService;
@@ -14,6 +17,9 @@ public class GroupAndResourceServiceImpl extends
 		BaseServiceImpl<GroupAndResource> implements IGroupAndResourceService {
 	@Autowired 
 	private IBaseService<GroupAndResource> baseService;
+	
+	@Autowired
+	protected IJdbcDao jdbcDao;
 	
 	@Override
 	public List<GroupAndResource> getResource(Integer groupId) throws Exception {
@@ -29,6 +35,14 @@ public class GroupAndResourceServiceImpl extends
 	@Override
 	public void doDelete(GroupAndResource gar) throws Exception {
 		this.baseService.delete(gar);
+	}
+
+	@Override
+	public Integer doDelByGroup(Integer groupId) throws Exception {
+		String sql = "delete from T_GROUP_RESOURCE where group_id=:groupId ";
+		Map<String, Object> paramMap = new HashMap<String, Object>();  
+	    paramMap.put("groupId", groupId);  
+		return this.jdbcDao.delete(sql, paramMap);
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.zml.oa.service.impl;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,21 @@ public class GroupServiceImpl implements IGroupService {
 	public List<Group> getGroupListPage() throws Exception {
 		List<Group> list = this.baseService.findByPage("Group", new String[]{}, new String[]{});
 		return list;
+	}
+
+	@Override
+	public Serializable doAdd(Group group) throws Exception {
+		return this.baseService.add(group);
+	}
+
+	@Override
+	public void doUpdate(Group group) throws Exception {
+		this.baseService.update(group);
+	}
+
+	@Override
+	public void doDelete(Group group) throws Exception {
+		this.baseService.delete(group);
 	}
 
 }

@@ -24,10 +24,13 @@ $(function() {
 		rownumbers:true,
 		singleSelect:true,
 		striped:true,
+		idField: 'id',
+		sortName: 'type',//默认排序字段
+        sortOrder: 'desc',//默认排序方式 'desc' 'asc'
 		columns : [ 
 		    [ 
-		        {field : 'name',title : '组名称',width :parseInt($(this).width()*0.2),align : 'center',editor : {type:'validatebox',options:{required:true}}},
-		        {field : 'type',title : '组类型',width : parseInt($(this).width()*0.2),align : 'center',editor : "text"}
+		        {field : 'name',title : '组名称',width : fixWidth(0.1),sortable: true,align : 'center',editor : {type:'validatebox',options:{required:true}}},
+		        {field : 'type',title : '组类型',width : fixWidth(0.1),sortable: true,align : 'center',editor : "text"}
             ] 
 		],
 		toolbar:'#toolbar',
@@ -53,8 +56,8 @@ $(function() {
 		columns : [ 
 		    [ 
                 {field:'ck', checkbox:true},
-                {field : 'name',title : '资源名称',width : parseInt($(this).width()*0.2)},
-                {field : 'type',title : '资源路径',width : parseInt($(this).width()*0.1),align : 'center',
+                {field : 'name',title : '资源名称',width : fixWidth(0.2)},
+                {field : 'type',title : '资源类型',width : fixWidth(0.1),align : 'center',
             	    formatter:function(value,row){
             		    if("menu"==row.type){
             		    	return "<font color=green>菜单<font>";
@@ -63,9 +66,9 @@ $(function() {
             		    }
 					}
                 },
-                {field : 'url',title : '资源类型',width : parseInt($(this).width()*0.1),align : 'center'},
-                {field : 'permission',title : '权限字符串',width : parseInt($(this).width()*0.2),align : 'left'},
-			    {field : 'available',title : '是否启用',width : parseInt($(this).width()*0.1),align : 'center',
+                {field : 'url',title : '资源路径',width : fixWidth(0.2),align : 'center'},
+                {field : 'permission',title : '权限字符串',width : fixWidth(0.2),align : 'left'},
+			    {field : 'available',title : '是否启用',width : fixWidth(0.1),align : 'center',
 		            formatter:function(value,row){
 		            	if("1"==row.available){
 		            		return "<font color=green>是<font>";
@@ -86,17 +89,16 @@ $(function() {
            });   
         }
 	});
-	//搜索框
-	$("#searchbox").searchbox({ 
-		 menu:"#mm", 
-		 prompt :'模糊查询',
-	    searcher:function(value,name){   
-	    	var str="{\"roleName\":\""+name+"\",\"value\":\""+value+"\"}";
-            var obj = eval('('+str+')');
-            $role.datagrid('reload',obj); 
-	    }
-	   
-	});
+    //修正宽高
+	function fixHeight(percent)   
+	{   
+		return parseInt($(this).width() * percent);
+	}
+
+	function fixWidth(percent)   
+	{   
+		return parseInt(($(this).width() - 50) * percent);
+	}
 });
 
 //收缩
@@ -126,7 +128,6 @@ function refresh(){
 
 //双击组时，关联组权限
 function getPermission(rowIndex, rowData){ 
-	alert(rowData.id);
     $.ajax({
         url: ctx + '/permissionAction/getGroupPermission',
         type: 'post',
@@ -172,8 +173,8 @@ function formInit(row) {
             $.messager.progress('close');
             var json = $.parseJSON(data);
             if (json.status) {
-                user_dialog.dialog('destroy');//销毁对话框
-                user_datagrid.datagrid('reload');//重新加载列表数据
+                group_dialog.dialog('destroy');//销毁对话框
+                group_datagrid.datagrid('reload');//重新加载列表数据
                 $.messager.show({
 					title : json.title,
 					msg : json.message,
@@ -200,8 +201,8 @@ function showGroup(row) {
     group_dialog = $('<div/>').dialog({
     	title : "组信息",
 		top: 20,
-		width : 600,
-		height : 300,
+		width : 500,
+		height : 200,
         modal: true,
         minimizable: true,
         maximizable: true,
@@ -210,8 +211,6 @@ function showGroup(row) {
             formInit(row);
             if (row) {
             	group_form.form('load', row);
-            } else {
-            	$("input[name=locked]:eq(0)").attr("checked", 'checked');//状态 初始化值
             }
 
         },
@@ -247,18 +246,18 @@ function operation() {
     }
 }
 
-//删除用户
+//删除组
 function delRows() {
     var row = group_datagrid.datagrid('getSelected');
     if (row) {
-        $.messager.confirm('确认提示！', '您确定要删除选中的所有行?', function (result) {
+        $.messager.confirm('确认提示！', '您确定要删除选中数据? 同时也会删除此用户组所对应的资源信息！', function (result) {
             if (result) {
                 var id = row.id;
                 $.ajax({
                     url: ctx + '/groupAction/delete/'+id,
                     type: 'post',
                     dataType: 'json',
-                    data: {id: id},
+                    data: {},
                     success: function (data) {
                         if (data.status) {
                             group_datagrid.datagrid('load');	// reload the group data

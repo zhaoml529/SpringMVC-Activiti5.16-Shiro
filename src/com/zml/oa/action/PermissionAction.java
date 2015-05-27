@@ -259,7 +259,7 @@ public class PermissionAction {
 	}
 	
 	/**
-	 * 获取所有资源列表
+	 * 获取所有资源列表-easyui
 	 * @return
 	 * @throws Exception
 	 */

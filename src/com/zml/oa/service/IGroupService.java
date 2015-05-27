@@ -1,5 +1,6 @@
 package com.zml.oa.service;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.zml.oa.entity.Group;
@@ -16,4 +17,10 @@ public interface IGroupService {
 	public List<Group> getGroupList() throws Exception;
 	
 	public List<Group> getGroupListPage() throws Exception;
+	
+	public Serializable doAdd(Group group) throws Exception;
+
+	public void doUpdate(Group group) throws Exception;
+	
+	public void doDelete(Group group) throws Exception;
 }

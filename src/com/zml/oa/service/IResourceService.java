@@ -22,4 +22,5 @@ public interface IResourceService {
 	public void doUpdate(Resource entity) throws Exception;
 	
 	public void doDelete(Resource entity) throws Exception;
+	
 }
