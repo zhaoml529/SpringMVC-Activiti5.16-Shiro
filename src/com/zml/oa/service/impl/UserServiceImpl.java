@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.zml.oa.entity.Group;
 import com.zml.oa.entity.User;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.service.IActivitiBaseService;
 import com.zml.oa.service.IGroupService;
 import com.zml.oa.service.IUserService;
@@ -264,5 +265,11 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
             addMembershipToIdentify(userId, groupId);
         }
     }
+
+	@Override
+	public List<User> getUserList(Page<User> page) throws Exception {
+		List<User> list = getListPage("User", new String[]{}, new String[]{}, page);
+		return list;
+	}
 
 }

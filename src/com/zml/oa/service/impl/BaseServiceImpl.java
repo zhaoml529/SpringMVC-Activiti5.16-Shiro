@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zml.oa.dao.IBaseDao;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IBaseService;
 import com.zml.oa.util.BeanUtils;
@@ -173,4 +174,47 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
         }
 	}
 
+	@Override
+	public List<T> getListPage(String tableSimpleName, String[] columns,
+			String[] values, Page<T> page) throws Exception {
+		// TODO Auto-generated method stub
+		Integer totalSum = 0;
+		List<T> list = new ArrayList<T>();
+		if(columns.length <= 0 && values.length <= 0){
+			list = getAllList(tableSimpleName);
+		}else{
+			list = findByWhere(tableSimpleName, columns, values);
+		}
+		if(!BeanUtils.isBlank(list)){
+			totalSum = list.size();
+		}
+		int[] pageParams = page.getPageParams(totalSum);
+		
+		StringBuffer sb = new StringBuffer();  
+        sb.append("select a from ").append(tableSimpleName).append( " a where ");  
+        if(columns.length==values.length){  
+            for(int i = 0; i < columns.length; i++){  
+                sb.append("a.").append(columns[i]).append("='").append(values[i]).append("'");  
+                if(i < columns.length-1){  
+                    sb.append(" and ");  
+                }  
+            } 
+	        String hql = sb.toString();
+	        if(hql.endsWith("where ")){
+	    	    hql = hql.substring(0, hql.length()-6);
+	        }
+	        logger.info("findByPage: HQL: "+hql);
+	        list = this.baseDao.findByPage(hql, pageParams[0], pageParams[1]); 
+	        if( list.size()>0 ){
+	        	page.setResult(list);
+        	    return list;
+            }else{
+        	    return Collections.emptyList();
+            }
+        }else{
+        	logger.info("findByPage: columns.length != values.length");
+        	return Collections.emptyList();
+        }
+	}
+	
 }

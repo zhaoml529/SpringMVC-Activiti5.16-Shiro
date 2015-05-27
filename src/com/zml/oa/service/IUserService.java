@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.zml.oa.entity.User;
+import com.zml.oa.pagination.Page;
 
 /**
  * @ClassName: IUserService
@@ -22,6 +23,8 @@ import com.zml.oa.entity.User;
 public interface IUserService {
 
 	public List<User> getUserList_page() throws Exception;
+
+	public List<User> getUserList(Page<User> page) throws Exception;
 	
 	public User getUserByName(String user_name) throws Exception;
 

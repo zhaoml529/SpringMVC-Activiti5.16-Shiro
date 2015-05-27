@@ -20,10 +20,10 @@ $(function() {
 		striped:true,
         columns : [ 
             [ 
-              {field : 'name',title : '用户名',width : 200,align : 'left',sortable: true, editor : {type:'validatebox',options:{required:true}}},
-              {field : 'passwd',title : '密码',width : 200,align : 'left',editor : {type:'validatebox',options:{required:true}}},
-              {field : 'registerDate', title : '注册时间', width : 200, editor : "datebox"},
-              {field : 'locked',title : '状态',width : 200,
+              {field : 'name',title : '用户名',width : fixWidth(0.2),align : 'left',sortable: true, editor : {type:'validatebox',options:{required:true}}},
+              {field : 'passwd',title : '密码',width : fixWidth(0.2),align : 'left',editor : {type:'validatebox',options:{required:true}}},
+              {field : 'registerDate', title : '注册时间', width : fixWidth(0.2), editor : "datebox"},
+              {field : 'locked',title : '状态',width : fixWidth(0.2),
             	  formatter:function(value,row){
             		  if("0"==row.locked){
 						return "<font color=green>正常<font>";
@@ -32,7 +32,7 @@ $(function() {
             		  }
 				  },
             	  editor : "text"},
-              {field : 'group_name',title : '用户组',width : 200}
+              {field : 'group_name',title : '用户组',width : fixWidth(0.2)}
     	    ] 
         ],
         toolbar: "#toolbar"
@@ -53,12 +53,14 @@ $(function() {
     //修正宽高
 	function fixHeight(percent)   
 	{   
-		return (document.body.clientHeight) * percent ;    
+		return parseInt($(this).width() * percent);
+		//return (document.body.clientHeight) * percent ;    
 	}
 
 	function fixWidth(percent)   
 	{   
-		return (document.body.clientWidth - 50) * percent ;    
+		return parseInt(($(this).width() - 30) * percent);
+		//return (document.body.clientWidth - 50) * percent ;    
 	}
 });
 

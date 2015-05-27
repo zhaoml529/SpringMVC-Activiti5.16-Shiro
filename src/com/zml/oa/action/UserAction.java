@@ -33,9 +33,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.Group;
 import com.zml.oa.entity.Message;
 import com.zml.oa.entity.User;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IGroupService;
@@ -82,11 +84,22 @@ public class UserAction {
 		return "user/list_user";
 	}
 	
+	/**
+	 * 
+	 * @param page 当前第几页
+	 * @param rows 每页显示记录数
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/toList")
 	@ResponseBody
-	public List<User> userList(HttpServletRequest request, Model model) throws Exception{
-		List<User> listUser = this.userService.getUserList_page();
-		return listUser;
+	public Datagrid<User> userList(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+		System.out.println(page+"---"+rows);
+		Page<User> p = new Page<User>(page, rows);
+		this.userService.getUserList(p);
+		System.out.println(p.getTotal()+"---"+p.getResult().size());
+		Datagrid<User> dataGrid = new Datagrid<User>(p.getTotal(), p.getResult());
+		return dataGrid;
 	}
 	
 	//此方法没用到，用Shiro提供的授权和认证服务

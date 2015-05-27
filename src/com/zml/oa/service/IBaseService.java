@@ -10,6 +10,8 @@ package com.zml.oa.service;
 import java.io.Serializable;
 import java.util.List;
 
+import com.zml.oa.pagination.Page;
+
 /**
  * @ClassName: IBaseService
  * @Description:IBaseService
@@ -38,5 +40,7 @@ public interface IBaseService<T> {
 	 public T getBean(final Class<T> obj,final Serializable id) throws Exception;
 	 
 	 public List<T> findByPage(String tableSimpleName,String[] columns,String[] values) throws Exception;
+	 
+	 public List<T> getListPage(String tableSimpleName,String[] columns,String[] values, Page<T> page) throws Exception;
 	
 }
