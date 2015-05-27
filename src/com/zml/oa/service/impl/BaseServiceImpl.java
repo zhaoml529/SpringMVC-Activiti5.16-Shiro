@@ -177,7 +177,6 @@ public class BaseServiceImpl<T> implements IBaseService<T> {
 	@Override
 	public List<T> getListPage(String tableSimpleName, String[] columns,
 			String[] values, Page<T> page) throws Exception {
-		// TODO Auto-generated method stub
 		Integer totalSum = 0;
 		List<T> list = new ArrayList<T>();
 		if(columns.length <= 0 && values.length <= 0){

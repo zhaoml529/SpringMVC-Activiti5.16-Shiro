@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zml.oa.entity.Group;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.service.IBaseService;
 import com.zml.oa.service.IGroupService;
 
@@ -18,8 +19,8 @@ public class GroupServiceImpl implements IGroupService {
 	private IBaseService<Group> baseService;
 	
 	@Override
-	public List<Group> getGroupList() throws Exception{
-		List<Group> list = this.baseService.getAllList("Group");
+	public List<Group> getGroupListPage(Page<Group> page) throws Exception{
+		List<Group> list = this.baseService.getListPage("Group", new String[]{}, new String[]{}, page);
 		return list;
 	}
 
@@ -42,6 +43,12 @@ public class GroupServiceImpl implements IGroupService {
 	@Override
 	public void doDelete(Group group) throws Exception {
 		this.baseService.delete(group);
+	}
+
+	@Override
+	public List<Group> getGroupList() throws Exception {
+		List<Group> list = this.baseService.getAllList("Group");
+		return list;
 	}
 
 }

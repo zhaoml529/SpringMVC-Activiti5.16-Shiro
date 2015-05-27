@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.zml.oa.entity.Group;
+import com.zml.oa.pagination.Page;
 
 /**
  * @ClassName: IGroupService
@@ -14,6 +15,8 @@ import com.zml.oa.entity.Group;
  */
 public interface IGroupService {
 
+	public List<Group> getGroupListPage(Page<Group> page) throws Exception;
+	
 	public List<Group> getGroupList() throws Exception;
 	
 	public List<Group> getGroupListPage() throws Exception;

@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.Group;
 import com.zml.oa.entity.Message;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IGroupAndResourceService;
@@ -64,9 +66,12 @@ public class GroupAction {
 	 */
 	@RequestMapping("/getGroupList")
 	@ResponseBody
-	public List<Group> getList(String sort, String order) throws Exception{
-		List<Group> list = this.groupService.getGroupList();
-		return list;
+	public Datagrid<Group> getList(@RequestParam(value = "page", required = false) Integer page, 
+								@RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+		Page<Group> p = new Page<Group>(page, rows);
+		this.groupService.getGroupListPage(p);
+		Datagrid<Group> dataGrid = new Datagrid<Group>(p.getTotal(), p.getResult());
+		return dataGrid;
 	}
 	
 	/**
