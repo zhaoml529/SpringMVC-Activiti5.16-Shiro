@@ -17,6 +17,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,7 +28,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.zml.oa.dao.IJdbcDao;
 import com.zml.oa.entity.GroupAndResource;
+import com.zml.oa.entity.Message;
 import com.zml.oa.entity.Resource;
 import com.zml.oa.entity.UserTask;
 import com.zml.oa.pagination.Pagination;
@@ -35,6 +38,7 @@ import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IGroupAndResourceService;
 import com.zml.oa.service.IResourceService;
 import com.zml.oa.service.IUserTaskService;
+import com.zml.oa.util.BeanUtils;
 
 /**
  * @ClassName: PermissionAction
@@ -60,7 +64,7 @@ public class PermissionAction {
     
     @Autowired
     protected IResourceService resourceService;
-	
+    
     @RequestMapping(value = "/loadBpmn_page")
 	public String loadBpmnInfo(Model model){
 		ProcessDefinitionQuery proDefQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
@@ -268,6 +272,32 @@ public class PermissionAction {
 	public List<Resource> getResource() throws Exception{
 		List<Resource> resList = this.resourceService.getAllResource();
 		return resList;
+	}
+	
+	/**
+	 * 保存权限信息-easyui
+	 * @param groupId
+	 * @param resourceIds
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/savePermission")
+	@ResponseBody
+	public Message savePermission(@RequestParam("groupId") Integer groupId,
+			  @RequestParam("resourceIds[]") String[] resourceIds) throws Exception{
+		System.out.println(groupId+"-----"+resourceIds);
+		if(!BeanUtils.isBlank(groupId)){
+			this.garService.doDelByGroup(groupId);
+			for(String resourceId: resourceIds){
+				GroupAndResource gr = new GroupAndResource();
+				gr.setGroupId(groupId);
+				gr.setResourceId(new Integer(resourceId));
+				this.garService.doAdd(gr);
+			}
+		}else{
+			return new Message(Boolean.FALSE, "保存失败，请选择用户组！");
+		}
+		return new Message(Boolean.TRUE, "保存成功！");
 	}
 	
 }

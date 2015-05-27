@@ -141,7 +141,7 @@ function getPermission(rowIndex, rowData){
       	    		    resource_datagrid.treegrid('select',e.resourceId);
       	    	    });
       			}else{
-      				parent.$.messager.show({
+      				$.messager.show({
       					title :"提示",
       					msg :"该角色暂无权限!",
       					timeout : 1000 * 2
@@ -263,7 +263,8 @@ function delRows() {
                     data: {},
                     success: function (data) {
                         if (data.status) {
-                            group_datagrid.datagrid('load');	// reload the group data
+                            group_datagrid.datagrid('load');	  // reload the group data
+                            resource_datagrid.treegrid('reload'); //reload the resource data
                             $.messager.show({
             					title : data.title,
             					msg : data.message,
@@ -283,4 +284,60 @@ function delRows() {
     } else {
     	$.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
     }
+}
+
+//保存权限设置
+function savePermission(){
+	var selections=resource_datagrid.treegrid('getSelections');
+	var selectionGroup=group_datagrid.datagrid('getSelected');
+	var checkedIds=[];
+	if(selections.length!=0){
+		$.each(selections,function(i,e){
+			checkedIds.push(e.id);
+		});
+		if(selectionGroup){
+			$.ajax({
+				url: ctx + '/permissionAction/savePermission',
+				type: 'post',
+				dataType: 'json',
+				data: {groupId:selectionGroup.id, resourceIds:checkedIds},
+                success: function (data) {
+                    if (data.status) {
+                        $.messager.show({
+        					title : data.title,
+        					msg : data.message,
+        					timeout : 1000 * 2
+        				});
+                    } else {
+                    	$.messager.show({
+        					title : data.title,
+        					msg : data.message,
+        					timeout : 1000 * 2
+        				});
+                    }
+                },
+				error:function(){
+					$.messager.show({
+						title :"提示",
+						msg : "分配失败！",
+						timeout : 1000 * 2
+					});
+				}
+				
+			});
+		}else{
+			$.messager.show({
+				title :"提示",
+				msg : "请选择角色！",
+				timeout : 1000 * 2
+			});
+		}
+	}else{
+		$.messager.show({
+			title :"提示",
+			msg : "请选择资源信息！",
+			timeout : 1000 * 2
+		});
+		expandAll();
+	}
 }
