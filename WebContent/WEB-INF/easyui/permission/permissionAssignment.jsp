@@ -49,6 +49,16 @@
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="refresh();">刷新</a>
 					</div>
 				</div>
+				
+				<%-- 列表右键 --%>
+				<div id="resource_datagrid_menu" class="easyui-menu" style="width:120px;display: none;">
+				    <div onclick="showDialog();" data-options="iconCls:'icon-add'">新增</div>
+				    <div onclick="edit();" data-options="iconCls:'icon-edit'">编辑</div>
+				    <div onclick="del();" data-options="iconCls:'icon-remove'">删除</div>
+				    <div onclick="lock(false);" data-options="iconCls:'icon-ok'">启用</div>
+				    <div onclick="lock(true);" data-options="iconCls:'icon-lock'">停用</div>
+				</div>
+				
 				<table id="resource" title="权限"></table>
 			</div>
 		</div>

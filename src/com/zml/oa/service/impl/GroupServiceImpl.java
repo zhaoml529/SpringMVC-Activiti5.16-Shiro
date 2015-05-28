@@ -51,4 +51,9 @@ public class GroupServiceImpl implements IGroupService {
 		return list;
 	}
 
+	@Override
+	public Group getGroupById(String id) throws Exception {
+		return this.baseService.getUnique("Group", new String[]{"id"}, new String[]{id});
+	}
+
 }

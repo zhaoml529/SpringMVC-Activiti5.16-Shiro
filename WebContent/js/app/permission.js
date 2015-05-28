@@ -87,6 +87,14 @@ $(function() {
                   id:row.id, //节点ID   
                   deepCascade:true //深度级联   
            });   
+        },
+        onContextMenu: function (e, row) {
+            e.preventDefault();
+            resource_datagrid.treegrid('unselectAll');
+            $('#resource_datagrid_menu').menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
         }
 	});
     //修正宽高
@@ -198,7 +206,7 @@ function formInit(row) {
 function showGroup(row) {
 	var _url = ctx+"/groupAction/toAdd";
 	if (row != undefined && row.id) {
-		_url = ctx+"/groupAction/toUpdate/"+row.id;
+		_url = ctx+"/groupAction/toUpdate";
 	}
     //弹出对话窗口
     group_dialog = $('<div/>').dialog({

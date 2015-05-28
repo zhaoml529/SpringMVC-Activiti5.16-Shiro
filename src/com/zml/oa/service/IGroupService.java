@@ -19,6 +19,8 @@ public interface IGroupService {
 	
 	public List<Group> getGroupList() throws Exception;
 	
+	public Group getGroupById(String id) throws Exception;
+	
 	public List<Group> getGroupListPage() throws Exception;
 	
 	public Serializable doAdd(Group group) throws Exception;
