@@ -52,8 +52,8 @@
 				
 				<%-- 列表右键 --%>
 				<div id="resource_datagrid_menu" class="easyui-menu" style="width:120px;display: none;">
-				    <div onclick="showDialog();" data-options="iconCls:'icon-add'">新增</div>
-				    <div onclick="edit();" data-options="iconCls:'icon-edit'">编辑</div>
+				    <div onclick="showResource();" data-options="iconCls:'icon-add'">新增</div>
+				    <div onclick="openResource();" data-options="iconCls:'icon-edit'">编辑</div>
 				    <div onclick="del();" data-options="iconCls:'icon-remove'">删除</div>
 				    <div onclick="lock(false);" data-options="iconCls:'icon-ok'">启用</div>
 				    <div onclick="lock(true);" data-options="iconCls:'icon-lock'">停用</div>

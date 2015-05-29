@@ -37,14 +37,20 @@ public class ResourceAction {
 		return "resource/list_resource";
 	}
 	
+	/**
+	 * 跳转添加页面-easyui
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/toAdd")
 	public String toAdd(Model model) throws Exception {
-		if(!model.containsAttribute("res")){
-			model.addAttribute("res", new Resource());
-		}
-		List<Resource> menuList = this.resourceService.getResourceByType();
-		model.addAttribute("list", menuList);
-		return "resource/add_resource";
+//		if(!model.containsAttribute("res")){
+//			model.addAttribute("res", new Resource());
+//		}
+//		List<Resource> menuList = this.resourceService.getResourceByType();
+//		model.addAttribute("list", menuList);
+		return "permission/add_resource";
 	}
 	
 
