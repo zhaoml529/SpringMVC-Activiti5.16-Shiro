@@ -1,13 +1,17 @@
 package com.zml.oa.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.zml.oa.dao.IJdbcDao;
 import com.zml.oa.entity.GroupAndResource;
 import com.zml.oa.entity.Resource;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.service.IBaseService;
 import com.zml.oa.service.IResourceService;
 import com.zml.oa.util.BeanUtils;
@@ -17,6 +21,9 @@ public class ResourceServiceImpl implements IResourceService {
 
 	@Autowired 
 	private IBaseService<Resource> baseService;
+	
+	@Autowired
+	protected IJdbcDao jdbcDao;
 	
 	@Override
 	public Resource getPermissions(Integer id) throws Exception {
@@ -72,6 +79,20 @@ public class ResourceServiceImpl implements IResourceService {
 	@Override
 	public void doDelete(Resource entity) throws Exception {
 		this.baseService.delete(entity);
+		
+	}
+
+	@Override
+	public List<Resource> getResourceList(Page<Resource> p) throws Exception {
+		return this.baseService.getListPage("Resource", new String[]{"available"}, new String[]{"1"}, p);
+	}
+
+	@Override
+	public void doDelete(String id) throws Exception {
+		String sql = "delete from T_RESOURCE where id=:id ";
+		Map<String, Object> paramMap = new HashMap<String, Object>();  
+	    paramMap.put("id", id);  
+		this.jdbcDao.delete(sql, paramMap);
 		
 	}
 

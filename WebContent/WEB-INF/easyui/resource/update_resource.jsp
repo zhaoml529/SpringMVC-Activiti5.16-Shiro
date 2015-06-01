@@ -32,20 +32,17 @@ $(function() {
 		url:"${ctx }/resourceAction/getMenuList",
 		idFiled:'id',
 	 	textFiled:'name',
-	 	parentField:'parentId',
-	 	onSelect:function(node){
-	 		//$("#pname").val(node.text);
-	 		alert(node.id);
-	 	}
+	 	parentField:'parentId'
 	});
 });
 </script>
 <div class="easyui-layout" style="padding:10px 20px">
     <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/>用户组信息</div>
     <form id="resource_form" method="post" >
+    	<input name="id" id="id"  type="hidden" />
         <div class="fitem">
             <label>资源名称:</label>
-            <input id="name" name="name" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="name" name="name" class="easyui-textbox easyui-validatebox" required="true" />
         </div>
         <div class="fitem">
             <label>资源类型:</label>
@@ -56,11 +53,11 @@ $(function() {
         </div>
         <div class="fitem">
             <label>资源路径:</label>
-            <input id="url" name="url" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="url" name="url" class="easyui-textbox easyui-validatebox" />
         </div>
         <div class="fitem">
             <label>权限字符串:</label>
-            <input id="url" name="permission" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="url" name="permission" class="easyui-textbox easyui-validatebox" required="true" />
         </div>
         <div class="fitem">
             <label>父编号名称:</label>

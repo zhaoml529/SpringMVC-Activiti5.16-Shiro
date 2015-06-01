@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.zml.oa.entity.GroupAndResource;
 import com.zml.oa.entity.Resource;
+import com.zml.oa.pagination.Page;
 
 public interface IResourceService {
 
@@ -15,6 +16,8 @@ public interface IResourceService {
 	
 	public List<Resource> getResourceListPage() throws Exception;
 	
+	public List<Resource> getResourceList(Page<Resource> p) throws Exception;
+	
 	public List<Resource> getResourceByType() throws Exception;
 	
 	public void doAdd(Resource entity) throws Exception;
@@ -22,5 +25,7 @@ public interface IResourceService {
 	public void doUpdate(Resource entity) throws Exception;
 	
 	public void doDelete(Resource entity) throws Exception;
+	
+	public void doDelete(String id) throws Exception;
 	
 }

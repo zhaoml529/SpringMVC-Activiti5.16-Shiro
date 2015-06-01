@@ -45,4 +45,12 @@ public class GroupAndResourceServiceImpl extends
 		return this.jdbcDao.delete(sql, paramMap);
 	}
 
+	@Override
+	public void doDelByResource(String resourceId) throws Exception {
+		String sql = "delete from T_GROUP_RESOURCE where resource_id=:resourceId ";
+		Map<String, Object> paramMap = new HashMap<String, Object>();  
+	    paramMap.put("resourceId", resourceId);  
+		this.jdbcDao.delete(sql, paramMap);
+	}
+
 }

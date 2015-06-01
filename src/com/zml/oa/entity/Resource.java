@@ -53,7 +53,7 @@ public class Resource implements Serializable {
 	
 	@Column(name = "parent_ids")
 	@NotEmpty(message="{resource.parentIds.not.empty}")
-	@Length(min = 5, max = 20, message = "{resource.parentIds.length.illegal}")
+	@Length(min = 2, max = 20, message = "{resource.parentIds.length.illegal}")
     private String parentIds; 						//父编号列表
 	
 	@Column(name = "available")
