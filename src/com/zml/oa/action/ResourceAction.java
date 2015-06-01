@@ -12,8 +12,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.zml.oa.entity.Message;
 import com.zml.oa.entity.Resource;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
@@ -65,18 +67,18 @@ public class ResourceAction {
 //		return this.resourceService.getResourceByType();
 //	}
 	
-	@RequestMapping(value = "/doAdd")
-	public String doAdd(@Valid @ModelAttribute("res") Resource res, 
-						 BindingResult results,
-						 Model model) throws Exception {
-		if(results.hasErrors()){
-			return toAdd(model);
-		}
-		
-		res.setAvailable(1);
-		this.resourceService.doAdd(res);
-		return "redirect:/resourceAction/listResource_page";
-	}
+//	@RequestMapping(value = "/doAdd")
+//	public String doAdd(@Valid @ModelAttribute("res") Resource res, 
+//						 BindingResult results,
+//						 Model model) throws Exception {
+//		if(results.hasErrors()){
+//			return toAdd(model);
+//		}
+//		
+//		res.setAvailable(1);
+//		this.resourceService.doAdd(res);
+//		return "redirect:/resourceAction/listResource_page";
+//	}
 	
 	@RequestMapping(value = "/toUpdate/{id}")
 	public String toUpdate(@PathVariable("id") Integer id, Model model) throws Exception{
@@ -123,5 +125,25 @@ public class ResourceAction {
 			throw e;
 		}
 		return "redirect:/resourceAction/listResource_page";
+	}
+	
+	/**
+	 * 获取菜单树-easyui
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value ="/getMenuList")
+	@ResponseBody
+	public List<Resource> getMenuList() throws Exception{
+		List<Resource> menuList = this.resourceService.getResourceByType();
+		return menuList;
+	} 
+	
+	@RequestMapping(value = "/doAdd")
+	@ResponseBody
+	public Message doAdd(@ModelAttribute Resource resource) throws Exception{
+		resource.setAvailable(1);
+		this.resourceService.doAdd(resource);
+		return new Message(Boolean.TRUE, "添加成功！");
 	}
 }

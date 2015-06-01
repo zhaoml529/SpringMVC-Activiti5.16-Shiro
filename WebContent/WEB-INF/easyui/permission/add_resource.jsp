@@ -25,9 +25,24 @@
     }
 </style>
 
+<script type="text/javascript">
+$(function() {
+	$("#parentId").combotree({
+		width:171,
+		url:"${ctx }/resourceAction/getMenuList",
+		idFiled:'id',
+	 	textFiled:'name',
+	 	parentField:'parentId',
+	 	onSelect:function(node){
+	 		//$("#pname").val(node.text);
+	 		alert(node.id);
+	 	}
+	});
+});
+</script>
 <div class="easyui-layout" style="padding:10px 20px">
     <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/>用户组信息</div>
-    <form id="group_form" method="post" >
+    <form id="resource_form" method="post" >
         <div class="fitem">
             <label>资源名称:</label>
             <input id="name" name="name" class="easyui-textbox easyui-validatebox" required="true">
@@ -50,6 +65,10 @@
         <div class="fitem">
             <label>父编号名称:</label>
             <input name="parentId"  class="easyui-textbox" id="parentId" type="text"/>
+        </div>
+        <div class="fitem">
+            <label>父编号列表:</label>
+            <input name="parentIds"  class="easyui-textbox" id="parentIds" type="text"/>
         </div>
         <div class="fitem">
             <label>是否启用:</label>
