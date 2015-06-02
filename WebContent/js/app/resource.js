@@ -2,7 +2,6 @@
  * 资源管理
  */
 
-
 var resource_treegrid;
 var resource_form;
 var resource_dialog;
