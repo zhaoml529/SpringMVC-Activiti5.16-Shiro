@@ -40,4 +40,5 @@ Shiro实现登录认证和权限控制，结合Ehcache缓存权限列表，毕�
 
 首页
 --------
-![](https://github.com/zhaoml529/SpringOA/raw/master/WebContent/WEB-INF/images/main.jpg)  
+![](https://github.com/zhaoml529/SpringOA/tree/EasyUI/WebContent/images/git_main.jpg)  
+    
