@@ -2,6 +2,7 @@ SpringOA简介
 ========
 
 基于SpringMVC+Shiro+Activiti 5.16 的简单OA，可以快速入门Activiti学习用。
+此版本前台使用的是EasyUI
 
 框架简介
 --------
