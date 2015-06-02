@@ -38,7 +38,9 @@ Shiro实现登录认证和权限控制，结合Ehcache缓存权限列表，毕�
 2.加入缓存 ehcache. --已实现<br>
 3.前端页面jquery EasyUI<br>
 
-首页
+系统页面
 --------
-![](https://github.com/zhaoml529/SpringOA/tree/EasyUI/WebContent/images/git_main.jpg)  
+![github](https://raw.githubusercontent.com/zhaoml529/SpringOA/EasyUI/WebContent/images/git_main.jpg "github")
+
+![github](https://raw.githubusercontent.com/zhaoml529/SpringOA/EasyUI/WebContent/images/git_index.jpg "github")  
     
