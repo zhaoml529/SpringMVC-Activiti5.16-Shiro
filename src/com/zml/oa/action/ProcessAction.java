@@ -44,7 +44,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zml.oa.entity.BaseVO;
+import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.User;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
@@ -316,26 +318,26 @@ public class ProcessAction {
      * @return
      * @throws Exception
      */
-    @RequiresPermissions("admin:process:*")
-    @RequestMapping(value = "/process/listProcess_page")
-    public ModelAndView listProcess(HttpServletRequest request) throws Exception{
-    	ModelAndView mav = new ModelAndView("workflow/list_process");
-    	
-    	//objects保存两个对象，Object[0]:是ProcessDefinition（流程定义），Object[1]:是Deployment（流程部署）
-    	List<Object[]> objects = new ArrayList<Object[]>();
-    	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
-    	int[] pageParams = PaginationThreadUtils.setPage(processDefinitionQuery.list().size());
-    	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
-    	for (ProcessDefinition processDefinition : processDefinitionList) {
-            String deploymentId = processDefinition.getDeploymentId();
-            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-            objects.add(new Object[]{processDefinition, deployment});
-        }
-    	Pagination pagination = PaginationThreadUtils.get();
-    	mav.addObject("obj", objects);
-    	mav.addObject("page", pagination.getPageStr());
-    	return mav;
-    }
+//    @RequiresPermissions("admin:process:*")
+//    @RequestMapping(value = "/process/listProcess_page")
+//    public ModelAndView listProcess(HttpServletRequest request) throws Exception{
+//    	ModelAndView mav = new ModelAndView("workflow/list_process");
+//    	
+//    	//objects保存两个对象，Object[0]:是ProcessDefinition（流程定义），Object[1]:是Deployment（流程部署）
+//    	List<Object[]> objects = new ArrayList<Object[]>();
+//    	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
+//    	int[] pageParams = PaginationThreadUtils.setPage(processDefinitionQuery.list().size());
+//    	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
+//    	for (ProcessDefinition processDefinition : processDefinitionList) {
+//            String deploymentId = processDefinition.getDeploymentId();
+//            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+//            objects.add(new Object[]{processDefinition, deployment});
+//        }
+//    	Pagination pagination = PaginationThreadUtils.get();
+//    	mav.addObject("obj", objects);
+//    	mav.addObject("page", pagination.getPageStr());
+//    	return mav;
+//    }
     
     /**
      * 删除部署的流程，级联删除流程实例 true。
@@ -496,6 +498,33 @@ public class ProcessAction {
         repositoryService.addModelEditorSource(modelData.getId(), modelNode.toString().getBytes("utf-8"));
 
         return "redirect:/processAction/process/listProcess_page";
+    }
+    
+    
+    /**
+     * 以下方法是对应easyui的写法
+     * 
+     * @author ZML
+     */
+    
+    @RequiresPermissions("admin:process:*")
+    @RequestMapping(value = "/process/listProcess")
+    public Datagrid<Object[]> listProcess(@RequestParam(value = "page", required = false) Integer page, 
+    								@RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+    	
+    	//objects保存两个对象，Object[0]:是ProcessDefinition（流程定义），Object[1]:是Deployment（流程部署）
+    	List<Object[]> objects = new ArrayList<Object[]>();
+    	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
+    	Page<Object[]> p = new Page<Object[]>(page, rows);
+    	int[] pageParams = p.getPageParams(processDefinitionQuery.list().size());
+    	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
+    	for (ProcessDefinition processDefinition : processDefinitionList) {
+            String deploymentId = processDefinition.getDeploymentId();
+            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+            objects.add(new Object[]{processDefinition, deployment});
+        }
+    	Datagrid<Object[]> dataGrid = new Datagrid<Object[]>(p.getTotal(), objects);
+    	return dataGrid;
     }
     
 }
