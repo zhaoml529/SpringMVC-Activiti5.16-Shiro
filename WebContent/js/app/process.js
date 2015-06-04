@@ -7,55 +7,25 @@ var process_form;
 var process_dialog;
 
 $(function() {
-	resource_treegrid = $("#process").datagrid({
-		width : 'auto',
-		height : $(this).height()-120,
-		url : ctx+"/processAction/process/listProcess_page",
+	process_datagrid = $("#process").datagrid({
+        url: ctx+"/processAction/process/listProcess",
+        width : 'auto',
+		height :  $(this).height()-85,
+		pagination:true,
 		rownumbers:true,
-		animate: true,
-		collapsible: true,
-		fitColumns: true,
 		border:false,
+		singleSelect:true,
 		striped:true,
-		cascadeCheck:true,
-		deepCascadeCheck:true,
-		idField: 'id',
-		treeField: 'name',
-		parentField : 'parentId',
 		columns : [ 
 		    [ 
-                {field : 'name',title : '资源名称',width : fixWidth(0.2)},
-                {field : 'type',title : '资源类型',width : fixWidth(0.1),align : 'center',
-            	    formatter:function(value,row){
-            		    if("menu"==row.type){
-            		    	return "<font color=green>菜单<font>";
-            		    }else{
-            		    	return "<font color=red>操作<font>";  
-            		    }
-					}
-                },
-                {field : 'url',title : '资源路径',width : fixWidth(0.2),align : 'center'},
-                {field : 'permission',title : '权限字符串',width : fixWidth(0.2),align : 'left'},
-			    {field : 'available',title : '是否启用',width : fixWidth(0.1),align : 'center',
-		            formatter:function(value,row){
-		            	if("1"==row.available){
-		            		return "<font color=green>是<font>";
-		            	}else{
-		            		return "<font color=red>否<font>";  
-		            	}
-					}
-                }
-                
+                {field : 'id',title : 'ProcessDefinitionId',width : fixWidth(0.2)},
+                {field : 'deploymentId',title : 'DeploymentId',width : fixWidth(0.1),align : 'center'},
+                {field : 'name',title : '名称',width : fixWidth(0.2),align : 'center'},
+                {field : 'key',title : 'key',width : fixWidth(0.2),align : 'left'},
+			    {field : 'version',title : '版本号',width : fixWidth(0.1),align : 'center'}
             ] 
 		],
-		toolbar:'#tb',
-        onContextMenu: function (e, row) {
-            e.preventDefault();
-            $('#resource_treegrid_menu').menu('show', {
-                left: e.pageX,
-                top: e.pageY
-            });
-        }
+		toolbar:'#tb'
 	});
     //修正宽高
 	function fixHeight(percent)   
@@ -69,30 +39,6 @@ $(function() {
 	}
 });
 
-//收缩
-function collapseAll(){
-	var node = resource_treegrid.treegrid('getSelected');
-	if (node) {
-		resource_treegrid.treegrid('collapseAll', node.id);
-	} else {
-		resource_treegrid.treegrid('collapseAll');
-	}
-}
-
-//展开
-function expandAll(){
-	var node = resource_treegrid.treegrid('getSelected');
-	if (node) {
-		resource_treegrid.treegrid('expandAll', node.id);
-	} else {
-		resource_treegrid.treegrid('expandAll');
-	}
-}
-
-//刷新
-function refresh(){
-	resource_treegrid.treegrid('reload');
-}
 
 
 //----------------Resource-------------------

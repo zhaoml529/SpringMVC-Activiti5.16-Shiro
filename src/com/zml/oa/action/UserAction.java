@@ -94,7 +94,6 @@ public class UserAction {
 	@RequestMapping("/toList")
 	@ResponseBody
 	public Datagrid<User> userList(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
-		System.out.println(page+"---"+rows);
 		Page<User> p = new Page<User>(page, rows);
 		this.userService.getUserList(p);
 		System.out.println(p.getTotal()+"---"+p.getResult().size());

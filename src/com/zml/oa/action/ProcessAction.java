@@ -506,12 +506,16 @@ public class ProcessAction {
      * 
      * @author ZML
      */
+    @RequestMapping("/process/toListProcess")
+    public String toListProcess() throws Exception{
+    	return "workflow/list_process";
+    }
     
-    @RequiresPermissions("admin:process:*")
-    @RequestMapping(value = "/process/listProcess")
-    public Datagrid<Object[]> listProcess(@RequestParam(value = "page", required = false) Integer page, 
-    								@RequestParam(value = "rows", required = false) Integer rows) throws Exception{
-    	
+	@RequestMapping("/process/listProcess")
+	@ResponseBody
+    public Datagrid<Object[]> listProcess(@RequestParam(value = "page", required = false) Integer page,
+    									  @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+    	System.out.println(page+"---"+rows);
     	//objects保存两个对象，Object[0]:是ProcessDefinition（流程定义），Object[1]:是Deployment（流程部署）
     	List<Object[]> objects = new ArrayList<Object[]>();
     	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
