@@ -235,7 +235,10 @@ public class VacationAction {
 		variables.put("isPass", completeFlag);
 		if(completeFlag){
 			//由userTask自动分配审批权限
-//			variables.put("auditGroup", "hr");
+			//variables.put("auditGroup", "hr");
+			
+			//此处需要修改，不能根据人来判断审批是否结束。应该根据流程实例id(processInstanceId)来判定。
+			//判断指定ID的实例是否存在，如果结果为空，则代表流程结束，实例已被删除(移到历史库中)
 			if("hr".equals(groupType)){
 				vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
 			}
