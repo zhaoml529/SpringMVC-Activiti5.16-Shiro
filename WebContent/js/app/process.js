@@ -8,7 +8,6 @@ var process_dialog;
 
 $(function() {
 	process_datagrid = $("#process").datagrid({
-        url: ctx+"/processAction/process/listProcess",
         width : 'auto',
 		height :  $(this).height()-85,
 		pagination:true,
@@ -18,11 +17,16 @@ $(function() {
 		striped:true,
 		columns : [ 
 		    [ 
-                {field : 'id',title : 'ProcessDefinitionId',width : fixWidth(0.2)},
+                {field : 'id',title : 'ProcessDefinitionId',width : fixWidth(0.1)},
                 {field : 'deploymentId',title : 'DeploymentId',width : fixWidth(0.1),align : 'center'},
-                {field : 'name',title : '名称',width : fixWidth(0.2),align : 'center'},
-                {field : 'key',title : 'key',width : fixWidth(0.2),align : 'left'},
-			    {field : 'version',title : '版本号',width : fixWidth(0.1),align : 'center'}
+                {field : 'name',title : '名称',width : fixWidth(0.1),align : 'center'},
+                {field : 'key',title : 'key',width : fixWidth(0.1),align : 'left'},
+			    {field : 'version',title : '版本号',width : fixWidth(0.1),align : 'center'},
+                {field : 'resourceName',title : 'XML',width : fixWidth(0.1),align : 'center'},
+                {field : 'diagramResourceName',title : '图片',width : fixWidth(0.1),align : 'center'},
+                {field : 'deploymentTime',title : '部署时间',width : fixWidth(0.1),align : 'center'},
+                {field : 'suspended',title : '是否挂起',width : fixWidth(0.1),align : 'center'},
+                {field : 'caozuo',title : '操作',width : fixWidth(0.1),align : 'center'}
             ] 
 		],
 		toolbar:'#tb'

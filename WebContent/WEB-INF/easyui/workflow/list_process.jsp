@@ -34,7 +34,52 @@
 			</div>
 		</div>
 		
-		<table id="process" title="流程定义"></table>
+		<table id="process" title="流程定义">
+			<thead>
+				<tr>
+					<th data-options="field:'id'">ProcessDefinitionId</th>
+					<th data-options="field:'deploymentId'">DeploymentId</th>
+					<th data-options="field:'name'">名称</th>
+					<th data-options="field:'key'">KEY</th>
+					<th data-options="field:'version'">版本号</th>
+					<th data-options="field:'resourceName'">XML</th>
+					<th data-options="field:'diagramResourceName'">图片</th>
+					<th data-options="field:'deploymentTime'">部署时间</th>
+					<th data-options="field:'suspended'">是否挂起</th>
+					<th data-options="field:'caozuo'">操作</th>
+				</tr>
+		    </thead>
+			<tbody id="tbody">
+	              <c:forEach items="${rows }" var="object">
+					<c:set var="process" value="${object[0] }" />
+					<c:set var="deployment" value="${object[1] }" />
+					<tr>
+						<td>${process.id }</td>
+						<td>${process.deploymentId }</td>
+						<td>${process.name }</td>
+						<td>${process.key }</td>
+						<td>${process.version }</td>
+						<td><a target="_blank" href='${ctx }/processAction/process/process-definition?processDefinitionId=${process.id}&resourceType=xml'>${process.resourceName }</a></td>
+						<td><a target="_blank" href='${ctx }/processAction/process/process-definition?processDefinitionId=${process.id}&resourceType=image'>${process.diagramResourceName }</a></td>
+						<td><fmt:formatDate value="${deployment.deploymentTime }"  type="both"/></td>
+						<td>${process.suspended} |
+							<c:if test="${process.suspended }">
+								<a href="${ctx }/processAction/process/updateProcessStatusByProDefinitionId?status=active&processDefinitionId=${process.id}">激活</a>
+							</c:if>
+							<c:if test="${!process.suspended }">
+								<a href="${ctx }/processAction/process/updateProcessStatusByProDefinitionId?status=suspend&processDefinitionId=${process.id}">挂起</a>
+							</c:if>
+						</td>
+						<td>
+	                        <a href='${ctx }/processAction/process/delete?deploymentId=${process.deploymentId}'>删除</a>|
+	                        <a href='${ctx }/processAction/process/redeploy/single?resourceName=${process.resourceName }&deploymentId=${process.deploymentId}'>加载</a>|
+	                        <%-- <a href='${ctx }/processAction/process/redeploy/single?resourceName=${process.resourceName }&diagramResourceName=${process.diagramResourceName }&deploymentId=${process.deploymentId}'>加载</a>| --%>
+	                        <a href='${ctx }/processAction/process/convert_to_model?processDefinitionId=${process.id}'>转换为Model</a>
+	                    </td>
+					</tr>
+				  </c:forEach>
+              </tbody>
+		</table>
 	</div>
 	</div>
   </body>

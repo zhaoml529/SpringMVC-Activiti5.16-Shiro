@@ -21,6 +21,7 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
@@ -512,12 +513,11 @@ public class ProcessAction {
     }
     
 	@RequestMapping("/process/listProcess")
-	@ResponseBody
-    public Datagrid<Object[]> listProcess(@RequestParam(value = "page", required = false) Integer page,
-    									  @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
-    	System.out.println(page+"---"+rows);
+    public String listProcess(@RequestParam(value = "page", required = false) Integer page,
+    									  @RequestParam(value = "rows", required = false) Integer rows,
+    									  Model model) throws Exception{
     	//objects保存两个对象，Object[0]:是ProcessDefinition（流程定义），Object[1]:是Deployment（流程部署）
-    	List<Object[]> objects = new ArrayList<Object[]>();
+    	List<Object[]> listObj = new ArrayList<Object[]>();
     	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
     	Page<Object[]> p = new Page<Object[]>(page, rows);
     	int[] pageParams = p.getPageParams(processDefinitionQuery.list().size());
@@ -525,10 +525,14 @@ public class ProcessAction {
     	for (ProcessDefinition processDefinition : processDefinitionList) {
             String deploymentId = processDefinition.getDeploymentId();
             Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-            objects.add(new Object[]{processDefinition, deployment});
+            listObj.add(new Object[]{processDefinition, deployment});
         }
-    	Datagrid<Object[]> dataGrid = new Datagrid<Object[]>(p.getTotal(), objects);
-    	return dataGrid;
+//    	Datagrid<Object[]> dataGrid = new Datagrid<Object[]>(p.getTotal(), listObj);
+    	model.addAttribute("rows", listObj);
+    	model.addAttribute("total", p.getTotal());
+    	System.out.println(p.getTotal());
+//    	return dataGrid;
+    	return "workflow/list_process";
     }
     
 }

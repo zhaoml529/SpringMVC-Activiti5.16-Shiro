@@ -60,6 +60,12 @@ public class Page<T> {
 	 * @return
 	 */
 	public int[] getPageParams(Integer total) {
+		if(this.page == null){
+			this.page = 1;
+		}
+		if(this.rows == null){
+			this.rows = 10;
+		}
 		int firstResult = (this.page - 1) * this.rows;
 		int maxResult = this.rows;
 		this.total = total;
