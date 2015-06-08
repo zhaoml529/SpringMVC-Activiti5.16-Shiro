@@ -17,11 +17,11 @@ $(function() {
 		striped:true,
 		columns : [ 
 		    [ 
-                {field : 'id',title : 'ProcessDefinitionId',width : fixWidth(0.1)},
-                {field : 'deploymentId',title : 'DeploymentId',width : fixWidth(0.1),align : 'center'},
+                {field : 'id',title : 'ProcessDefinitionId',width : fixWidth(0.2)},
+                {field : 'deploymentId',title : 'DeploymentId',width : fixWidth(0.05),align : 'center'},
                 {field : 'name',title : '名称',width : fixWidth(0.1),align : 'center'},
                 {field : 'key',title : 'key',width : fixWidth(0.1),align : 'left'},
-			    {field : 'version',title : '版本号',width : fixWidth(0.1),align : 'center'},
+			    {field : 'version',title : '版本号',width : fixWidth(0.05),align : 'center'},
                 {field : 'resourceName',title : 'XML',width : fixWidth(0.1),align : 'center'},
                 {field : 'diagramResourceName',title : '图片',width : fixWidth(0.1),align : 'center'},
                 {field : 'deploymentTime',title : '部署时间',width : fixWidth(0.1),align : 'center'},
