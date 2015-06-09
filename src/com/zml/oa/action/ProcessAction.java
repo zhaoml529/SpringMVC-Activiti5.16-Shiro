@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.stream.XMLInputFactory;
@@ -21,7 +20,6 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
@@ -39,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -513,26 +510,33 @@ public class ProcessAction {
     }
     
 	@RequestMapping("/process/listProcess")
-    public String listProcess(@RequestParam(value = "page", required = false) Integer page,
-    									  @RequestParam(value = "rows", required = false) Integer rows,
-    									  Model model) throws Exception{
-    	//objects保存两个对象，Object[0]:是ProcessDefinition（流程定义），Object[1]:是Deployment（流程部署）
-    	List<Object[]> listObj = new ArrayList<Object[]>();
+	@ResponseBody
+    public Datagrid<com.zml.oa.entity.ProcessDefinitionEntity> listProcess(@RequestParam(value = "page", required = false) Integer page,
+    									  @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
     	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
     	Page<Object[]> p = new Page<Object[]>(page, rows);
     	int[] pageParams = p.getPageParams(processDefinitionQuery.list().size());
     	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
+    	
+    	com.zml.oa.entity.ProcessDefinitionEntity pd = new com.zml.oa.entity.ProcessDefinitionEntity();
+    	List<com.zml.oa.entity.ProcessDefinitionEntity> pdList = new  ArrayList<com.zml.oa.entity.ProcessDefinitionEntity>();
     	for (ProcessDefinition processDefinition : processDefinitionList) {
             String deploymentId = processDefinition.getDeploymentId();
             Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-            listObj.add(new Object[]{processDefinition, deployment});
+            //封装到ProcessDefinitionEntity中
+            pd.setId(processDefinition.getId());
+            pd.setName(processDefinition.getName());
+            pd.setKey(processDefinition.getKey());
+            pd.setDeploymentId(processDefinition.getDeploymentId());
+            pd.setVersion(processDefinition.getVersion());
+            pd.setResourceName(processDefinition.getResourceName());
+            pd.setDiagramResourceName(processDefinition.getDiagramResourceName());
+            pd.setDeploymentTime(deployment.getDeploymentTime());
+            pd.setSuspended(processDefinition.isSuspended());
+            pdList.add(pd);
         }
-//    	Datagrid<Object[]> dataGrid = new Datagrid<Object[]>(p.getTotal(), listObj);
-    	model.addAttribute("rows", listObj);
-    	model.addAttribute("total", p.getTotal());
-    	System.out.println(p.getTotal());
-//    	return dataGrid;
-    	return "workflow/list_process";
+    	Datagrid<com.zml.oa.entity.ProcessDefinitionEntity> dataGrid = new Datagrid<com.zml.oa.entity.ProcessDefinitionEntity>(p.getTotal(), pdList);
+    	return dataGrid;
     }
     
 }

@@ -8,6 +8,7 @@ var process_dialog;
 
 $(function() {
 	process_datagrid = $("#process").datagrid({
+        url: ctx+"/processAction/process/listProcess",
         width : 'auto',
 		height :  $(this).height()-85,
 		pagination:true,
@@ -15,22 +16,40 @@ $(function() {
 		border:false,
 		singleSelect:true,
 		striped:true,
+//        pageList : [2, 5, 10, 15, 20 ],
+//        pageSize:2,
 		columns : [ 
 		    [ 
                 {field : 'id',title : 'ProcessDefinitionId',width : fixWidth(0.2)},
-                {field : 'deploymentId',title : 'DeploymentId',width : fixWidth(0.05),align : 'center'},
+                {field : 'deploymentId',title : 'DeploymentId',width : fixWidth(0.1),align : 'center'},
                 {field : 'name',title : '名称',width : fixWidth(0.1),align : 'center'},
-                {field : 'key',title : 'key',width : fixWidth(0.1),align : 'left'},
-			    {field : 'version',title : '版本号',width : fixWidth(0.05),align : 'center'},
-                {field : 'resourceName',title : 'XML',width : fixWidth(0.1),align : 'center'},
-                {field : 'diagramResourceName',title : '图片',width : fixWidth(0.1),align : 'center'},
+                {field : 'key',title : 'key',width : fixWidth(0.1),align : 'center'},
+			    {field : 'version',title : '版本号',width : fixWidth(0.1),align : 'center'},
+                {field : 'resourceName',title : 'XML',width : fixWidth(0.1),align : 'center',
+			    	formatter:function(value, row){
+			    		return "<a target='_blank' id='xml' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=xml'>"+row.resourceName+"</a>"
+			    	}
+                },
+                {field : 'diagramResourceName',title : '图片',width : fixWidth(0.1),align : 'center',
+			    	formatter:function(value, row){
+			    		return "<a target='_blank' id='image' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=image'>"+row.diagramResourceName+"</a>"
+			    	}
+                },
                 {field : 'deploymentTime',title : '部署时间',width : fixWidth(0.1),align : 'center'},
-                {field : 'suspended',title : '是否挂起',width : fixWidth(0.1),align : 'center'},
-                {field : 'caozuo',title : '操作',width : fixWidth(0.1),align : 'center'}
+                {field : 'suspended',title : '是否挂起',width : fixWidth(0.1),align : 'center',
+		          	formatter:function(value, row){
+		        		if(row.suspended){
+		        			return "<a href='updateProcessStatusByProDefinitionId?status=active&processDefinitionId="+row.id+"'>激活</a>";
+		        		}else{
+		        			return "<a href='updateProcessStatusByProDefinitionId?status=suspend&processDefinitionId="+row.id+"'>挂起</a>";  
+		        		}
+					}
+                }
             ] 
 		],
 		toolbar:'#tb'
 	});
+	
     //修正宽高
 	function fixHeight(percent)   
 	{   

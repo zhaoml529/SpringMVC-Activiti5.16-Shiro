@@ -9,7 +9,7 @@ var resource_dialog;
 $(function() {
 	resource_treegrid = $("#resource").treegrid({
 		width : 'auto',
-		height : $(this).height()-120,
+		height : $(this).height()-85,
 		url : ctx+"/resourceAction/listResource",
 		rownumbers:true,
 		animate: true,

@@ -27,7 +27,7 @@
 		 <div id="tb">
 			<div style="margin:5px 5px 5px 5px;">
 				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showResource();">删除</a>
-				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="openResource();">记载</a>
+				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="openResource();">加载</a>
 				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="delRows();">转换为Model</a>&nbsp;|&nbsp;
 				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="expandAll();">部署流程</a>
 				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="collapseAll();">重新部署全部流程</a>
@@ -35,7 +35,7 @@
 		</div>
 		
 		<table id="process" title="流程定义">
-			<thead>
+<%-- 			<thead>
 				<tr>
 					<th data-options="field:'id'">ProcessDefinitionId</th>
 					<th data-options="field:'deploymentId'">DeploymentId</th>
@@ -48,7 +48,7 @@
 					<th data-options="field:'suspended'">是否挂起</th>
 					<th data-options="field:'caozuo'">操作</th>
 				</tr>
-		    </thead>
+		    </thead> 
 			<tbody id="tbody">
 	              <c:forEach items="${rows }" var="object">
 					<c:set var="process" value="${object[0] }" />
@@ -73,12 +73,12 @@
 						<td>
 	                        <a href='${ctx }/processAction/process/delete?deploymentId=${process.deploymentId}'>删除</a>|
 	                        <a href='${ctx }/processAction/process/redeploy/single?resourceName=${process.resourceName }&deploymentId=${process.deploymentId}'>加载</a>|
-	                        <%-- <a href='${ctx }/processAction/process/redeploy/single?resourceName=${process.resourceName }&diagramResourceName=${process.diagramResourceName }&deploymentId=${process.deploymentId}'>加载</a>| --%>
+	                        <a href='${ctx }/processAction/process/redeploy/single?resourceName=${process.resourceName }&diagramResourceName=${process.diagramResourceName }&deploymentId=${process.deploymentId}'>加载</a>|
 	                        <a href='${ctx }/processAction/process/convert_to_model?processDefinitionId=${process.id}'>转换为Model</a>
 	                    </td>
 					</tr>
 				  </c:forEach>
-              </tbody>
+              </tbody> --%>
 		</table>
 	</div>
 	</div>

@@ -29,6 +29,7 @@
 <script type="text/javascript" src="${ctx}/js/jquery-migrate-1.2.1.min.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx}/css/themes/icon.css">
 <link rel="stylesheet" type="text/css" href="${ctx}/css/easyui/common.css">
+<link rel="stylesheet" type="text/css" href="${ctx }/css/tipsy.css">
 <%-- <link rel="stylesheet" type="text/css" href="${ctx}/css/bootstrap.min.css"> --%>
 <%-- <link rel="stylesheet" type="text/css" href="${ctx}/css/easyui/templatemo_main.css"> --%>
 
@@ -40,6 +41,7 @@
 <script type="text/javascript" src="${ctx}/js/easyui/easyui-lang-zh_CN.js"></script>
 <%-- <script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script> --%>
 <script type="text/javascript" src="${ctx}/js/easyui/jqueryUtil.js"></script>
+<script type="text/javascript" src="${ctx }/js/easyui/login/jquery.tipsy.js"></script>
 
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine.js"></script>
 <script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine-zh_CN.js"></script>
