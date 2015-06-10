@@ -44,6 +44,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.Message;
+import com.zml.oa.entity.ProcessInstanceEntity;
 import com.zml.oa.entity.User;
 import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.Pagination;
@@ -281,19 +282,39 @@ public class ProcessAction {
      */
     
     /**
+     * 跳转管理运行中的流程页面
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/process/toListProcessRunning")
+    public String toListProcessRunning() throws Exception{
+    	return "workflow/list_process_running";
+    }
+    
+    /**
      * 管理运行中的流程
      * @param model
      * @return
      * @throws Exception
      */
     @RequiresPermissions("admin:process:*")
-    @RequestMapping(value="/process/runningProcess_page")
-    public Datagrid<ProcessInstance> listRuningProcess(@RequestParam(value = "page", required = false) Integer page,
+    @RequestMapping(value="/process/runningProcess")
+    @ResponseBody
+    public Datagrid<ProcessInstanceEntity> listRuningProcess(@RequestParam(value = "page", required = false) Integer page,
 			  						 @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
     	Page<ProcessInstance> p = new Page<ProcessInstance>(page, rows);
     	List<ProcessInstance> list = this.processService.listRuningProcess(p);
-//		return "workflow/running_process";
-    	return new Datagrid<ProcessInstance>(p.getTotal(), list);
+    	List<ProcessInstanceEntity> pieList = new ArrayList<ProcessInstanceEntity>();
+    	for(ProcessInstance processInstance : list){
+    		ProcessInstanceEntity pie = new ProcessInstanceEntity();
+    		pie.setId(processInstance.getId());
+    		pie.setProcessInstanceId(processInstance.getProcessInstanceId());
+    		pie.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+    		pie.setActivityId(processInstance.getActivityId());
+    		pie.setSuspended(processInstance.isSuspended());
+    		pieList.add(pie);
+    	}
+    	return new Datagrid<ProcessInstanceEntity>(p.getTotal(), pieList);
     }
     
     

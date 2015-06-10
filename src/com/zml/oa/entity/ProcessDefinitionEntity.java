@@ -3,6 +3,11 @@ package com.zml.oa.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * 流程定义实体 act_re_procdef，此实体类是配合easyui使用
+ * @author ZML
+ *
+ */
 public class ProcessDefinitionEntity implements Serializable {
 	
 	/**
