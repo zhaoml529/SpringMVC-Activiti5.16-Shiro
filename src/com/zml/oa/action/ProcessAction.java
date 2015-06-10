@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.Datagrid;
+import com.zml.oa.entity.Message;
 import com.zml.oa.entity.User;
 import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.Pagination;
@@ -230,20 +231,6 @@ public class ProcessAction {
     	model.addAttribute("baseList", baseVO);
     	return "apply/list_running";
     }
-    /**
-     * 管理运行中的流程
-     * @param model
-     * @return
-     * @throws Exception
-     */
-    @RequiresPermissions("admin:process:*")
-    @RequestMapping(value="/process/runningProcess_page")
-    public String listRuningProcess(Model model) throws Exception{
-    	List<ProcessInstance> list = this.processService.listRuningProcess(model);
-    	model.addAttribute("list", list);
-    	model.addAttribute("taskType", BaseVO.RUNNING);
-		return "workflow/running_process";
-    }
     
     /**
      * 管理已结束的流程
@@ -284,7 +271,80 @@ public class ProcessAction {
         }
     	return "redirect:/processAction/process/runningProcess_page";
     }
+
     
+    
+    /**
+     * 以下方法是对应easyui的写法
+     * 
+     * @author ZML
+     */
+    
+    /**
+     * 管理运行中的流程
+     * @param model
+     * @return
+     * @throws Exception
+     */
+    @RequiresPermissions("admin:process:*")
+    @RequestMapping(value="/process/runningProcess_page")
+    public Datagrid<ProcessInstance> listRuningProcess(@RequestParam(value = "page", required = false) Integer page,
+			  						 @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+    	Page<ProcessInstance> p = new Page<ProcessInstance>(page, rows);
+    	List<ProcessInstance> list = this.processService.listRuningProcess(p);
+//		return "workflow/running_process";
+    	return new Datagrid<ProcessInstance>(p.getTotal(), list);
+    }
+    
+    
+    /**
+     * 跳转流程定义页面
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/process/toListProcess")
+    public String toListProcess() throws Exception{
+    	return "workflow/list_process";
+    }
+    
+    /**
+     * 流程定义的加载
+     * @param page
+     * @param rows
+     * @return
+     * @throws Exception
+     */
+	@RequestMapping("/process/listProcess")
+	@ResponseBody
+    public Datagrid<com.zml.oa.entity.ProcessDefinitionEntity> listProcess(@RequestParam(value = "page", required = false) Integer page,
+    									  @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+    	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
+    	Page<Object[]> p = new Page<Object[]>(page, rows);
+    	int[] pageParams = p.getPageParams(processDefinitionQuery.list().size());
+    	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
+    	
+    	List<com.zml.oa.entity.ProcessDefinitionEntity> pdList = new  ArrayList<com.zml.oa.entity.ProcessDefinitionEntity>();
+    	for (ProcessDefinition processDefinition : processDefinitionList) {
+    		com.zml.oa.entity.ProcessDefinitionEntity pd = new com.zml.oa.entity.ProcessDefinitionEntity();
+            String deploymentId = processDefinition.getDeploymentId();
+            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+            //封装到ProcessDefinitionEntity中
+            pd.setId(processDefinition.getId());
+            pd.setName(processDefinition.getName());
+            pd.setKey(processDefinition.getKey());
+            pd.setDeploymentId(processDefinition.getDeploymentId());
+            pd.setVersion(processDefinition.getVersion());
+            pd.setResourceName(processDefinition.getResourceName());
+            pd.setDiagramResourceName(processDefinition.getDiagramResourceName());
+            pd.setDeploymentTime(deployment.getDeploymentTime());
+            pd.setSuspended(processDefinition.isSuspended());
+            pdList.add(pd);
+        }
+    	Datagrid<com.zml.oa.entity.ProcessDefinitionEntity> dataGrid = new Datagrid<com.zml.oa.entity.ProcessDefinitionEntity>(p.getTotal(), pdList);
+    	return dataGrid;
+    }
+	
+	
     /**
      * 激活、挂起流程实例-根据processDefinitionId
      * @param status
@@ -295,60 +355,80 @@ public class ProcessAction {
      */
     @RequiresPermissions("admin:process:suspend,active")
     @RequestMapping(value = "/process/updateProcessStatusByProDefinitionId")
-    public String updateProcessStatusByProDefinitionId(
+    @ResponseBody
+    public Message updateProcessStatusByProDefinitionId(
     		@RequestParam("status") String status,
-    		@RequestParam("processDefinitionId") String processDefinitionId,
-            RedirectAttributes redirectAttributes) throws Exception{
+    		@RequestParam("processDefinitionId") String processDefinitionId) throws Exception{
     	//如果用/{status}/{processDefinitionId} rest风格，@PathVariable获取的processDefinitionId 为com.zml.oa,实际是com.zml.oa.vacation:1:32529.难道是BUG?
+    	Message message = new Message();
     	if (status.equals("active")) {
-            redirectAttributes.addFlashAttribute("message", "已激活ID为[" + processDefinitionId + "]的流程定义。");
             repositoryService.activateProcessDefinitionById(processDefinitionId, true, null);
+            message.setStatus(Boolean.TRUE);
+            message.setMessage("已激活ID为[" + processDefinitionId + "]的流程定义。");
         } else if (status.equals("suspend")) {
             repositoryService.suspendProcessDefinitionById(processDefinitionId, true, null);
-            redirectAttributes.addFlashAttribute("message", "已挂起ID为[" + processDefinitionId + "]的流程定义。");
+            message.setStatus(Boolean.TRUE);
+            message.setMessage("已挂起ID为[" + processDefinitionId + "]的流程定义。");
         }
-    	return "redirect:/processAction/process/listProcess_page";
+    	return message;
     }
     
     /**
-     * 流程定义
-     * @param request
+     * 部署全部流程
+     *
      * @return
      * @throws Exception
      */
-//    @RequiresPermissions("admin:process:*")
-//    @RequestMapping(value = "/process/listProcess_page")
-//    public ModelAndView listProcess(HttpServletRequest request) throws Exception{
-//    	ModelAndView mav = new ModelAndView("workflow/list_process");
-//    	
-//    	//objects保存两个对象，Object[0]:是ProcessDefinition（流程定义），Object[1]:是Deployment（流程部署）
-//    	List<Object[]> objects = new ArrayList<Object[]>();
-//    	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
-//    	int[] pageParams = PaginationThreadUtils.setPage(processDefinitionQuery.list().size());
-//    	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
-//    	for (ProcessDefinition processDefinition : processDefinitionList) {
-//            String deploymentId = processDefinition.getDeploymentId();
-//            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-//            objects.add(new Object[]{processDefinition, deployment});
-//        }
-//    	Pagination pagination = PaginationThreadUtils.get();
-//    	mav.addObject("obj", objects);
-//    	mav.addObject("page", pagination.getPageStr());
-//    	return mav;
-//    }
+    @RequiresPermissions("admin:process:*")
+    @RequestMapping(value = "/process/redeploy/all")
+    @ResponseBody
+    public Message redeployAll(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, 
+				    		HttpServletResponse response) throws Exception {
+    	try {
+    		List<Deployment> deploymentList = this.repositoryService.createDeploymentQuery().list();
+    		//删除现有所有流程实例
+    		for(Deployment deployment : deploymentList){
+    			String deploymentId = deployment.getId();
+    			this.repositoryService.deleteDeployment(deploymentId, true);
+    		}
+    		//重新部署全部流程实例
+    		//方法一：通过classpath/deploy目录下的.zip或.bar文件部署
+    		workflowProcessDefinitionService.deployAllFromClasspath(exportDir);
+    		
+    		//方法二：通过classpath/bpmn下的流程描述文件部署-流程图错乱，一直提倡用打包部署没有任何问题。
+//        	workflowProcessDefinitionService.redeployBpmn(exportDir);
+
+    		return new Message(Boolean.TRUE, "已重新部署全部流程！");
+		} catch (Exception e) {
+			return new Message(Boolean.FALSE, "重新部署流程失败！");
+		}
+    }
     
     /**
-     * 删除部署的流程，级联删除流程实例 true。
-     * 不管是否指定级联删除，部署的相关数据均会被删除，这些数据包括流程定义的身份数据（IdentityLink）、流程定义数据（ProcessDefinition）、流程资源（Resource）
-     * 部署数据（Deployment）。
-     * 如果设置级联(true)，则会删除流程实例数据（ProcessInstance）,其中流程实例也包括流程任务（Task）与流程实例的历史数据；如果设置flase 将不会级联删除。
-     * 如果数据库中已经存在流程实例数据，那么将会删除失败，因为在删除流程定义时，流程定义数据的ID已经被流程实例的相关数据所引用。
+     * 部署单个流程
      *
-     * @param deploymentId 流程部署ID
+     * @return
+     * @throws Exception
      */
-    @RequestMapping(value = "/process/delete")
-    public String delete(@RequestParam("deploymentId") String deploymentId) {
-        repositoryService.deleteDeployment(deploymentId, true);
+    @RequiresPermissions("admin:process:*")
+    @RequestMapping(value = "/process/redeploy/single")
+    public String redeploySingle(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
+    							@RequestParam("resourceName") String resourceName,
+    							@RequestParam(value = "diagramResourceName", required = false) String diagramResourceName,
+    							@RequestParam("deploymentId") String deploymentId,
+    							RedirectAttributes redirectAttributes) throws Exception {
+        try {
+        	this.repositoryService.deleteDeployment(deploymentId, true);
+        	//方法一：通过classpath/deploy目录下的.zip或.bar文件部署
+        	String processKey = resourceName.substring(0, resourceName.indexOf('.'))+".zip";
+        	workflowProcessDefinitionService.redeploySingleFrom(exportDir, processKey);
+        	//方法二：通过classpath/bpmn下的流程描述文件部署--流程图错乱，一直提倡用打包部署没有任何问题。
+//        	workflowProcessDefinitionService.redeployBpmn(exportDir, resourceName,diagramResourceName);
+        	redirectAttributes.addFlashAttribute("message", "已重新部署流程！");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
+			throw e;
+		}
         return "redirect:/processAction/process/listProcess_page";
     }
     
@@ -391,72 +471,25 @@ public class ProcessAction {
             logger.error("error on deploy process, because of file input stream", e);
         }
 
-        return "redirect:/processAction/process/listProcess_page";
+        return "redirect:/processAction/process/toListProcess";
     }
     
     /**
-     * 部署全部流程
+     * 删除部署的流程，级联删除流程实例 true。
+     * 不管是否指定级联删除，部署的相关数据均会被删除，这些数据包括流程定义的身份数据（IdentityLink）、流程定义数据（ProcessDefinition）、流程资源（Resource）
+     * 部署数据（Deployment）。
+     * 如果设置级联(true)，则会删除流程实例数据（ProcessInstance）,其中流程实例也包括流程任务（Task）与流程实例的历史数据；如果设置flase 将不会级联删除。
+     * 如果数据库中已经存在流程实例数据，那么将会删除失败，因为在删除流程定义时，流程定义数据的ID已经被流程实例的相关数据所引用。
      *
-     * @return
-     * @throws Exception
+     * @param deploymentId 流程部署ID
      */
-    @RequiresPermissions("admin:process:*")
-    @RequestMapping(value = "/process/redeploy/all")
-    public void redeployAll(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, 
-				    		HttpServletResponse response,
-				    		RedirectAttributes redirectAttributes) throws Exception {
-    	PrintWriter out = response.getWriter();
-    	try {
-    		List<Deployment> deploymentList = this.repositoryService.createDeploymentQuery().list();
-    		//删除现有所有流程实例
-    		for(Deployment deployment : deploymentList){
-    			String deploymentId = deployment.getId();
-    			this.repositoryService.deleteDeployment(deploymentId, true);
-    		}
-    		//重新部署全部流程实例
-    		//方法一：通过classpath/deploy目录下的.zip或.bar文件部署
-    		workflowProcessDefinitionService.deployAllFromClasspath(exportDir);
-    		
-    		//方法二：通过classpath/bpmn下的流程描述文件部署-流程图错乱，一直提倡用打包部署没有任何问题。
-//        	workflowProcessDefinitionService.redeployBpmn(exportDir);
-
-//        	redirectAttributes.addFlashAttribute("message", "已重新部署全部流程！");
-        	out.print("success");
-		} catch (Exception e) {
-//			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
-			out.print("fail");
-			throw e;
-		}
-//        return "redirect:/processAction/process/listProcess_page";
+    @RequestMapping(value = "/process/delete")
+    @ResponseBody
+    public Message delete(@RequestParam("deploymentId") String deploymentId) {
+        repositoryService.deleteDeployment(deploymentId, true);
+        return new Message(Boolean.TRUE, "删除成功！");
     }
     
-    /**
-     * 部署单个流程
-     *
-     * @return
-     * @throws Exception
-     */
-    @RequiresPermissions("admin:process:*")
-    @RequestMapping(value = "/process/redeploy/single")
-    public String redeploySingle(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
-    							@RequestParam("resourceName") String resourceName,
-    							@RequestParam(value = "diagramResourceName", required = false) String diagramResourceName,
-    							@RequestParam("deploymentId") String deploymentId,
-    							RedirectAttributes redirectAttributes) throws Exception {
-        try {
-        	this.repositoryService.deleteDeployment(deploymentId, true);
-        	//方法一：通过classpath/deploy目录下的.zip或.bar文件部署
-        	String processKey = resourceName.substring(0, resourceName.indexOf('.'))+".zip";
-        	workflowProcessDefinitionService.redeploySingleFrom(exportDir, processKey);
-        	//方法二：通过classpath/bpmn下的流程描述文件部署--流程图错乱，一直提倡用打包部署没有任何问题。
-//        	workflowProcessDefinitionService.redeployBpmn(exportDir, resourceName,diagramResourceName);
-        	redirectAttributes.addFlashAttribute("message", "已重新部署流程！");
-		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
-			throw e;
-		}
-        return "redirect:/processAction/process/listProcess_page";
-    }
     
     /**
      * 转换为model
@@ -467,7 +500,8 @@ public class ProcessAction {
      */
     @RequiresPermissions("admin:process:*")
     @RequestMapping(value = "/process/convert_to_model")
-    public String convertToModel(@RequestParam("processDefinitionId") String processDefinitionId)
+    @ResponseBody
+    public Message convertToModel(@RequestParam("processDefinitionId") String processDefinitionId)
             throws UnsupportedEncodingException, XMLStreamException {
     	ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
                 .processDefinitionId(processDefinitionId).singleResult();
@@ -495,48 +529,6 @@ public class ProcessAction {
 
         repositoryService.addModelEditorSource(modelData.getId(), modelNode.toString().getBytes("utf-8"));
 
-        return "redirect:/processAction/process/listProcess_page";
+        return new Message(Boolean.TRUE, "转换成功！请到[ 流程设计模型 ]菜单中查看！");
     }
-    
-    
-    /**
-     * 以下方法是对应easyui的写法
-     * 
-     * @author ZML
-     */
-    @RequestMapping("/process/toListProcess")
-    public String toListProcess() throws Exception{
-    	return "workflow/list_process";
-    }
-    
-	@RequestMapping("/process/listProcess")
-	@ResponseBody
-    public Datagrid<com.zml.oa.entity.ProcessDefinitionEntity> listProcess(@RequestParam(value = "page", required = false) Integer page,
-    									  @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
-    	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
-    	Page<Object[]> p = new Page<Object[]>(page, rows);
-    	int[] pageParams = p.getPageParams(processDefinitionQuery.list().size());
-    	List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(pageParams[0], pageParams[1]);
-    	
-    	com.zml.oa.entity.ProcessDefinitionEntity pd = new com.zml.oa.entity.ProcessDefinitionEntity();
-    	List<com.zml.oa.entity.ProcessDefinitionEntity> pdList = new  ArrayList<com.zml.oa.entity.ProcessDefinitionEntity>();
-    	for (ProcessDefinition processDefinition : processDefinitionList) {
-            String deploymentId = processDefinition.getDeploymentId();
-            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-            //封装到ProcessDefinitionEntity中
-            pd.setId(processDefinition.getId());
-            pd.setName(processDefinition.getName());
-            pd.setKey(processDefinition.getKey());
-            pd.setDeploymentId(processDefinition.getDeploymentId());
-            pd.setVersion(processDefinition.getVersion());
-            pd.setResourceName(processDefinition.getResourceName());
-            pd.setDiagramResourceName(processDefinition.getDiagramResourceName());
-            pd.setDeploymentTime(deployment.getDeploymentTime());
-            pd.setSuspended(processDefinition.isSuspended());
-            pdList.add(pd);
-        }
-    	Datagrid<com.zml.oa.entity.ProcessDefinitionEntity> dataGrid = new Datagrid<com.zml.oa.entity.ProcessDefinitionEntity>(p.getTotal(), pdList);
-    	return dataGrid;
-    }
-    
 }

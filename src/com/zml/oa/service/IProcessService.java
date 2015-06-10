@@ -13,6 +13,7 @@ import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
+import com.zml.oa.pagination.Page;
 
 public interface IProcessService {
 	
@@ -142,7 +143,7 @@ public interface IProcessService {
      * @return
      * @throws Exception
      */
-    public List<ProcessInstance> listRuningProcess(Model model) throws Exception;
+    public List<ProcessInstance> listRuningProcess(Page<ProcessInstance> page) throws Exception;
 
     /**
      * 激活流程实例

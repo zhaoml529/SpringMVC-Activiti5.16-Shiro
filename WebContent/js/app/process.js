@@ -16,8 +16,8 @@ $(function() {
 		border:false,
 		singleSelect:true,
 		striped:true,
-//        pageList : [2, 5, 10, 15, 20 ],
-//        pageSize:2,
+//      pageList : [2, 5, 10, 15, 20 ],
+//      pageSize:2,
 		columns : [ 
 		    [ 
                 {field : 'id',title : 'ProcessDefinitionId',width : fixWidth(0.2)},
@@ -35,13 +35,17 @@ $(function() {
 			    		return "<a target='_blank' id='image' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=image'>"+row.diagramResourceName+"</a>"
 			    	}
                 },
-                {field : 'deploymentTime',title : '部署时间',width : fixWidth(0.1),align : 'center'},
+                {field : 'deploymentTime',title : '部署时间',width : fixWidth(0.1),align : 'center',
+                	formatter:function(value, row){
+                		return moment(value).format("YYYY-MM-DD HH:mm:ss");
+                	}
+                },
                 {field : 'suspended',title : '是否挂起',width : fixWidth(0.1),align : 'center',
 		          	formatter:function(value, row){
-		        		if(row.suspended){
-		        			return "<a href='updateProcessStatusByProDefinitionId?status=active&processDefinitionId="+row.id+"'>激活</a>";
+		        		if(value){
+		        			return "<a href='javascript:void(0);' onclick=\"suspended('active','"+row.id.toString()+"')\">激活</a>";
 		        		}else{
-		        			return "<a href='updateProcessStatusByProDefinitionId?status=suspend&processDefinitionId="+row.id+"'>挂起</a>";  
+		        			return "<a href='javascript:void(0);' onclick=\"suspended('suspend','"+row.id.toString()+"')\">挂起</a>";  
 		        		}
 					}
                 }
@@ -60,138 +64,143 @@ $(function() {
 	{   
 		return parseInt(($(this).width() - 50) * percent);
 	}
+	
 });
 
+//部署流程
+function deploy(){
+	$("#deployFieldset").toggle("normal");
+}
 
-
-//----------------Resource-------------------
-
-function resourceFormInit(row) {
-	var _url = ctx+"/resourceAction/doAdd";
-	if (row != undefined && row.id) {
-		_url = ctx+"/resourceAction/doUpdate";
-	}
-	resource_form = $('#resource_form').form({
-        url: _url,
-        onSubmit: function (param) {
-            $.messager.progress({
+//部署全部流程
+function deployAll(){
+	$.ajax({
+        type: "POST",
+        url: ctx+"/processAction/process/redeploy/all",
+        data: {},
+        success: function (data) {
+        	$.messager.progress("close");
+        	if (data.status) {
+        		process_datagrid.datagrid("reload"); //reload the process data
+            } 
+        	$.messager.show({
+				title : data.title,
+				msg : data.message,
+				timeout : 1000 * 2
+			});
+        },
+        beforeSend:function(){
+        	$.messager.progress({
                 title: '提示信息！',
                 text: '数据处理中，请稍后....'
             });
-            var isValid = $(this).form('validate');
-            if (!isValid) {
-                $.messager.progress('close');
-            }
-            return isValid;
-        },
-        success: function (data) {
-            $.messager.progress('close');
-            var json = $.parseJSON(data);
-            if (json.status) {
-            	resource_dialog.dialog('destroy');//销毁对话框
-            	resource_treegrid.treegrid('reload');//重新加载列表数据
-                $.messager.show({
-					title : json.title,
-					msg : json.message,
-					timeout : 1000 * 2
-				});
-            } else {
-				$.messager.show({
-					title :  json.title,
-					msg : json.message,
-					timeout : 1000 * 2
-				});
-            } 
-        }
-    });
+    	},
+    	complete: function(){
+    		$.messager.progress("close");
+   		}
+	});
 }
 
-function showResource(row){
-	var _url = ctx+"/resourceAction/toAdd";
-	if (row != undefined && row.id) {
-		_url = ctx+"/resourceAction/toUpdate/"+row.id;
+//挂起、激活
+function suspended( status, id ){
+	var url_ = ctx+"/processAction/process/updateProcessStatusByProDefinitionId?status=active&processDefinitionId="+id;
+	if(status == "suspend"){
+		url_ = ctx+"/processAction/process/updateProcessStatusByProDefinitionId?status=suspend&processDefinitionId="+id;
 	}
-    //弹出对话窗口
-    resource_dialog = $('<div/>').dialog({
-    	title : "资源信息",
-		top: 20,
-		width : 600,
-		height : 400,
-        modal: true,
-        minimizable: true,
-        maximizable: true,
-        href: _url,
-        onLoad: function () {
-            resourceFormInit(row);
-            if (row) {
-            	resource_form.form('load', row);
-            }
-
+	
+	$.ajax({
+        type: "POST",
+        url: url_,
+        data: {},
+        success: function (data) {
+        	$.messager.progress("close");
+        	if (data.status) {
+        		process_datagrid.datagrid("reload"); //reload the process data
+            } 
+        	$.messager.show({
+				title : data.title,
+				msg : data.message,
+				timeout : 1000 * 2
+			});
         },
-        buttons: [
-            {
-                text: '保存',
-                iconCls: 'icon-save',
-                handler: function () {
-                	resource_form.submit();
-                }
-            },
-            {
-                text: '关闭',
-                iconCls: 'icon-cancel',
-                handler: function () {
-                	resource_dialog.dialog('destroy');
-                }
-            }
-        ],
-        onClose: function () {
-            resource_dialog.dialog('destroy');
-        }
-    });
+        beforeSend:function(){
+        	$.messager.progress({
+                title: '提示信息！',
+                text: '数据处理中，请稍后....'
+            });
+    	},
+    	complete: function(){
+    		$.messager.progress("close");
+   		}
+	});
 }
 
-//添加修改操作
-function openResource() {
-    var row = resource_treegrid.treegrid('getSelected');
-    if (row) {
-    	showResource(row);
-    } else {
-        $.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
-    }
-}
-
-//删除组
+//删除
 function delRows() {
-	var row = resource_treegrid.treegrid('getSelected');
+	var row = process_datagrid.datagrid('getSelected');
     if (row) {
-        $.messager.confirm('确认提示！', '您确定要删除选中数据? 同时也会删除此用户组所对应的权限信息！', function (result) {
+    	$.messager.confirm('确认提示！', '您确定要删除选中流程信息? 此操作同时也会删除与此流程相关的审批数据！', function (result) {
             if (result) {
-                var id = row.id;
-                $.ajax({
-                    url: ctx + '/resourceAction/doDelete/'+id,
-                    type: 'post',
-                    dataType: 'json',
-                    data: {},
-                    success: function (data) {
-                        if (data.status) {
-                            resource_treegrid.treegrid('reload'); //reload the resource data
-                            $.messager.show({
-            					title : data.title,
-            					msg : data.message,
-            					timeout : 1000 * 2
-            				});
-                        } else {
-                        	$.messager.show({
-            					title : data.title,
-            					msg : data.message,
-            					timeout : 1000 * 2
-            				});
-                        }
-                    }
-                });
+            	$.messager.confirm('再次确认！', '请再次确认您的选择，此操作很重要!', function (result) {
+            		if(result){
+            			var id = row.deploymentId;
+            			$.ajax({
+            				type: "POST",
+            				url: ctx+"/processAction/process/delete?deploymentId="+id,
+            				data: {},
+            				success: function (data) {
+            					$.messager.progress("close");
+            					if (data.status) {
+            						process_datagrid.datagrid("reload");
+            					} 
+            					$.messager.show({
+            						title : data.title,
+            						msg : data.message,
+            						timeout : 1000 * 2
+            					});
+            				}
+            			});
+            		}
+            	});
             }
-        });
-    } else {
+    	});
+    }else {
     	$.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
     }
 }
+
+
+//转换为Model
+function convert_to_model(){
+	var row = process_datagrid.datagrid('getSelected');
+    if (row) {
+    	$.ajax({
+    		type: "POST",
+    		url: ctx+"/processAction/process/convert_to_model?processDefinitionId="+row.id,
+    		data: {},
+    		success: function (data) {
+    			$.messager.progress("close");
+    			if (data.status) {
+    				process_datagrid.datagrid("reload"); //reload the process data
+    			} 
+    			$.messager.show({
+    				title : data.title,
+    				msg : data.message,
+    				timeout : 1000 * 2
+    			});
+    		},
+    		beforeSend:function(){
+    			$.messager.progress({
+    				title: '提示信息！',
+    				text: '数据处理中，请稍后....'
+    			});
+    		},
+    		complete: function(){
+    			$.messager.progress("close");
+    		}
+    	});
+    }else {
+    	$.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
+    }
+}
+

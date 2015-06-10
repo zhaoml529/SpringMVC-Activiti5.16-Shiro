@@ -26,14 +26,23 @@
 	<div data-options="region:'center',border:true">
 		 <div id="tb">
 			<div style="margin:5px 5px 5px 5px;">
-				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showResource();">删除</a>
-				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="openResource();">加载</a>
-				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="delRows();">转换为Model</a>&nbsp;|&nbsp;
-				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="expandAll();">部署流程</a>
-				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="collapseAll();">重新部署全部流程</a>
+				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showResource();">加载</a>
+				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="convert_to_model();">转换为Model</a>
+				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="delRows();">删除</a>&nbsp;|&nbsp;
+				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="deploy();">部署流程</a>
+				<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="deployAll();">重新部署全部流程</a>
 			</div>
 		</div>
-		
+		<fieldset id="deployFieldset" style="display: none">
+			<legend style="margin-left: 10px" align="left">部署新流程</legend>
+			<div align="left">
+			<b>支持文件格式：</b>zip、bar、bpmn、bpmn20.xml<br /><br />
+			<form action="${ctx }/processAction/process/deploy" method="post" enctype="multipart/form-data">
+				<input type="file" name="file" />
+				<input type="submit" class="input_button4" value="Submit" />
+			</form>
+			</div>
+		</fieldset>
 		<table id="process" title="流程定义">
 <%-- 			<thead>
 				<tr>

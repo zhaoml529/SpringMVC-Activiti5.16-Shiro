@@ -33,18 +33,12 @@
 <%-- <link rel="stylesheet" type="text/css" href="${ctx}/css/bootstrap.min.css"> --%>
 <%-- <link rel="stylesheet" type="text/css" href="${ctx}/css/easyui/templatemo_main.css"> --%>
 
-<link rel="stylesheet" href="${ctx}/css/jquery_validation_engine/validationEngine.jquery.css" type="text/css" />
-<link rel="stylesheet" href="${ctx}/css/jquery_validation_engine/template.css" type="text/css" />
-
-<script type="text/javascript" src="${ctx}/js/util.js"></script>
+<script type="text/javascript" src="${ctx}/js/moment.min.js"></script>
 <script type="text/javascript" src="${ctx}/js/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="${ctx}/js/easyui/easyui-lang-zh_CN.js"></script>
 <%-- <script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script> --%>
 <script type="text/javascript" src="${ctx}/js/easyui/jqueryUtil.js"></script>
 <script type="text/javascript" src="${ctx }/js/easyui/login/jquery.tipsy.js"></script>
-
-<script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine.js"></script>
-<script type="text/javascript" src="${ctx}/js/jquery_validation_engine/jquery.validationEngine-zh_CN.js"></script>
 
 <script type="text/javascript" charset="utf-8">
     var ctx = "${ctx}";

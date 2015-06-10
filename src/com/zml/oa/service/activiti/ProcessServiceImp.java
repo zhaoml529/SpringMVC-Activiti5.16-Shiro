@@ -40,6 +40,7 @@ import com.zml.oa.entity.Salary;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IExpenseService;
@@ -510,13 +511,11 @@ public class ProcessServiceImp implements IProcessService{
 	}
 
 	@Override
-	public List<ProcessInstance> listRuningProcess(Model model) throws Exception {
+	public List<ProcessInstance> listRuningProcess(Page<ProcessInstance> page) throws Exception {
+		
 		ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery();
-		Integer totalSum = processInstanceQuery.list().size();
-		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
-		Pagination pagination = PaginationThreadUtils.get();
+		int[] pageParams = page.getPageParams(processInstanceQuery.list().size());
 		List<ProcessInstance> list = processInstanceQuery.orderByProcessInstanceId().desc().listPage(pageParams[0], pageParams[1]);
-		model.addAttribute("page", pagination.getPageStr());
 		return list;
 	}
 
