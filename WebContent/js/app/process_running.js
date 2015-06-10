@@ -22,9 +22,15 @@ $(function() {
 		    [ 
                 {field : 'id',title : '执行ID',width : fixWidth(0.2)},
                 {field : 'processInstanceId',title : '流程实例ID',width : fixWidth(0.1),align : 'center'},
-                {field : 'processDefinitionId',title : '流程定义ID',width : fixWidth(0.1),align : 'center'},
+                {field : 'processDefinitionId',title : '流程定义ID',width : fixWidth(0.2),align : 'center'},
                 {field : 'activityId',title : 'activityId',width : fixWidth(0.1),align : 'center'},
-                {field : 'suspended',title : '是否挂起',width : fixWidth(0.1),align : 'center',
+                {field : 'activityId_',title : '当前节点',width : fixWidth(0.3),align : 'center',
+                	formatter:function(value, row){
+                		var name = $("#name").val();
+                		return "<a class='trace' id='diagram' href='#' pid='${p.id }' pdid='${p.processDefinitionId}' title='see'>"+ name +"</a> <c:set var='pdid' value='"+row.processDefinitionId+"' /><c:set var='activityId' value='"+row.activityId+"' />";
+					}
+                },
+                {field : 'suspended',title : '挂起/激活',width : fixWidth(0.1),align : 'center',
 		          	formatter:function(value, row){
 		        		if(value){
 		        			return "<a href='javascript:void(0);' onclick=\"suspended('active','"+row.id.toString()+"')\">激活</a>";
