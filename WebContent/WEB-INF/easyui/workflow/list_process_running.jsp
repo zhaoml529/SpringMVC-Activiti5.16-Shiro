@@ -36,7 +36,7 @@
 			</tr>
 		</table>
 	 </div>
-	 <input type="hidden" id="name" value="<%=ProcessDefinitionCache.getActivityName(pageContext.getAttribute('processDefinitionId').toString(), ObjectUtils.toString(pageContext.getAttribute('activityId'))) %>" />
+	 <%-- <input type="hidden" id="name" value="<%=ProcessDefinitionCache.getActivityName(pageContext.getAttribute('processDefinitionId').toString(), ObjectUtils.toString(pageContext.getAttribute('activityId'))) %>" /> --%>
 	 <table id="process_running" title="流程定义"></table>
 	</div>
   </body>
