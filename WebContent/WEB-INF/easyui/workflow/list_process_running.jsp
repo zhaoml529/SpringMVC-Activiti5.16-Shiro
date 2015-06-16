@@ -1,12 +1,5 @@
-<%@ page import="com.zml.oa.util.ProcessDefinitionCache,org.activiti.engine.RepositoryService"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@ page import="java.util.*,org.apache.commons.lang3.StringUtils,org.apache.commons.lang3.ObjectUtils" %>
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/taglibs/taglibs.jsp"%>
-<%
-	RepositoryService repositoryService = WebApplicationContextUtils.getWebApplicationContext(session.getServletContext()).getBean(org.activiti.engine.RepositoryService.class);
-	ProcessDefinitionCache.setRepositoryService(repositoryService);
-%>
 <!DOCTYPE html>
 <html>
   <head>
@@ -16,7 +9,11 @@
 	<meta http-equiv="expires" content="0">    
 	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 	<meta http-equiv="description" content="This is my page">
-	<script type="text/javascript" src="${ctx}/js/app/process_running.js?_=${sysInitTime}"></script>
+	<link href="${ctx }/css/common/jquery.qtip.min.css" type="text/css" rel="stylesheet" />
+	<script src="${ctx}/js/app/process_running.js?_=${sysInitTime}" type="text/javascript"></script>
+	<script src="${ctx }/js/trace.js" type="text/javascript"></script>
+	<script src="${ctx }/js/common/jquery.outerhtml.js" type="text/javascript"></script>
+	<script src="${ctx }/js/common/jquery.qtip.min.js" type="text/javascript"></script>
   </head>
   <body>
 	 <div class="well well-small" style="margin-left: 5px;margin-top: 5px">
@@ -29,14 +26,13 @@
 	 <div id="tb" style="padding:2px 0">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
-				<td style="padding-left:2px">
+				<td style="padding-left:2px;">
 					<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showResource();">挂起</a>
 			<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="convert_to_model();">激活</a>
 				</td>
 			</tr>
 		</table>
 	 </div>
-	 <%-- <input type="hidden" id="name" value="<%=ProcessDefinitionCache.getActivityName(pageContext.getAttribute('processDefinitionId').toString(), ObjectUtils.toString(pageContext.getAttribute('activityId'))) %>" /> --%>
 	 <table id="process_running" title="流程定义"></table>
 	</div>
   </body>

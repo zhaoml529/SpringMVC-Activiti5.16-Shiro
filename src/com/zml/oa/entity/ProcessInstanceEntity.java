@@ -16,7 +16,8 @@ public class ProcessInstanceEntity implements Serializable {
 	private String processInstanceId; 		//流程实例id
 	private String processDefinitionId; 	//流程定义id
 	private String activityId; 				//流程节点id
-	private Boolean suspended;
+	private Boolean suspended;				//挂起/激活
+	private String taskName;				//当前节点名称
 	
 	  /**
 	   * The name of the process definition of the process instance.
@@ -122,6 +123,14 @@ public class ProcessInstanceEntity implements Serializable {
 	public void setSuspended(Boolean suspended) {
 		this.suspended = suspended;
 	}
-	
+
+	public String getTaskName() {
+		return taskName;
+	}
+
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
+
 	
 }

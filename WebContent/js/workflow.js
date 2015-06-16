@@ -1,4 +1,5 @@
 function graphTrace(options) {
+	alert("trace!");
     var _defaults = {
         srcEle: this,
         pid: $(this).attr('pid'),

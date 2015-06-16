@@ -24,10 +24,9 @@ $(function() {
                 {field : 'processInstanceId',title : '流程实例ID',width : fixWidth(0.1),align : 'center'},
                 {field : 'processDefinitionId',title : '流程定义ID',width : fixWidth(0.2),align : 'center'},
                 {field : 'activityId',title : 'activityId',width : fixWidth(0.1),align : 'center'},
-                {field : 'activityId_',title : '当前节点',width : fixWidth(0.3),align : 'center',
+                {field : 'taskName',title : '当前节点',width : fixWidth(0.3),align : 'center',
                 	formatter:function(value, row){
-                		var name = $("#name").val();
-                		return "<a class='trace' id='diagram' href='#' pid='${p.id }' pdid='${p.processDefinitionId}' title='see'>"+ name +"</a> <c:set var='pdid' value='"+row.processDefinitionId+"' /><c:set var='activityId' value='"+row.activityId+"' />";
+                		return "<a class='trace' onclick=\"graphTrace('"+row.processInstanceId+"')\" id='diagram' href='#' pid='"+row.id+"' pdid='"+row.processDefinitionId+"' title='see'>"+value+"</a>";
 					}
                 },
                 {field : 'suspended',title : '挂起/激活',width : fixWidth(0.1),align : 'center',
@@ -55,6 +54,8 @@ $(function() {
 		return parseInt(($(this).width() - 50) * percent);
 	}
 	
+	// 跟踪
+    $('.trace').click(graphTrace);
 });
 
 //部署流程

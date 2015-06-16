@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -53,6 +54,7 @@ import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.activiti.WorkflowDeployService;
 import com.zml.oa.service.activiti.WorkflowService;
+import com.zml.oa.util.ProcessDefinitionCache;
 import com.zml.oa.util.UserUtil;
 import com.zml.oa.util.WorkflowUtils;
 
@@ -197,7 +199,7 @@ public class ProcessAction {
     @RequestMapping(value = "/process/trace/{pid}")
     @ResponseBody
     public List<Map<String, Object>> traceProcess(@PathVariable("pid") String processInstanceId) throws Exception {
-        List<Map<String, Object>> activityInfos = traceService.traceProcess(processInstanceId);
+        List<Map<String, Object>> activityInfos = this.traceService.traceProcess(processInstanceId);
         return activityInfos;
     }
     
@@ -301,7 +303,7 @@ public class ProcessAction {
     @RequestMapping(value="/process/runningProcess")
     @ResponseBody
     public Datagrid<ProcessInstanceEntity> listRuningProcess(@RequestParam(value = "page", required = false) Integer page,
-			  						 @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+			  						 @RequestParam(value = "rows", required = false) Integer rows, HttpSession session) throws Exception{
     	Page<ProcessInstance> p = new Page<ProcessInstance>(page, rows);
     	List<ProcessInstance> list = this.processService.listRuningProcess(p);
     	List<ProcessInstanceEntity> pieList = new ArrayList<ProcessInstanceEntity>();
@@ -312,7 +314,12 @@ public class ProcessAction {
     		pie.setProcessDefinitionId(processInstance.getProcessDefinitionId());
     		pie.setActivityId(processInstance.getActivityId());
     		pie.setSuspended(processInstance.isSuspended());
+    		
+    		ProcessDefinitionCache.setRepositoryService(this.repositoryService);
+    		String taskName = ProcessDefinitionCache.getActivityName(processInstance.getProcessDefinitionId(), processInstance.getActivityId());
+    		pie.setTaskName(taskName);
     		pieList.add(pie);
+    		
     	}
     	return new Datagrid<ProcessInstanceEntity>(p.getTotal(), pieList);
     }
