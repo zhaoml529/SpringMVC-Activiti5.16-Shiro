@@ -67,15 +67,14 @@ function graphTrace( id) {
                 $(this).data('vars', varsArray[i]);
             });
         	
-            
-            var imgWidth, imgHeight;
+            var imgWidth = 0, imgHeight = 0;
 	         // 这里创建一个图像保存到内存，并没有添加到 HTML 中，只是个参考
 	         $("<img/>").attr("src", imageUrl).load(function() {
 	        	 alert(this.width);
 		         imgWidth = this.width;
 		         imgHeight = this.height;
 	         });
-            alert(imgWidth+"----"+imgHeight);
+           alert(imgWidth+"----"+imgHeight);
             
             //弹出对话窗口
            var workflowTraceDialog = $('#workflowTraceDialog').dialog({
