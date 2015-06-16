@@ -12,6 +12,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -21,6 +23,10 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Entity
 @Table(name = "T_VACATION")
+// 在Hibernate中可以利用@DynamicInsert和@DynamicUpdate生成动态SQL语句，
+//即在插入和修改数据的时候,语句中只包括要插入或者修改的字段。
+@DynamicUpdate(true)
+@DynamicInsert(true)
 public class Vacation extends BaseVO implements Serializable{	
 	/**
 	 * 
