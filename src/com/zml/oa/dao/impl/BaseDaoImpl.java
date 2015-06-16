@@ -77,4 +77,9 @@ public class BaseDaoImpl<T> implements IBaseDao<T> {
 	    return (T) query.uniqueResult();
 	}
 
+	@Override
+	public Long count(String hql) {
+		return (Long) this.getSession().createQuery(hql).uniqueResult();
+	}
+
 }

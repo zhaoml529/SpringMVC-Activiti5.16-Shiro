@@ -90,4 +90,11 @@ public interface IBaseDao<T> {
 	 * @throws
 	 */
 	public T unique(final String hql) throws Exception;
+	
+	/**
+	 * 
+	 * @param hql
+	 * @return
+	 */
+	public Long count(String hql);
 }
