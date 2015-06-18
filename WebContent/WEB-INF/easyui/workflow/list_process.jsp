@@ -16,7 +16,7 @@
 	<div class="easyui-layout" data-options="fit:true">
 	<div data-options="region:'north',border:false" title="" style="height: 82px; overflow: hidden; padding: 5px;">
 		<div class="well well-small">
-			<span class="badge" iconCls="icon-save" plain="true" >提示</span>
+			<span class="badge" iconCls="icon-save" plain="true" id="tishi" title="提示">提示</span>
 			<p>
 				在此你可以对<span class="label-info"><strong>流程定义</strong></span>进行部署!  &nbsp;<span class="label-info"><strong>提示</strong></span>可以单个文件加载，
 				也可以多个文件同时加载！点击xml或者png链接可以查看具体内容！

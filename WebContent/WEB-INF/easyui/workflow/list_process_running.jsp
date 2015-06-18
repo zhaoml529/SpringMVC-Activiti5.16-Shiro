@@ -17,7 +17,7 @@
   </head>
   <body>
 	 <div class="well well-small" style="margin-left: 5px;margin-top: 5px">
-		<span class="badge">提示</span>
+		<span class="badge easyui-tooltip" title="提示">提示</span>
 		<p>
 			在此你可以对<span class="label-info"><strong>用户</strong></span>进行编辑!
 		</p>

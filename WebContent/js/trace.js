@@ -17,8 +17,8 @@ function graphTrace( id) {
                     'class': 'activity-attr'
                 }).css({
                     position: 'absolute',
-                    left: (v.x - 1),
-                    top: (v.y - 1),
+                    left: (v.x + 4),
+                    top: (v.y + 26),
                     width: (v.width - 2),
                     height: (v.height - 2),
                     backgroundColor: 'black',
@@ -26,15 +26,15 @@ function graphTrace( id) {
                     zIndex: $.fn.qtip.zindex - 1
                 });
 
-                // 节点边框
+                // 跟踪节点边框
                 var $border = $('<div/>', {
                     'class': 'activity-attr-border'
                 }).css({
                     position: 'absolute',
-                    left: (v.x + 12),
-                    top: (v.y + 32),
-                    width: (v.width - 4),
-                    height: (v.height - 3),
+                    left: (v.x + 4),
+                    top: (v.y + 26),
+                    width: (v.width - 2),
+                    height: (v.height - 2),
                     zIndex: $.fn.qtip.zindex - 2
                 });
 
@@ -50,8 +50,8 @@ function graphTrace( id) {
             if ($('#workflowTraceDialog').length == 0) {
                 $('<div/>', {
                     id: 'workflowTraceDialog',
-                    title: '查看流程（按ESC键可以关闭）',
-                    html: "<div class='easyui-layout'><img id='imagePic' src='" + imageUrl + "'style='position:absolute; left:10px; top:30px; border: solid;' />" +
+//                    title: '查看流程（按ESC键可以关闭）',
+                    html: "<div class='easyui-layout'><img src='" + imageUrl + "'style='left:0px; top:0px;' />" +
                     "<div id='processImageBorder'>" +
                     positionHtml +
                     "</div>" +
@@ -67,66 +67,79 @@ function graphTrace( id) {
                 $(this).data('vars', varsArray[i]);
             });
         	
-            var imgWidth = 0, imgHeight = 0;
 	         // 这里创建一个图像保存到内存，并没有添加到 HTML 中，只是个参考
 	         $("<img/>").attr("src", imageUrl).load(function() {
-	        	 alert(this.width);
-		         imgWidth = this.width;
-		         imgHeight = this.height;
+		            //弹出对话窗口
+		           var workflowTraceDialog = $('#workflowTraceDialog').dialog({
+		            	title : "查看流程",
+		        		top: 20,
+		        		width : this.width+30,
+		        		height : this.height+90,
+		                modal: true,
+		                minimizable: true,
+		                maximizable: true,
+		                resizable: true,
+		                onLoad: function () {
+		                	alert("!!!!");
+		                	//$('#workflowTraceDialog').dialog('option', 'title', '查看流程（按ESC键可以关闭）');
+//		                    $('#workflowTraceDialog').css('padding', '0.2em');
+//		                    $('#workflowTraceDialog .ui-accordion-content').css('padding', '0.2em').height($('#workflowTraceDialog').height() - 75);
+		                    // 此处用于显示每个节点的信息，如果不需要可以删除
+		                    $('.activity-attr').qtip({
+		                        content: function() {
+		                            var vars = $(this).data('vars');
+		                            var tipContent = "<table class='tableHue2'>";
+		                            $.each(vars, function(varKey, varValue) {
+		                                if (varValue) {
+		                                    tipContent += "<tr><td class='title1'>" + varKey + "</td><td class='left'>" + varValue + "<td/></tr>";
+		                                }
+		                            });
+		                            tipContent += "</table>";
+		                            return tipContent;
+		                        },
+		                        position: {
+		                            at: 'bottom left',
+		                            adjust: {
+		                                x: 3
+		                            }
+		                        }
+		                    });
+		                    // end qtip
+		                },
+		                buttons: [
+		                    {
+		                        text: '关闭',
+		                        iconCls: 'icon-cancel',
+		                        handler: function () {
+		                        	workflowTraceDialog.dialog('destroy');
+		                        }
+		                    }
+		                ],
+		                onClose: function () {
+		                	workflowTraceDialog.dialog('destroy');
+		                }
+		            });
+		        // 此处用于显示每个节点的信息，如果不需要可以删除
+                   $('.activity-attr').qtip({
+                       content: function() {
+                           var vars = $(this).data('vars');
+                           var tipContent = "<table class='easyui-datagrid' title='Basic DataGrid'><thead>";
+                           $.each(vars, function(varKey, varValue) {
+                               if (varValue) {
+                                   tipContent += "<tr><td class='title1'>" + varKey + "</td><td class='left'>" + varValue + "<td/></tr>";
+                               }
+                           });
+                           tipContent += "</thead></table>";
+                           return tipContent;
+                       },
+                       position: {
+                           at: 'bottom left',
+                           adjust: {
+                               x: 60
+                           }
+                       }
+                   });
 	         });
-           alert(imgWidth+"----"+imgHeight);
-            
-            //弹出对话窗口
-           var workflowTraceDialog = $('#workflowTraceDialog').dialog({
-            	title : "用户信息",
-        		top: 20,
-        		width : 1500,
-        		height : 600,
-                modal: true,
-                minimizable: true,
-                maximizable: true,
-                resizable: true,
-                onLoad: function () {
-                	//$('#workflowTraceDialog').dialog('option', 'title', '查看流程（按ESC键可以关闭）');
-                    $('#workflowTraceDialog').css('padding', '0.2em');
-                    $('#workflowTraceDialog .ui-accordion-content').css('padding', '0.2em').height($('#workflowTraceDialog').height() - 75);
-
-                    // 此处用于显示每个节点的信息，如果不需要可以删除
-                    $('.activity-attr').qtip({
-                        content: function() {
-                            var vars = $(this).data('vars');
-                            var tipContent = "<table class='tableHue2'>";
-                            $.each(vars, function(varKey, varValue) {
-                                if (varValue) {
-                                    tipContent += "<tr><td class='title1'>" + varKey + "</td><td class='left'>" + varValue + "<td/></tr>";
-                                }
-                            });
-                            tipContent += "</table>";
-                            return tipContent;
-                        },
-                        position: {
-                            at: 'bottom left',
-                            adjust: {
-                                x: 3
-                            }
-                        }
-                    });
-                    // end qtip
-                },
-                buttons: [
-                    {
-                        text: '关闭',
-                        iconCls: 'icon-cancel',
-                        handler: function () {
-                        	workflowTraceDialog.dialog('destroy');
-                        }
-                    }
-                ],
-                onClose: function () {
-                	workflowTraceDialog.dialog('destroy');
-                }
-            });
-            
             
         },
         beforeSend:function(){

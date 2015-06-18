@@ -54,8 +54,7 @@ $(function() {
 		return parseInt(($(this).width() - 50) * percent);
 	}
 	
-	// 跟踪
-    $('.trace').click(graphTrace);
+
 });
 
 //部署流程

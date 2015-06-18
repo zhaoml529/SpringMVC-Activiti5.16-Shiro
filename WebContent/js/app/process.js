@@ -27,12 +27,12 @@ $(function() {
 			    {field : 'version',title : '版本号',width : fixWidth(0.1),align : 'center'},
                 {field : 'resourceName',title : 'XML',width : fixWidth(0.1),align : 'center',
 			    	formatter:function(value, row){
-			    		return "<a target='_blank' id='xml' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=xml'>"+row.resourceName+"</a>"
+			    		return "<a id='tip' target='_blank' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=xml'>"+row.resourceName+"</a>"
 			    	}
                 },
                 {field : 'diagramResourceName',title : '图片',width : fixWidth(0.1),align : 'center',
 			    	formatter:function(value, row){
-			    		return "<a target='_blank' id='image' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=image'>"+row.diagramResourceName+"</a>"
+			    		return "<a id='tip' target='_blank' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=image'>"+row.diagramResourceName+"</a>"
 			    	}
                 },
                 {field : 'deploymentTime',title : '部署时间',width : fixWidth(0.1),align : 'center',
@@ -64,7 +64,7 @@ $(function() {
 	{   
 		return parseInt(($(this).width() - 50) * percent);
 	}
-	
+
 });
 
 //部署流程
