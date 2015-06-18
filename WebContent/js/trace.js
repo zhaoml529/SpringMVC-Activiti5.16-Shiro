@@ -80,31 +80,7 @@ function graphTrace( id) {
 		                maximizable: true,
 		                resizable: true,
 		                onLoad: function () {
-		                	alert("!!!!");
-		                	//$('#workflowTraceDialog').dialog('option', 'title', '查看流程（按ESC键可以关闭）');
-//		                    $('#workflowTraceDialog').css('padding', '0.2em');
-//		                    $('#workflowTraceDialog .ui-accordion-content').css('padding', '0.2em').height($('#workflowTraceDialog').height() - 75);
-		                    // 此处用于显示每个节点的信息，如果不需要可以删除
-		                    $('.activity-attr').qtip({
-		                        content: function() {
-		                            var vars = $(this).data('vars');
-		                            var tipContent = "<table class='tableHue2'>";
-		                            $.each(vars, function(varKey, varValue) {
-		                                if (varValue) {
-		                                    tipContent += "<tr><td class='title1'>" + varKey + "</td><td class='left'>" + varValue + "<td/></tr>";
-		                                }
-		                            });
-		                            tipContent += "</table>";
-		                            return tipContent;
-		                        },
-		                        position: {
-		                            at: 'bottom left',
-		                            adjust: {
-		                                x: 3
-		                            }
-		                        }
-		                    });
-		                    // end qtip
+		                	
 		                },
 		                buttons: [
 		                    {
@@ -123,7 +99,7 @@ function graphTrace( id) {
                    $('.activity-attr').qtip({
                        content: function() {
                            var vars = $(this).data('vars');
-                           var tipContent = "<table class='easyui-datagrid' title='Basic DataGrid'><thead>";
+                           var tipContent = "<table class='easyui-datagrid'><thead>";
                            $.each(vars, function(varKey, varValue) {
                                if (varValue) {
                                    tipContent += "<tr><td class='title1'>" + varKey + "</td><td class='left'>" + varValue + "<td/></tr>";

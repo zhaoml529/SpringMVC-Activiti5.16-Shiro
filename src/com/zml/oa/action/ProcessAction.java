@@ -250,32 +250,6 @@ public class ProcessAction {
     	return "workflow/finished_process";
     }
     
-    /**
-     * 激活、挂起流程实例-根据processInstanceId
-     * @param status
-     * @param processInstanceId
-     * @param redirectAttributes
-     * @return
-     * @throws Exception
-     */
-    @RequiresPermissions("admin:process:suspend,active")
-    @RequestMapping(value = "/process/updateProcessStatusByProInstanceId/{status}/{processInstanceId}")
-    public String updateProcessStatusByProInstanceId(
-    		@PathVariable("status") String status, 
-    		@PathVariable("processInstanceId") String processInstanceId,
-            RedirectAttributes redirectAttributes) throws Exception{
-    	
-    	if (status.equals("active")) {
-    		this.processService.activateProcessInstance(processInstanceId);
-            redirectAttributes.addFlashAttribute("message", "已激活ID为[ " + processInstanceId + " ]的流程实例。");
-        } else if (status.equals("suspend")) {
-        	this.processService.suspendProcessInstance(processInstanceId);
-            redirectAttributes.addFlashAttribute("message", "已挂起ID为[ " + processInstanceId + " ]的流程实例。");
-        }
-    	return "redirect:/processAction/process/runningProcess_page";
-    }
-
-    
     
     /**
      * 以下方法是对应easyui的写法
@@ -398,6 +372,36 @@ public class ProcessAction {
             message.setStatus(Boolean.TRUE);
             message.setMessage("已挂起ID为[" + processDefinitionId + "]的流程定义。");
         }
+    	return message;
+    }
+    
+    /**
+     * 激活、挂起流程实例-根据processInstanceId
+     * @param status
+     * @param processInstanceId
+     * @param redirectAttributes
+     * @return
+     * @throws Exception
+     */
+    @RequiresPermissions("admin:process:suspend,active")
+    @RequestMapping(value = "/process/updateProcessStatusByProInstanceId/{status}/{processInstanceId}")
+    @ResponseBody
+    public Message updateProcessStatusByProInstanceId(
+    		@PathVariable("status") String status, 
+    		@PathVariable("processInstanceId") String processInstanceId,
+            RedirectAttributes redirectAttributes) throws Exception{
+    	Message message = new Message();
+    	if (status.equals("active")) {
+    		this.processService.activateProcessInstance(processInstanceId);
+//          redirectAttributes.addFlashAttribute("message", "已激活ID为[ " + processInstanceId + " ]的流程实例。");
+    		message.setStatus(Boolean.TRUE);
+            message.setMessage("已激活ID为[" + processInstanceId + "]的流程实例。");
+    	} else if (status.equals("suspend")) {
+        	this.processService.suspendProcessInstance(processInstanceId);
+//          redirectAttributes.addFlashAttribute("message", "已挂起ID为[ " + processInstanceId + " ]的流程实例。");
+        	message.setStatus(Boolean.TRUE);
+            message.setMessage("已挂起ID为[" + processInstanceId + "]的流程实例。");
+    	}
     	return message;
     }
     

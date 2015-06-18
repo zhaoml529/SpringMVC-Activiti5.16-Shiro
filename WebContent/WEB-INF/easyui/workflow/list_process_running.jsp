@@ -19,21 +19,21 @@
 	 <div class="well well-small" style="margin-left: 5px;margin-top: 5px">
 		<span class="badge easyui-tooltip" title="提示">提示</span>
 		<p>
-			在此你可以对<span class="label-info"><strong>用户</strong></span>进行编辑!
+			在此你可以对<span class="label-info"><strong>流程实例</strong></span>进行操作!
 		</p>
 	 </div>	
 	 <div data-options="region:'center',border:true">
-	 <div id="tb" style="padding:2px 0">
+<!-- 	 <div id="tb" style="padding:2px 0">
 		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td style="padding-left:2px;">
 					<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showResource();">挂起</a>
-			<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="convert_to_model();">激活</a>
+					<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="convert_to_model();">激活</a>
 				</td>
 			</tr>
 		</table>
-	 </div>
-	 <table id="process_running" title="流程定义"></table>
+	 </div> -->
+	 <table id="process_running" title="流程实例"></table>
 	</div>
   </body>
 </html>
