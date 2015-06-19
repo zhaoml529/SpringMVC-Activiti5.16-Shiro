@@ -24,12 +24,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zml.oa.entity.Datagrid;
+import com.zml.oa.entity.Message;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.PaginationThreadUtils;
 
 @Controller
@@ -42,17 +46,29 @@ public class ProcessModelAction {
 	private RepositoryService repositoryService;
 	
 	/**
+	 * 调整模型列表
+	 * @return
+	 */
+	@RequestMapping(value = "/toListModel")
+	public String toListModel(){
+		return "workflow/list_model";
+	}
+	
+	
+	/**
 	 * 模型列表
 	 * @return
 	 */
-	@RequestMapping(value = "/listModel_page")
-    public ModelAndView modelList() {
-        ModelAndView mav = new ModelAndView("workflow/list_model");
+	@RequestMapping(value = "/listModel")
+	@ResponseBody
+    public Datagrid<Model> modelList(
+    		@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "rows", required = false) Integer rows) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
-        int[] pageParams = PaginationThreadUtils.setPage(modelQuery.list().size());
+        Page<Model> p = new Page<Model>(page, rows);
+        int[] pageParams = p.getPageParams(modelQuery.list().size());
         List<Model> list = modelQuery.listPage(pageParams[0], pageParams[1]);
-        mav.addObject("list", list);
-        return mav;
+        return new Datagrid<Model>(p.getTotal(), list);
     }
 	
 	/**
@@ -102,7 +118,9 @@ public class ProcessModelAction {
 	 * @return
 	 */
     @RequestMapping(value = "deploy/{modelId}")
-    public String deploy(@PathVariable("modelId") String modelId, RedirectAttributes redirectAttributes) {
+    @ResponseBody
+    public Message deploy(@PathVariable("modelId") String modelId) {
+    	Message message = new Message();
         try {
             Model modelData = repositoryService.getModel(modelId);
             ObjectNode modelNode = (ObjectNode) new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId()));
@@ -113,12 +131,14 @@ public class ProcessModelAction {
 
             String processName = modelData.getName() + ".bpmn20.xml";
             Deployment deployment = repositoryService.createDeployment().name(modelData.getName()).addString(processName, new String(bpmnBytes)).deploy();
-            redirectAttributes.addFlashAttribute("message", "部署成功，部署ID=" + deployment.getId());
+            message.setStatus(Boolean.TRUE);
+            message.setMessage("部署成功，部署ID=" + deployment.getId());
         } catch (Exception e) {
-        	redirectAttributes.addFlashAttribute("message", "根据模型部署流程失败:modelId="+modelId);
+        	message.setStatus(Boolean.FALSE);
+        	message.setMessage("根据模型部署流程失败:modelId="+modelId);
             logger.error("根据模型部署流程失败：modelId={}" + modelId, e);
         }
-        return "redirect:/modelAction/listModel_page";
+        return message;
     }
 
     /**
@@ -152,8 +172,17 @@ public class ProcessModelAction {
      * @return
      */
     @RequestMapping(value = "delete/{modelId}")
-    public String delete(@PathVariable("modelId") String modelId) {
-        repositoryService.deleteModel(modelId);
-        return "redirect:/modelAction/listModel_page";
+    @ResponseBody
+    public Message delete(@PathVariable("modelId") String modelId) {
+    	Message message = new Message();
+    	try {
+    		repositoryService.deleteModel(modelId);
+    		 message.setStatus(Boolean.TRUE);
+             message.setMessage("删除成功！");
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+            message.setMessage("删除失败！");
+		}
+        return message;
     }
 }
