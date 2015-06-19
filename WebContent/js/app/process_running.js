@@ -2,12 +2,12 @@
  * 管理运行中的流程
  */
 
-var process_datagrid;
+var process_datagrid_runing;
 var process_form;
 var process_dialog;
 
 $(function() {
-	process_datagrid = $("#process_running").datagrid({
+	process_datagrid_runing = $("#process_running").datagrid({
         url: ctx+"/processAction/process/runningProcess",
         width : 'auto',
 		height :  $(this).height()-135,
@@ -20,7 +20,7 @@ $(function() {
 //      pageSize:2,
 		columns : [ 
 		    [ 
-                {field : 'id',title : '执行ID',width : fixWidth(0.2)},
+                {field : 'id',title : '执行ID',width : fixWidth(0.2),align : 'center'},
                 {field : 'processInstanceId',title : '流程实例ID',width : fixWidth(0.1),align : 'center'},
                 {field : 'processDefinitionId',title : '流程定义ID',width : fixWidth(0.2),align : 'center'},
                 {field : 'activityId',title : 'activityId',width : fixWidth(0.1),align : 'center'},
@@ -59,7 +59,6 @@ $(function() {
 
 //挂起、激活
 function suspended( status, id ){
-	var id = row.processInstanceId.toString();
 	var url_ = ctx+"/processAction/process/updateProcessStatusByProInstanceId/active/"+id;
 	if(status == "suspend"){
 		url_ = ctx+"/processAction/process/updateProcessStatusByProInstanceId/suspend/"+id;
@@ -72,7 +71,7 @@ function suspended( status, id ){
 		success: function (data) {
 			$.messager.progress("close");
 			if (data.status) {
-				process_datagrid.datagrid("reload"); //reload the process data
+				process_datagrid_runing.datagrid("reload"); //reload the process data
 			} 
 			$.messager.show({
 				title : data.title,

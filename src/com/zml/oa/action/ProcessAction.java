@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
@@ -235,23 +236,6 @@ public class ProcessAction {
     	return "apply/list_running";
     }
     
-    /**
-     * 管理已结束的流程
-     *
-     * @return
-     * @throws Exception 
-     */
-    @RequiresPermissions("admin:process:*")
-    @RequestMapping(value = "/process/finishedProcess")
-    @ResponseBody
-    public Datagrid<BaseVO> findFinishedProcessInstances(
-    		@RequestParam(value = "page", required = false) Integer page,
-    		@RequestParam(value = "rows", required = false) Integer rows) throws Exception {
-    	Page<BaseVO> p = new Page<BaseVO>(page, rows);
-    	
-    	List<BaseVO> processList = this.processService.findFinishedProcessInstances(p);
-    	return new Datagrid<BaseVO>(p.getTotal(), processList);
-    }
     
     
     /**
@@ -261,13 +245,13 @@ public class ProcessAction {
      */
     
     /**
-     * 跳转管理运行中的流程页面
+     * 跳转流程管理页面
      * @return
      * @throws Exception
      */
-    @RequestMapping("/process/toListProcessRunning")
+    @RequestMapping("/process/toListProcessManager")
     public String toListProcessRunning() throws Exception{
-    	return "workflow/list_process_running";
+    	return "workflow/list_process_manager";
     }
     
     /**
@@ -301,15 +285,43 @@ public class ProcessAction {
     	return new Datagrid<ProcessInstanceEntity>(p.getTotal(), pieList);
     }
     
+    /**
+     * 管理已结束的流程
+     *
+     * @return
+     * @throws Exception 
+     */
+    @RequiresPermissions("admin:process:*")
+    @RequestMapping(value = "/process/finishedProcess")
+    @ResponseBody
+    public Datagrid<Object> findFinishedProcessInstances(
+    		@RequestParam(value = "page", required = false) Integer page,
+    		@RequestParam(value = "rows", required = false) Integer rows) throws Exception {
+    	Page<BaseVO> p = new Page<BaseVO>(page, rows);
+    	List<Object> jsonList=new ArrayList<Object>(); 
+    	List<BaseVO> processList = this.processService.findFinishedProcessInstances(p);
+    	for(BaseVO base : processList){
+    		Map<String, Object> map=new HashMap<String, Object>();
+    		map.put("businessType", base.getBusinessType());
+    		map.put("user_name", base.getUser_name());
+    		map.put("title", base.getTitle());
+    		map.put("startTime", base.getHistoricProcessInstance().getStartTime());
+    		map.put("endTime", base.getHistoricProcessInstance().getEndTime());
+    		map.put("deleteReason", base.getHistoricProcessInstance().getDeleteReason());
+    		map.put("version", base.getProcessDefinition().getVersion());
+    		jsonList.add(map);
+    	}
+    	return new Datagrid<Object>(p.getTotal(), jsonList);
+    }
     
     /**
      * 跳转流程定义页面
      * @return
      * @throws Exception
      */
-    @RequestMapping("/process/toListProcess")
+    @RequestMapping("/process/toListProcessInstance")
     public String toListProcess() throws Exception{
-    	return "workflow/list_process";
+    	return "workflow/list_process_instance";
     }
     
     /**

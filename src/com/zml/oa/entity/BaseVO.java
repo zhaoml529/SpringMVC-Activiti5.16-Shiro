@@ -10,6 +10,9 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 public class BaseVO implements Serializable{
 
@@ -61,18 +64,23 @@ public class BaseVO implements Serializable{
 	private String businessKey;
 	
     // 流程任务
+	@JsonBackReference 
     private Task task;
 
     // 运行中的流程实例
+	@JsonBackReference 
     private ProcessInstance processInstance;
 
     // 历史的流程实例
+	@JsonBackReference 
     private HistoricProcessInstance historicProcessInstance;
 
     // 历史任务
+	@JsonBackReference 
     private HistoricTaskInstance historicTaskInstance;
     
     // 流程定义
+	@JsonBackReference 
     private ProcessDefinition processDefinition;
 
     @Transient
