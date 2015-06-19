@@ -11,7 +11,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -21,6 +23,8 @@ import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -212,26 +216,49 @@ public class UserAction {
 	}
 	
 	@RequiresPermissions("admin:*")
-	@RequestMapping(value = "/listSession")
-    public String list(Model model) {
+	@RequestMapping(value = "/toListOnlineUser")
+	public String toOnlineUser() throws Exception{
+		return "user/online_user";
+	}
+	
+	@RequiresPermissions("admin:*")
+	@RequestMapping(value = "/listOnlineUser")
+	@ResponseBody
+    public List<Object> list(Model model) {
         Collection<Session> sessions =  sessionDAO.getActiveSessions();
-        model.addAttribute("sessions", sessions);
-        model.addAttribute("sessionCount", sessions.size());
-        return "user/list_session";
+        List<Object> jsonList=new ArrayList<Object>(); 
+        for(Session session : sessions){
+        	Map<String, Object> map=new HashMap<String, Object>();
+        	PrincipalCollection principalCollection = (PrincipalCollection) session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+        	String userName = (String)principalCollection.getPrimaryPrincipal();
+        	Boolean forceLogout = session.getAttribute(Constants.SESSION_FORCE_LOGOUT_KEY) != null;
+        	map.put("id", session.getId());
+        	map.put("userName", userName);
+        	map.put("host", session.getHost());
+        	map.put("lastAccessTime", session.getLastAccessTime());
+        	map.put("forceLogout", forceLogout);
+        	jsonList.add(map);
+        }
+        return jsonList;
     }
 
 	@RequiresPermissions("admin:session:forceLogout")
-    @RequestMapping("/{sessionId}/forceLogout")
-    public String forceLogout(
-            @PathVariable("sessionId") String sessionId, RedirectAttributes redirectAttributes) {
+    @RequestMapping("/forceLogout/{sessionId}")
+	@ResponseBody
+    public Message forceLogout(@PathVariable("sessionId") String sessionId) {
+		Message message = new Message();
         try {
             Session session = sessionDAO.readSession(sessionId);
             if(session != null) {
                 session.setAttribute(Constants.SESSION_FORCE_LOGOUT_KEY, Boolean.TRUE);
             }
-        } catch (Exception e) {/*ignore*/}
-        redirectAttributes.addFlashAttribute("msg", "强制退出成功！");
-        return "redirect:/userAction/listSession";
+            message.setStatus(Boolean.TRUE);
+            message.setMessage("强制退出成功！");
+        } catch (Exception e) {
+        	message.setStatus(Boolean.FALSE);
+            message.setMessage("强制退出失败！");
+        }
+        return message;
     }
 	
 	@RequiresPermissions("admin:user:syncUser")
