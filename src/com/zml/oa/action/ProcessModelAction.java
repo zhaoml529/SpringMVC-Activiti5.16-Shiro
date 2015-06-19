@@ -46,7 +46,7 @@ public class ProcessModelAction {
 	private RepositoryService repositoryService;
 	
 	/**
-	 * 调整模型列表
+	 * 跳转模型列表
 	 * @return
 	 */
 	@RequestMapping(value = "/toListModel")
@@ -70,6 +70,16 @@ public class ProcessModelAction {
         List<Model> list = modelQuery.listPage(pageParams[0], pageParams[1]);
         return new Datagrid<Model>(p.getTotal(), list);
     }
+	
+	/**
+	 * 跳转创建模型页面
+	 * @return
+	 */
+	@RequestMapping(value = "/toAddModel")
+	public String toCreateModel(){
+		return "workflow/add_model";
+	}
+	
 	
 	/**
 	 * 创建模型

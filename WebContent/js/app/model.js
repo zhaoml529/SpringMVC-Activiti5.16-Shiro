@@ -60,7 +60,7 @@ $(function() {
 function formInit() {
 	var _url = ctx+"/modelAction/create";
 
-    user_form = $('#model_form').form({
+    model_form = $('#model_form').form({
         url: _url,
         onSubmit: function (param) {
             $.messager.progress({
@@ -99,23 +99,23 @@ function formInit() {
 function add(){
 	//弹出对话窗口
     model_dialog = $('<div/>').dialog({
-    	title : "用户信息",
+    	title : "模型信息",
 		top: 20,
 		width : 600,
 		height : 300,
         modal: true,
         minimizable: true,
         maximizable: true,
-        href: _url,
+        href: ctx+"/modelAction/toAddModel",
         onLoad: function () {
-            formInit(row);
+            formInit();
         },
         buttons: [
             {
                 text: '保存',
                 iconCls: 'icon-save',
                 handler: function () {
-                    user_form.submit();
+                    model_form.submit();
                 }
             },
             {
