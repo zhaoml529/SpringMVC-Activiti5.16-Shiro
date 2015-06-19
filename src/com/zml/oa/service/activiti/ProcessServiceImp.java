@@ -125,11 +125,11 @@ public class ProcessServiceImp implements IProcessService{
      * @return
      */
     @Override
-    public List<BaseVO> findFinishedProcessInstances(Model model) {
+    public List<BaseVO> findFinishedProcessInstances(Page<BaseVO> page) {
         HistoricProcessInstanceQuery historQuery = historyService.createHistoricProcessInstanceQuery().finished();
+    	
         Integer totalSum = historQuery.list().size();
-        int[] pageParams = PaginationThreadUtils.setPage(totalSum);
-    	Pagination pagination = PaginationThreadUtils.get();
+        int[] pageParams = page.getPageParams(totalSum);
 		List<HistoricProcessInstance> list = historQuery.orderByProcessInstanceEndTime().desc().listPage(pageParams[0], pageParams[1]);
 		List<BaseVO> processList = new ArrayList<BaseVO>();
 		
@@ -147,7 +147,6 @@ public class ProcessServiceImp implements IProcessService{
 			}
 		}
 		
-		model.addAttribute("page", pagination.getPageStr());
         return processList;
     }
 	

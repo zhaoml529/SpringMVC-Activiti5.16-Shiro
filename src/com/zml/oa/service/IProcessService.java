@@ -104,7 +104,7 @@ public interface IProcessService {
      *
      * @return
      */
-    public List<BaseVO> findFinishedProcessInstances(Model model) throws Exception;
+    public List<BaseVO> findFinishedProcessInstances(Page<BaseVO> page) throws Exception;
     
     /**
      * 各个审批人员查看自己完成的任务

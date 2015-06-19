@@ -242,12 +242,15 @@ public class ProcessAction {
      * @throws Exception 
      */
     @RequiresPermissions("admin:process:*")
-    @RequestMapping(value = "/process/finishedProcess_page")
-    public String findFinishedProcessInstances(Model model) throws Exception {
-    	List<BaseVO> processList = this.processService.findFinishedProcessInstances(model);
-    	model.addAttribute("processList", processList);
-    	model.addAttribute("taskType", BaseVO.FINISHED);
-    	return "workflow/finished_process";
+    @RequestMapping(value = "/process/finishedProcess")
+    @ResponseBody
+    public Datagrid<BaseVO> findFinishedProcessInstances(
+    		@RequestParam(value = "page", required = false) Integer page,
+    		@RequestParam(value = "rows", required = false) Integer rows) throws Exception {
+    	Page<BaseVO> p = new Page<BaseVO>(page, rows);
+    	
+    	List<BaseVO> processList = this.processService.findFinishedProcessInstances(p);
+    	return new Datagrid<BaseVO>(p.getTotal(), processList);
     }
     
     

@@ -10,7 +10,7 @@ $(function() {
 	process_datagrid = $("#process_running").datagrid({
         url: ctx+"/processAction/process/runningProcess",
         width : 'auto',
-		height :  $(this).height()-85,
+		height :  $(this).height()-135,
 		pagination:true,
 		rownumbers:true,
 		border:false,
@@ -50,7 +50,7 @@ $(function() {
 
 	function fixWidth(percent)   
 	{   
-		return parseInt(($(this).width() - 50) * percent);
+		return parseInt(($(this).width() - 55) * percent);
 	}
 	
 
