@@ -139,7 +139,7 @@ function suspended( status, id ){
 function delRows() {
 	var row = process_datagrid.datagrid('getSelected');
     if (row) {
-    	$.messager.confirm('确认提示！', '您确定要删除选中流程信息? 此操作同时也会删除与此流程相关的审批数据！', function (result) {
+    	$.messager.confirm('确认提示！', '您确定要删除选中流程信息? 此操作同时也会删除与此流程相关的所有审批数据！', function (result) {
             if (result) {
             	$.messager.confirm('再次确认！', '请再次确认您的选择，此操作很重要!', function (result) {
             		if(result){

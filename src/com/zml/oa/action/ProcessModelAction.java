@@ -116,6 +116,7 @@ public class ProcessModelAction {
             repositoryService.addModelEditorSource(modelData.getId(), editorNode.toString().getBytes("utf-8"));
 
             response.sendRedirect(request.getContextPath() + "/modeler/service/editor?id=" + modelData.getId());
+            return;
         } catch (Exception e) {
             logger.error("创建模型失败：", e);
         }
@@ -142,7 +143,7 @@ public class ProcessModelAction {
             String processName = modelData.getName() + ".bpmn20.xml";
             Deployment deployment = repositoryService.createDeployment().name(modelData.getName()).addString(processName, new String(bpmnBytes)).deploy();
             message.setStatus(Boolean.TRUE);
-            message.setMessage("部署成功，部署ID=" + deployment.getId());
+            message.setMessage("部署成功，部署ID=" + deployment.getId()+" 请到【流程定义】菜单中查看！");
         } catch (Exception e) {
         	message.setStatus(Boolean.FALSE);
         	message.setMessage("根据模型部署流程失败:modelId="+modelId);
