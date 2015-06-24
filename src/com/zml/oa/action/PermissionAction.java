@@ -1,6 +1,7 @@
 package com.zml.oa.action;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.dao.IJdbcDao;
+import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.GroupAndResource;
 import com.zml.oa.entity.Message;
 import com.zml.oa.entity.Resource;
 import com.zml.oa.entity.UserTask;
+import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IGroupAndResourceService;
@@ -65,18 +68,6 @@ public class PermissionAction {
     @Autowired
     protected IResourceService resourceService;
     
-    @RequestMapping(value = "/loadBpmn_page")
-	public String loadBpmnInfo(Model model){
-		ProcessDefinitionQuery proDefQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
-		Integer totalSum = proDefQuery.list().size();
-		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
-		Pagination pagination = PaginationThreadUtils.get();
-		List<ProcessDefinition> processDefinitionList = proDefQuery.listPage(pageParams[0], pageParams[1]);
-		model.addAttribute("proDefList", processDefinitionList);
-		model.addAttribute("page", pagination.getPageStr());
-		return "permission/list_bpmn";
-	}
-	
 	@RequestMapping(value = "/setAuthor")
 	public String setAuthor(@RequestParam("id") String processDefinitionId) {
 		ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
@@ -95,14 +86,15 @@ public class PermissionAction {
 		return list;
 	}
 	/**
-	 * 删除 usertask表中数据，重新初始化节点信息。
+	 * easyui-删除 usertask表中数据，初始化节点信息。
 	 * @param redirectAttributes
 	 * @return
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/initialization")
-	public void initialization(HttpServletResponse response) throws Exception {
-		PrintWriter out = response.getWriter();
+	@ResponseBody
+	public Message initialization(HttpServletResponse response) throws Exception {
+		Message message = new Message();
 		try {
 			this.userTaskService.deleteAll();
 			ProcessDefinitionQuery proDefQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
@@ -111,14 +103,14 @@ public class PermissionAction {
 				//读取节点信息保存到usertask表
 				setSingleActivitiInfo(processDefinition);
 			}
-			out.print("success");
+			message.setMessage("初始化成功！");
+			message.setStatus(Boolean.TRUE);
 		} catch (Exception e) {
-			out.print("fail");
+			message.setMessage("初始化失败！");
+			message.setStatus(Boolean.FALSE);
 			throw e;
 		}
-		//RedirectAttributes redirectAttributes
-		//redirectAttributes.addFlashAttribute("message", "初始化成功！");
-		//return "redirect:/permissionAction/loadBpmn_page";
+		return message;
 		
 	}
 	
@@ -249,6 +241,47 @@ public class PermissionAction {
 			throw e;
 		}
 	}
+	
+	/**
+	 * easyui
+	 * @return
+	 */
+	@RequestMapping(value = "/toListBpmn")
+	public String toListBpmn(){
+		return "bpmn/list_bpmn";
+	}
+	
+	/**
+	 * BPMN列表 easyui
+	 * @param page
+	 * @param rows
+	 * @return
+	 */
+	@RequestMapping(value = "/listBpmn")
+	@ResponseBody
+	public Datagrid<Object> listBpmn(
+			@RequestParam(value = "page", required = false) Integer page,
+    		@RequestParam(value = "rows", required = false) Integer rows){
+		Page<Object> p = new Page<Object>(page, rows);
+		List<Object> jsonList=new ArrayList<Object>(); 
+		
+		ProcessDefinitionQuery proDefQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
+		Integer totalSum = proDefQuery.list().size();
+		int[] pageParams = p.getPageParams(totalSum);
+		List<ProcessDefinition> processDefinitionList = proDefQuery.listPage(pageParams[0], pageParams[1]);
+		for(ProcessDefinition pd : processDefinitionList){
+			Map<String, Object> map=new HashMap<String, Object>();
+			map.put("id", pd.getId());
+			map.put("name", pd.getName());
+			map.put("key", pd.getKey());
+			map.put("resourceName", pd.getResourceName());
+			map.put("diagramResourceName", pd.getDiagramResourceName());
+			jsonList.add(map);
+		}
+		return new Datagrid<Object>(p.getTotal(), jsonList);
+		
+	}
+	
 	
 	/**
 	 * 获取组权限-easyui

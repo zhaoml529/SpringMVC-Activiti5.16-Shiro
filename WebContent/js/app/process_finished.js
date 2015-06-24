@@ -27,7 +27,7 @@ $(function() {
                 		}else if(value == "salary"){
                 			return "薪资调整";
                 		}else if(value == "expense"){
-                			return "爆笑申请";
+                			return "报销申请";
                 		}
 					}
                 },

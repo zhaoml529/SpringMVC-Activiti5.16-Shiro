@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.Datagrid;
@@ -278,25 +279,71 @@ public class UserAction {
 		return "redirect:/userAction/toList_page";
 	}  
 	
-	@RequestMapping(value = "/chooseUser_page")
-	public String chooseUser(@RequestParam("groupId") String groupId,
-							@RequestParam("flag") boolean flag,
-							@RequestParam("key") String key,
-							Model model) throws Exception{
-		List<User> userList = new ArrayList<>();
-		if("-1".equals(groupId)){
-			userList = this.userService.getUserList_page();
-		}else{
-			userList = this.userService.getUserByGroupId(groupId);
-		}
-		Pagination pagination = PaginationThreadUtils.get();
-		model.addAttribute("page", pagination.getPageStr());
-		List<Group> groupList = this.groupService.getGroupList();
-		model.addAttribute("userList", userList);
-		model.addAttribute("groupList", groupList);
-		model.addAttribute("groupId", groupId);
-		model.addAttribute("key", key);
-		model.addAttribute("flag", flag);
-		return "user/choose_user";
+	
+	/**
+	 * 跳转选择候选人页面-easyui
+	 * @return
+	 */
+	@RequestMapping(value = "/toChooseUser")
+	public ModelAndView toChooseUser(@RequestParam("multiSelect") boolean multiSelect, @RequestParam("key") String key){
+		ModelAndView mv = new ModelAndView("bpmn/choose_user");
+		mv.addObject("key", key);
+		mv.addObject("multiSelect", multiSelect);
+		return mv;
 	}
+	
+	
+	/**
+	 * 获取候选人列表 - easyui
+	 * @param page
+	 * @param rows
+	 * @param groupId
+	 * @param flag
+	 * @param key
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/chooseUser")
+	@ResponseBody
+	public Datagrid<Object> chooseUser(
+			@RequestParam(value = "page", required = false) Integer page, 
+			@RequestParam(value = "rows", required = false) Integer rows,
+			@RequestParam(value = "groupId", required = false) String groupId) throws Exception{
+		Page<User> p = new Page<User>(page, rows);
+		if(groupId != null){
+			this.userService.getUserList(p);
+		}else{
+			this.userService.getUserByGroupId(groupId, p);
+		}
+		List<Object> jsonList=new ArrayList<Object>(); 
+		
+		for(User user: p.getResult()){
+			Map<String, Object> map=new HashMap<String, Object>();
+			map.put("id", user.getId());
+			map.put("name", user.getName());
+			map.put("group", user.getGroup().getName());
+			map.put("registerDate", user.getRegisterDate());
+			jsonList.add(map);
+		}
+		Datagrid<Object> dataGrid = new Datagrid<Object>(p.getTotal(), jsonList);
+		return dataGrid;
+		
+		
+//		List<User> userList = new ArrayList<>();
+//		if(groupId != null){
+//			userList = this.userService.getUserList_page();
+//		}else{
+//			userList = this.userService.getUserByGroupId(groupId);
+//		}
+//		Pagination pagination = PaginationThreadUtils.get();
+//		List<Group> groupList = this.groupService.getGroupList();
+//		
+//		model.addAttribute("userList", userList);
+//		model.addAttribute("groupList", groupList);
+//		model.addAttribute("groupId", groupId);
+//		model.addAttribute("key", key);
+//		model.addAttribute("flag", flag);
+//		return "user/choose_user";
+	}
+	
 }

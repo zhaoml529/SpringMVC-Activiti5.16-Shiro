@@ -151,4 +151,16 @@ public class GroupAction {
 			return new Message(Boolean.FALSE, "删除失败！ID为空！");
 		}
 	}
+	
+	/**
+	 * 候选人页面使用-easyui
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/getAllGroup")
+	@ResponseBody
+	public List<Group> getGroupList() throws Exception{
+		List<Group> list = this.groupService.getGroupList();
+		return list;
+	}
 }

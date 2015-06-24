@@ -30,7 +30,7 @@ public interface IUserService {
 
 	public User getUserById(Integer id) throws Exception;
 	
-	public List<User> getUserByGroupId(String groupId) throws Exception;
+	public List<User> getUserByGroupId(String groupId, Page<User> page) throws Exception;
 	
 	public void doUpdate(User user) throws Exception;
 	

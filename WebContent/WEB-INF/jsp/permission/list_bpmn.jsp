@@ -192,7 +192,7 @@
 		//普通用户节点
 		var modal = 
 		'<td>\
-			<table style="border: 2px solid red;padding: 5px;margin: 5px">\
+			<table style="border: 2px solid red;padding: 5px;margin: 5px;">\
 			<tr>\
 				<td>名称:</td>\
 				<td>'+obj.taskName+'</td>\

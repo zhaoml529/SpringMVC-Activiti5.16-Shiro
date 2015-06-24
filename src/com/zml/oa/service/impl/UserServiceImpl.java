@@ -64,8 +64,9 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
 	}
 
 	@Override
-	public List<User> getUserByGroupId(String groupId) throws Exception {
-		List<User> list = findByPage("User", new String[]{"group"}, new String[]{groupId});
+	public List<User> getUserByGroupId(String groupId, Page<User> page) throws Exception {
+//		List<User> list = findByPage("User", new String[]{"group"}, new String[]{groupId});
+		List<User> list = getListPage("User", new String[]{"group"}, new String[]{groupId}, page);
 		return list;
 	}
 	
