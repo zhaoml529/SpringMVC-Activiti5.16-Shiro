@@ -4,6 +4,7 @@
 
 var bpmn_datagrid;
 var bpmn_win;
+var tb_width = 0;
 
 
 $(function() {
@@ -55,6 +56,7 @@ $(function() {
         minimizable: false,
         maximizable: false,
         onBeforeClose: function(){
+        	alert($("#modelTable").width());
         	$("#modelTable").html("");
         }
     });
@@ -335,6 +337,7 @@ function setAuthor(){
 					for(var i=0;i<data.length;i++) {  
 						//逐个显示审批人员
 						outputData(data[i]);
+						tb_width += 280;
 					}
 					//最后显示model
 //					modelDialog( data );
