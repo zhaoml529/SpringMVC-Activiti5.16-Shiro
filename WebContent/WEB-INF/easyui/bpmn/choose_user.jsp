@@ -9,61 +9,49 @@
 <meta http-equiv="expires" content="0" />    
 <title>选取审批人员</title>
 <script type="text/javascript">
-	var key = "${key }";
-	function selectUser( userId, userName ){
-		$("#"+key+"_id", window.parent.document).val(userId);
-		$("#"+key+"_name", window.parent.document).val(userName);
-		window.parent.closeDialogFrame();
-	}
-	
-	function getUserByGroup( groupId, flag ){
-		window.location.href = '${ctx }/userAction/chooseUser_page?groupId='+groupId+'&flag='+flag+'&key='+key;
-	}
-	
-	function getValue(){
-        var ids='';
-        var names='';
-        var checked = $("input:checked");//获取所有被选中的标签元素
-        for(i=0;i<checked.length;i++){
-         	//将所有被选中的标签元素的值保存成一个字符串，以逗号隔开
-       	 	var obj = checked[i].value.split("_");
-            if(i<checked.length-1){
-	           ids+=obj[0]+',';
-	           names+=obj[1]+',';
-            }else{
-               ids+=obj[0];
-               names+=obj[1];
-            }
-        }
-        $("#"+key+"_id", window.parent.document).val(ids);
-		$("#"+key+"_name", window.parent.document).val(names); 
-	}
-	
+
 </script>
 </head>
 <body>
-	<input type="hidden" id="key" value="${key }"/>
-	<input type="hidden" id="multiSelect" value="${multiSelect }"/>
-
-      <div style="text-align: left;padding: 2px 1em 2px">
-	      用户组：<select id="group"  name="subject" onchange="getUserByGroup(this.value,'${flag }')">
-			<option value="-1"> -- 所有人员 -- </option> 
-			<c:choose>
-				<c:when test="${empty groupList }">
-					<option value="-1">-- 所有人员 --</option>
-				</c:when>
-				<c:otherwise>
-					<c:forEach items="${groupList}" var="group">
-						<option ${groupId == group.id?'selected':'' } value="${group.id}">${group.name}</option>
-					</c:forEach>
-				</c:otherwise>
-			</c:choose>  
-		  </select>
-	  </div>
-	  
-	<input id="group" style="width:150px">
-	
-	<table id="user_datagrid" title="候选人"></table>
+	<div title="候选人" style="width:986px;height:364px;">
+		<div class="easyui-layout" fit="true">
+			<div region="west" split="true" style="width:120px;">
+				<ul class="easyui-tree">
+					<li>
+						<span>部门</span>
+						<ul>
+							<c:choose>
+								<c:when test="${empty groupList }">
+									暂无部门信息，请联系管理员！
+								</c:when>
+								<c:otherwise>
+									<c:forEach items="${groupList}" var="group">
+										<li><a href="javascript:void(0);" onclick="addTab('${group.name}','${group.id }','${taskDefKey }','${multiSelect }');"><span>${group.name}</span></a></li>
+									</c:forEach>
+								</c:otherwise>
+							</c:choose>  
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div region="center" border="false" border="false">
+				<div id="userTabs" class="easyui-tabs" fit="true">
+					<div title="Home" style="padding:10px;">
+						<div class="well well-small">
+							<span class="badge" iconCls="icon-save" plain="true" id="tishi" title="提示">提示</span>
+							<p>
+								请点击左侧<span class="label-info"><strong>部门</strong></span>来选择人员，选择人员后点击<span class="label-info"><strong>确认</strong></span>键设定人员！
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div region="south" border="false" style="text-align:right;height:30px;line-height:30px;">
+				<a class="easyui-linkbutton" icon="icon-ok" href="javascript:void(0)" onclick="set_chooseUser();">确认</a>
+				<a class="easyui-linkbutton" icon="icon-cancel" href="javascript:void(0)" onclick="destroy_chooseUser('${taskDefKey }');">取消</a>
+			</div>
+		</div>
+	</div>
     
 </body>
 

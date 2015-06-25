@@ -8,10 +8,11 @@ var group_combobox;
 
 $(function() {
 	//数据列表
+	var groupId = $("#groupId").val();
     user_datagrid = $('#user_datagrid').datagrid({
-        url: ctx+"/userAction/chooseUser",
+        url: ctx+"/userAction/chooseUser?groupId="+groupId,
         width : 'auto',
-		height :  $(this).height()-85,
+		height :  $(this).height(),
 		pagination:true,
 		rownumbers:true,
 		border:false,
@@ -19,19 +20,19 @@ $(function() {
 		striped:true,
         columns : [ 
             [ 
-              {field:'ck', 
+              {field:'ck', title : '#',width : fixWidth(0.1),align : 'center',
             	  formatter:function(value,row){
-            		  value = $("#multiSelect").val();
-            		  if(value){
-            			  return '<input id="check_'+row.id+'" value="'+row.id+'_'+row.name+'" name="ids" type="checkbox" />';
+            		  var multiSelect = $("#multiSelect").val();
+            		  if(multiSelect == "true"){
+            			  return '<input type="checkbox" id="check_'+row.id+'" value="'+row.id+'_'+row.name+'" name="ids" />';
             		  }else{
-            			  return '<input type="radio" name="id" value="'+row.id+'" onclick="selectUser(this.value,\''+row.name+'\');" />';
+            			  return '<input type="radio" name="id" value="'+row.id+'" onclick="selectUser(\''+row.id+'\',\''+row.name+'\');" />';
             		  }
 				  }
               },
-              {field : 'name',title : '用户名',width : fixWidth(0.2),align : 'left'},
-              {field : 'registerDate', title : '注册时间', width : fixWidth(0.2)},
-              {field : 'group',title : '用户组',width : fixWidth(0.2)}
+              {field : 'name',title : '用户名',width : fixWidth(0.3),align : 'center'},
+              {field : 'registerDate', title : '注册时间', width : fixWidth(0.3),align : 'center'},
+              {field : 'group',title : '用户组',width : fixWidth(0.3),align : 'center'}
     	    ] 
         ]
         //toolbar: "#toolbar"
@@ -58,3 +59,11 @@ $(function() {
 		return parseInt(($(this).width() - 50) * percent);
 	}
 });
+
+//选择用户，对父页面赋值
+function selectUser( userId, userName ){
+	var taskDefKey = $("#taskDefKey").val();
+	$("#"+taskDefKey+"_id", window.parent.document).val(userId);
+	$("#"+taskDefKey+"_name", window.parent.document).val(userName);
+	//window.parent.closeDialogFrame();
+}

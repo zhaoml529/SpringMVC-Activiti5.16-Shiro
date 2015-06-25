@@ -283,15 +283,33 @@ public class UserAction {
 	/**
 	 * 跳转选择候选人页面-easyui
 	 * @return
+	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/toChooseUser")
-	public ModelAndView toChooseUser(@RequestParam("multiSelect") boolean multiSelect, @RequestParam("key") String key){
+	public ModelAndView toChooseUser(@RequestParam("multiSelect") boolean multiSelect, @RequestParam("taskDefKey") String taskDefKey) throws Exception{
 		ModelAndView mv = new ModelAndView("bpmn/choose_user");
-		mv.addObject("key", key);
+		List<Group> groupList = this.groupService.getGroupList();
+		mv.addObject("taskDefKey", taskDefKey);
 		mv.addObject("multiSelect", multiSelect);
+		mv.addObject("groupList", groupList);
 		return mv;
 	}
 	
+	/**
+	 * 在tabs中根据groupId显示用户列表
+	 * @return
+	 */
+	@RequestMapping(value = "/toShowUser")
+	public ModelAndView toShowUser(
+			@RequestParam("groupId") String groupId,
+			@RequestParam("multiSelect") boolean multiSelect, 
+			@RequestParam("taskDefKey") String taskDefKey){
+		ModelAndView mv = new ModelAndView("bpmn/show_user");
+		mv.addObject("groupId", groupId);
+		mv.addObject("multiSelect", multiSelect);
+		mv.addObject("taskDefKey", taskDefKey);
+		return mv;
+	}
 	
 	/**
 	 * 获取候选人列表 - easyui
@@ -310,8 +328,8 @@ public class UserAction {
 			@RequestParam(value = "rows", required = false) Integer rows,
 			@RequestParam(value = "groupId", required = false) String groupId) throws Exception{
 		Page<User> p = new Page<User>(page, rows);
-		if(groupId != null){
-			this.userService.getUserList(p);
+		if(groupId == null){
+ 			this.userService.getUserList(p);
 		}else{
 			this.userService.getUserByGroupId(groupId, p);
 		}

@@ -81,8 +81,8 @@ public class PermissionAction {
 	
 	@RequestMapping(value = "/listUserTask")
 	@ResponseBody
-	public List<UserTask> listUserTask(@RequestParam("processKey") String processKey) throws Exception{
-		List<UserTask> list = this.userTaskService.findByWhere(processKey);
+	public List<UserTask> listUserTask(@RequestParam("procDefKey") String procDefKey) throws Exception{
+		List<UserTask> list = this.userTaskService.findByWhere(procDefKey);
 		return list;
 	}
 	/**
@@ -175,11 +175,20 @@ public class PermissionAction {
 		}
 	}
 	
+	/**
+	 * 保存设定的审批人员-easyui
+	 * @param procDefKey
+	 * @param request
+	 * @param redirectAttribute
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/setPermission")
-	public String setPermission(@RequestParam("processKey") String processKey,
+	@ResponseBody
+	public Message setPermission(@RequestParam("procDefKey") String procDefKey,
 								HttpServletRequest request,
 								RedirectAttributes redirectAttribute) throws Exception{
-		List<UserTask> list = this.userTaskService.findByWhere(processKey);
+		List<UserTask> list = this.userTaskService.findByWhere(procDefKey);
 		for(UserTask userTask : list){
 			String taskDefKey = userTask.getTaskDefKey();
 			String ids = request.getParameter(taskDefKey+"_id");
@@ -190,8 +199,7 @@ public class PermissionAction {
 			userTask.setCandidate_ids(ids);
 			this.userTaskService.doUpdate(userTask);
 		}
-		redirectAttribute.addFlashAttribute("message", "设置审批人员成功！");
-		return "redirect:/permissionAction/loadBpmn_page";
+		return new Message(Boolean.TRUE, "设置审批人员成功！");
 	}
 	
 	@RequestMapping(value = "/listPermission_page")

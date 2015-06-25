@@ -3,7 +3,9 @@
  */
 
 var bpmn_datagrid;
-var bpmn_win;
+var bpmn_dialog;
+var model_dialog;
+var model_form;
 var model_width = 0;
 
 
@@ -139,30 +141,32 @@ function chooseUser( multiSelect, taskDefKey ){
         modal: true,
         minimizable: true,
         maximizable: true,
-        href: ctx+"/userAction/toChooseUser?multiSelect="+multiSelect+"&key="+taskDefKey,
+        href: ctx+"/userAction/toChooseUser?multiSelect="+multiSelect+"&taskDefKey="+taskDefKey,
 //        onLoad: function () {
 //        	//$("#choose-user").html('<iframe src="'+ctx+'/userAction/chooseUser_page?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" name="dialogFrame" scrolling="auto"></iframe>');
 //        	userFormInit( multiSelect, taskDefKey );
 //        },
-        buttons: [
-            {
-                text: '保存',
-                iconCls: 'icon-save',
-                handler: function () {
-                	//调用子页面方法,dialogFrame不能为id，因为在FireFox下id不能获取iframe对象
-   				 	dialogFrame.window.getValue();
-   				 	bpmn_dialog.dialog('destroy');
-                }
-            },
-            {
-                text: '关闭',
-                iconCls: 'icon-cancel',
-                handler: function () {
-                	bpmn_dialog.dialog('destroy');
-                }
-            }
-        ],
+//        buttons: [
+//            {
+//                text: '保存',
+//                iconCls: 'icon-save',
+//                handler: function () {
+//                	//调用子页面方法,dialogFrame不能为id，因为在FireFox下id不能获取iframe对象
+//   				 	dialogFrame.window.getValue();
+//   				 	bpmn_dialog.dialog('destroy');
+//                }
+//            },
+//            {
+//                text: '关闭',
+//                iconCls: 'icon-cancel',
+//                handler: function () {
+//                	bpmn_dialog.dialog('destroy');
+//                }
+//            }
+//        ],
         onClose: function () {
+        	$("#"+taskDefKey+"_id").val("");
+        	$("#"+taskDefKey+"_name").val("");
         	bpmn_dialog.dialog('destroy');
         }
     });
@@ -207,19 +211,9 @@ function chooseGroup( taskDefKey ){
 }
 
 //子窗口调用-关闭选人或组页面
-function closeDialogFrame(){
-	$("#choose-user").dialog("close");
-}
-
-
-
-//显示流程节点
-function modelDialog( data ){
-	alert("open dialog");
-	bpmn_win=$('#dialog-form').window('open'); // open a window
-	//弹出对话窗口
-	
-}
+//function closeDialogFrame(){
+//	$("#bpmn_dialog").dialog("close");
+//}
 
 //组合流程节点
 function outputData( obj ){
@@ -296,20 +290,75 @@ function outputData( obj ){
 	}
 }
 
-function initModelTable(){
+//初始化表单
+function formInit( procDefKey ) {
+    model_form = $('#model_form').form({
+        url: ctx+"/permissionAction/setPermission?procDefKey="+procDefKey,
+        onSubmit: function (param) {
+            $.messager.progress({
+                title: '提示信息！',
+                text: '数据处理中，请稍后....'
+            });
+            var isValid = $(this).form('validate');
+            if (!isValid) {
+                $.messager.progress('close');
+            }
+            return isValid;
+        },
+        success: function (data) {
+            $.messager.progress('close');
+            var json = $.parseJSON(data);
+            if (json.status) {
+            	bpmn_dialog.dialog('destroy');//销毁对话框
+                bpmn_datagrid.datagrid('reload');//重新加载列表数据
+                
+            } 
+            $.messager.show({
+				title : json.title,
+				msg : json.message,
+				timeout : 1000 * 2
+			});
+        }
+    });
+}
+
+function initModelTable( procDefKey ){
     //显示节点信息
-    bpmn_win = $('#dialog-form').window({
-        top: ($(window).height()-300) * 0.5,
+	model_dialog = $('#dialog-form').dialog({
+    	top: ($(window).height()-450) * 0.5,
         left: ($(window).width()-model_width-5) * 0.5,
 		width : model_width+5,
-		height : 300,
+		height : 400,
 		closed: false,
-		shadow: true,
         modal: true,
+        shadow: true,
         iconCls: 'icon-save',
         minimizable: false,
         maximizable: false,
-        onBeforeClose: function(){
+        buttons: [
+            {
+                text: '保存',
+                iconCls: 'icon-save',
+                handler: function () {
+                    $.messager.progress({
+                        title: '提示信息！',
+                        text: '数据处理中，请稍后....'
+                    });
+					$('#model_form').submit();
+                }
+            },
+            {
+                text: '关闭',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                	model_dialog.dialog('close');
+                }
+            }
+        ],
+        onLoad: function () {
+            formInit( procDefKey );
+        },
+        onClose: function () {
         	$("#modelTable").html("");
         	model_width = 0;
         }
@@ -323,7 +372,7 @@ function setAuthor(){
 		$.ajax({
 			type: "POST", 
 			url: ctx+"/permissionAction/listUserTask",
-			data: {processKey: row.key},
+			data: {procDefKey: row.key},
 			success: function (data) {
 				if(data.length == 0){
 					$.messager.show({
@@ -342,8 +391,8 @@ function setAuthor(){
 						model_width += 300;	//每个节点的宽度
 					}
 					//显示model
-					initModelTable();
-					bpmn_win.window('open');
+					initModelTable(row.key);
+
 					//$("#modelForm").attr("action","${ctx}/permissionAction/setPermission?processKey="+data[0].procDefKey);
 				}
 			}
@@ -351,6 +400,32 @@ function setAuthor(){
     } else {
         $.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
     }
-	
+}
+
+//根据groupId显示人员列表的标签--choose_user.jsp
+function addTab(title, groupId, taskDefKey, multiSelect){
+	if ($('#userTabs').tabs('exists', title)){
+		$('#userTabs').tabs('select', title);
+	} else {
+		var url = ctx+"/userAction/toShowUser?groupId="+groupId+"&taskDefKey="+taskDefKey+"&multiSelect="+multiSelect;
+		var content = '<iframe scrolling="auto" frameborder="0"  src="'+url+'" style="width:100%;height:100%;"></iframe>';
+		$('#userTabs').tabs('add',{
+			title:title,
+			content:content,
+			closable:true
+		});
+	}
+}
+
+//取消选择--choose_user.jsp
+function destroy_chooseUser(taskDefKey){
+	$("#"+taskDefKey+"_id").val("");
+	$("#"+taskDefKey+"_name").val("");
+	bpmn_dialog.dialog('destroy');
+}
+
+//选择人时，同时也对父页面赋值了。所以，确认键就只关闭页面就好--choose_user.jsp
+function set_chooseUser(){
+	bpmn_dialog.dialog('destroy');
 }
 
