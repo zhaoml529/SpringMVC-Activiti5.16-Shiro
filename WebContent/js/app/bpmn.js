@@ -4,7 +4,7 @@
 
 var bpmn_datagrid;
 var bpmn_win;
-var tb_width = 0;
+var model_width = 0;
 
 
 $(function() {
@@ -43,24 +43,6 @@ $(function() {
         toolbar: "#toolbar"
     });
 
-    //显示节点信息
-    bpmn_win = $('#dialog-form').window({
-        top: ($(window).height()-300) * 0.5,
-        left: ($(window).width()-1500) * 0.5,
-		width : 1500,
-		height : 300,
-		closed: true,
-		shadow: true,
-        modal: true,
-        iconCls: 'icon-save',
-        minimizable: false,
-        maximizable: false,
-        onBeforeClose: function(){
-        	alert($("#modelTable").width());
-        	$("#modelTable").html("");
-        }
-    });
-    
     //修正宽高
 	function fixHeight(percent)   
 	{   
@@ -192,7 +174,7 @@ function chooseGroup( taskDefKey ){
     	title : "设定候选人",
 		top: 20,
 		width : 1000,
-		height : 400,
+		height : auto,
         modal: true,
         minimizable: true,
         maximizable: true,
@@ -246,7 +228,7 @@ function outputData( obj ){
 	//普通用户节点
 	var modal = 
 	'<td>\
-		<table style="border: 2px solid red;padding: 5px;margin: 5px; width: 280px;">\
+		<table style="border: 2px solid;padding: 5px;margin: 5px; width: 280px;" class="easyui-propertygrid well well-small">\
 		<tr>\
 			<td>名称:</td>\
 			<td>'+obj.taskName+'</td>\
@@ -264,8 +246,8 @@ function outputData( obj ){
 		<tr>\
 			<td>选择:</td>\
 			<td>\
-				<input type="text" id="'+taskDefKey+'_name" name="'+taskDefKey+'_name" readonly class="text ui-widget-content ui-corner-all"/>\
-				<input type="hidden" id="'+taskDefKey+'_id" name="'+taskDefKey+'_id" class="text ui-widget-content ui-corner-all"/>\
+				<input type="text" id="'+taskDefKey+'_name" name="'+taskDefKey+'_name" readonly class="easyui-textbox"/>\
+				<input type="hidden" id="'+taskDefKey+'_id" name="'+taskDefKey+'_id" class="easyui-textbox"/>\
 			</td>\
 		</tr>\
 		</table>\
@@ -274,7 +256,7 @@ function outputData( obj ){
 	//修改任务的节点已经在配置文件的 initiator 中设置，此处不用选择任务办理人。
 	var modify = 
 		'<td>\
-		<table style="border: 2px solid red;padding: 5px;margin: 5px">\
+		<table style="border: 2px solid;padding: 5px;margin: 5px; width: 280px;" class="easyui-propertygrid well well-small">\
 		<tr>\
 			<td>名称:</td>\
 			<td>'+obj.taskName+'</td>\
@@ -291,8 +273,8 @@ function outputData( obj ){
 		<tr>\
 			<td>选择:</td>\
 			<td>\
-				<input type="text" id="'+taskDefKey+'_name" value="任务发起人" name="'+taskDefKey+'_name" class="text ui-widget-content ui-corner-all"/>\
-				<input type="hidden" id="'+taskDefKey+'_id" value="0" name="'+taskDefKey+'_id" class="text ui-widget-content ui-corner-all"/>\
+				<input type="text" id="'+taskDefKey+'_name" value="任务发起人" name="'+taskDefKey+'_name" class="easyui-textbox"/>\
+				<input type="hidden" id="'+taskDefKey+'_id" value="0" name="'+taskDefKey+'_id" class="easyui-textbox"/>\
 			</td>\
 		</tr>\
 		</table>\
@@ -312,6 +294,26 @@ function outputData( obj ){
 		modal.find("table input[id="+taskDefKey+"_name]").attr("value",obj.candidate_name);
 		modal.find("table input[id="+taskDefKey+"_id]").attr("value",obj.candidate_ids);
 	}
+}
+
+function initModelTable(){
+    //显示节点信息
+    bpmn_win = $('#dialog-form').window({
+        top: ($(window).height()-300) * 0.5,
+        left: ($(window).width()-model_width-5) * 0.5,
+		width : model_width+5,
+		height : 300,
+		closed: false,
+		shadow: true,
+        modal: true,
+        iconCls: 'icon-save',
+        minimizable: false,
+        maximizable: false,
+        onBeforeClose: function(){
+        	$("#modelTable").html("");
+        	model_width = 0;
+        }
+    });
 }
 
 //设定审批人员
@@ -337,10 +339,10 @@ function setAuthor(){
 					for(var i=0;i<data.length;i++) {  
 						//逐个显示审批人员
 						outputData(data[i]);
-						tb_width += 280;
+						model_width += 300;	//每个节点的宽度
 					}
-					//最后显示model
-//					modelDialog( data );
+					//显示model
+					initModelTable();
 					bpmn_win.window('open');
 					//$("#modelForm").attr("action","${ctx}/permissionAction/setPermission?processKey="+data[0].procDefKey);
 				}

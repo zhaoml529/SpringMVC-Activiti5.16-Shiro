@@ -40,8 +40,8 @@
 		</table>
 	</div>
 	
-    <div id="dialog-form" title="设定审批人员" class="easyui-window" style="margin-top: 5px;">
-		<div data-options="region:'north',border:false" title="" style="height: 82px; overflow: hidden; padding: 5px;">
+    <div id="dialog-form" title="设定审批人员" class="easyui-window" closed="true" style="margin-top: 5px;">
+		<div data-options="region:'north',border:false" title="" style="overflow: hidden; padding: 5px;">
 			<div class="well well-small">
 				<span class="badge" iconCls="icon-save" plain="true" id="tishi" title="提示">提示</span>
 				<p>
@@ -49,12 +49,14 @@
 				</p>
 			</div>
 		</div>
-		<form id="modelForm" method="post">
-			<table>
-				<tr id="modelTable">
-				</tr>
-			</table>
-		</form>
+		<div align="center">
+			<form id="modelForm" method="post">
+				<table>
+					<tr id="modelTable">
+					</tr>
+				</table>
+			</form>
+		</div>
 	</div>
 	
 	<div id="choose-user" title="选择人员" style="display: none;">
