@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.Group;
@@ -42,23 +43,45 @@ public class GroupAction {
 		return "group/list_group";
 	}
 	
-	@RequestMapping("/toList_page")
-	public String toListPage(Model model) throws Exception{
-		List<Group> list = this.groupService.getGroupListPage();
-		Pagination pagination = PaginationThreadUtils.get();
-		model.addAttribute("page", pagination.getPageStr());
-		model.addAttribute("groupList", list);
-		return "group/list_group";
+//	@RequestMapping("/toList_page")
+//	public String toListPage(Model model) throws Exception{
+//		List<Group> list = this.groupService.getGroupListPage();
+//		Pagination pagination = PaginationThreadUtils.get();
+//		model.addAttribute("page", pagination.getPageStr());
+//		model.addAttribute("groupList", list);
+//		return "group/list_group";
+//	}
+	
+	/**
+	 * 跳转候选组也没-easyui
+	 * @param taskDefKey
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/toChooseGroup")
+	public ModelAndView toChooseGroup(@RequestParam("taskDefKey") String taskDefKey, Model model) throws Exception{
+		ModelAndView mv = new ModelAndView("bpmn/choose_group");
+		mv.addObject("taskDefKey", taskDefKey);
+		return mv;
 	}
 	
-	@RequestMapping("/chooseGroup_page")
-	public String chooseGroup(@RequestParam("key") String key, Model model) throws Exception{
-		List<Group> list = this.groupService.getGroupListPage();
-		Pagination pagination = PaginationThreadUtils.get();
-		model.addAttribute("page", pagination.getPageStr());
-		model.addAttribute("groupList", list);
-		model.addAttribute("key", key);
-		return "group/choose_group";
+	/**
+	 * 候选组-easyui
+	 * @param page
+	 * @param rows
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/chooseGroup")
+	@ResponseBody
+	public Datagrid<Group> chooseGroup(
+			@RequestParam(value = "page", required = false) Integer page, 
+			@RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+		Page<Group> p = new Page<Group>(page, rows);
+		this.groupService.getGroupListPage(p);
+		return new Datagrid<Group>(p.getTotal(), p.getResult());
+		
 	}
 	
 	/**

@@ -24,7 +24,7 @@ $(function() {
             	  formatter:function(value,row){
             		  var multiSelect = $("#multiSelect").val();
             		  if(multiSelect == "true"){
-            			  return '<input type="checkbox" id="check_'+row.id+'" value="'+row.id+'_'+row.name+'" name="ids" />';
+            			  return '<input type="checkbox" id="check_'+row.id+'" value="'+row.id+'_'+row.name+'" name="ids" onclick="selectUsers();" />';
             		  }else{
             			  return '<input type="radio" name="id" value="'+row.id+'" onclick="selectUser(\''+row.id+'\',\''+row.name+'\');" />';
             		  }
@@ -60,10 +60,31 @@ $(function() {
 	}
 });
 
-//选择用户，对父页面赋值
+//选择单个用户用户，对父页面赋值
 function selectUser( userId, userName ){
 	var taskDefKey = $("#taskDefKey").val();
 	$("#"+taskDefKey+"_id", window.parent.document).val(userId);
 	$("#"+taskDefKey+"_name", window.parent.document).val(userName);
 	//window.parent.closeDialogFrame();
+}
+
+//选择候选人，对父页面赋值
+function selectUsers(){
+	var taskDefKey = $("#taskDefKey").val();
+    var ids='';
+    var names='';
+    var checked = $("input:checked");//获取所有被选中的标签元素
+    for(i=0;i<checked.length;i++){
+     	//将所有被选中的标签元素的值保存成一个字符串，以逗号隔开
+   	 	var obj = checked[i].value.split("_");
+        if(i<checked.length-1){
+           ids+=obj[0]+',';
+           names+=obj[1]+',';
+        }else{
+           ids+=obj[0];
+           names+=obj[1];
+        }
+    }
+    $("#"+taskDefKey+"_id", window.parent.document).val(ids);
+	$("#"+taskDefKey+"_name", window.parent.document).val(names); 
 }

@@ -101,7 +101,6 @@ public class UserAction {
 	public Datagrid<User> userList(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
 		Page<User> p = new Page<User>(page, rows);
 		this.userService.getUserList(p);
-		System.out.println(p.getTotal()+"---"+p.getResult().size());
 		Datagrid<User> dataGrid = new Datagrid<User>(p.getTotal(), p.getResult());
 		return dataGrid;
 	}

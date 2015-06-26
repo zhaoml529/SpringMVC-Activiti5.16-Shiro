@@ -27,12 +27,12 @@ $(function() {
               {field : 'key',title : 'KEY',width : fixWidth(0.2),align : 'left'},
               {field : 'resourceName',title : 'XML',width : fixWidth(0.2),align : 'center',
 			    	formatter:function(value, row){
-			    		return "<a id='tip' target='_blank' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=xml'>"+row.resourceName+"</a>"
+			    		return "<a id='tip' target='_blank' title='点击查看' href='../processAction/process/process-definition?processDefinitionId="+row.id+"&resourceType=xml'>"+row.resourceName+"</a>"
 			    	}
               },
               {field : 'diagramResourceName',title : '图片',width : fixWidth(0.2),align : 'center',
 			    	formatter:function(value, row){
-			    		return "<a id='tip' target='_blank' title='点击查看' href='process-definition?processDefinitionId="+row.id+"&resourceType=image'>"+row.diagramResourceName+"</a>"
+			    		return "<a id='tip' target='_blank' title='点击查看' href='../processAction/process/process-definition?processDefinitionId="+row.id+"&resourceType=image'>"+row.diagramResourceName+"</a>"
 			    	}
               }
 //              {field : 'setApprovalPersonnel', title : '操作', width : fixWidth(0.4), align : 'left',
@@ -142,28 +142,6 @@ function chooseUser( multiSelect, taskDefKey ){
         minimizable: true,
         maximizable: true,
         href: ctx+"/userAction/toChooseUser?multiSelect="+multiSelect+"&taskDefKey="+taskDefKey,
-//        onLoad: function () {
-//        	//$("#choose-user").html('<iframe src="'+ctx+'/userAction/chooseUser_page?groupId=-1&flag='+multiSelect+'&key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogFrame" name="dialogFrame" scrolling="auto"></iframe>');
-//        	userFormInit( multiSelect, taskDefKey );
-//        },
-//        buttons: [
-//            {
-//                text: '保存',
-//                iconCls: 'icon-save',
-//                handler: function () {
-//                	//调用子页面方法,dialogFrame不能为id，因为在FireFox下id不能获取iframe对象
-//   				 	dialogFrame.window.getValue();
-//   				 	bpmn_dialog.dialog('destroy');
-//                }
-//            },
-//            {
-//                text: '关闭',
-//                iconCls: 'icon-cancel',
-//                handler: function () {
-//                	bpmn_dialog.dialog('destroy');
-//                }
-//            }
-//        ],
         onClose: function () {
         	$("#"+taskDefKey+"_id").val("");
         	$("#"+taskDefKey+"_name").val("");
@@ -178,14 +156,14 @@ function chooseGroup( taskDefKey ){
     	title : "设定候选人",
 		top: 20,
 		width : 1000,
-		height : auto,
+		height : 400,
         modal: true,
         minimizable: true,
         maximizable: true,
-        href: _url,
-        onLoad: function () {
-        	$("#choose-group").html('<iframe src="'+ctx+'/groupAction/chooseGroup_page?key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogGroupFrame" name="dialogGroupFrame" scrolling="auto"></iframe>');
-        },
+        href: ctx+"/groupAction/toChooseGroup?taskDefKey="+taskDefKey,
+//        onLoad: function () {
+//        	$("#choose-group").html('<iframe src="'+ctx+'/groupAction/chooseGroup_page?key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogGroupFrame" name="dialogGroupFrame" scrolling="auto"></iframe>');
+//        },
         buttons: [
             {
                 text: '保存',
