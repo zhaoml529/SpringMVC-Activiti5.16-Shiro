@@ -8,6 +8,8 @@ var model_dialog;
 var model_form;
 var model_width = 0;
 
+var group_datagrid;
+
 
 $(function() {
 	//数据列表
@@ -45,17 +47,18 @@ $(function() {
         toolbar: "#toolbar"
     });
 
-    //修正宽高
-	function fixHeight(percent)   
-	{   
-		return parseInt($(this).width() * percent);
-	}
-
-	function fixWidth(percent)   
-	{   
-		return parseInt(($(this).width() - 50) * percent);
-	}
 });
+
+//修正宽高
+function fixHeight(percent)   
+{   
+	return parseInt($(this).width() * percent);
+}
+
+function fixWidth(percent)   
+{   
+	return parseInt(($(this).width() - 50) * percent);
+}
 
 
 //初始化所有
@@ -161,17 +164,40 @@ function chooseGroup( taskDefKey ){
         minimizable: true,
         maximizable: true,
         href: ctx+"/groupAction/toChooseGroup?taskDefKey="+taskDefKey,
-//        onLoad: function () {
-//        	$("#choose-group").html('<iframe src="'+ctx+'/groupAction/chooseGroup_page?key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogGroupFrame" name="dialogGroupFrame" scrolling="auto"></iframe>');
-//        },
+        onLoad: function () {
+        	//$("#group_datagrid").html('<iframe src="'+ctx+'/groupAction/chooseGroup_page?key='+taskDefKey+'" frameborder="0" height="100%" width="100%" id="dialogGroupFrame" name="dialogGroupFrame" scrolling="auto"></iframe>');
+            //显示候选组
+            group_datagrid = $('#group_datagrid').datagrid({
+                url: ctx+"/groupAction/chooseGroup",
+                width : 'auto',
+        		height :  $(this).height()-40,
+        		pagination:true,
+        		rownumbers:true,
+        		border:false,
+        		singleSelect:true,
+        		striped:true,
+                columns : [ 
+                    [ 
+                      {field:'ck', title : '#',width : ($(this).width() - 50) * 0.1,align : 'center',
+                    	  formatter:function(value,row){
+                    		  return '<input type="checkbox" id="check_'+row.id+'" value="'+row.id+'_'+row.name+'" name="ids" />';
+        				  }
+                      },
+                      {field : 'name',title : '用户名',width : ($(this).width() - 50) * 0.45,align : 'center'},
+                      {field : 'type',title : '用户组',width : ($(this).width() - 50) * 0.45,align : 'center'}
+            	    ] 
+                ]
+            });
+        },
         buttons: [
             {
                 text: '保存',
                 iconCls: 'icon-save',
                 handler: function () {
                 	//调用子页面方法,dialogFrame不能为id，因为在FireFox下id不能获取iframe对象
-   				 	dialogFrame.window.getValue();
-   				 	bpmn_dialog.dialog('destroy');
+   				 	//dialogFrame.window.getValue();
+                	getValue($("#taskDefKey").val());
+                	bpmn_dialog.dialog('destroy');
                 }
             },
             {
@@ -186,6 +212,27 @@ function chooseGroup( taskDefKey ){
         	bpmn_dialog.dialog('destroy');
         }
     });
+}
+
+//取出候选组的值
+function getValue(taskDefKey){
+    var ids='';
+    var names='';
+    var checked = $("input:checked");//获取所有被选中的标签元素
+    for(i=0;i<checked.length;i++){
+     	//将所有被选中的标签元素的值保存成一个字符串，以逗号隔开
+   	 	var obj = checked[i].value.split("_");
+   	 	alert(obj+" ******");
+        if(i<checked.length-1){
+           ids+=obj[0]+',';
+           names+=obj[1]+',';
+        }else{
+           ids+=obj[0];
+           names+=obj[1];
+        }
+    }
+    $("#"+taskDefKey+"_id").val(ids);
+	$("#"+taskDefKey+"_name").val(names); 
 }
 
 //子窗口调用-关闭选人或组页面
