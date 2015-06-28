@@ -5,7 +5,7 @@
 $(function(){
 	$("#group").combobox({
 		width:160,
-		url:"${ctx }/groupAction/getGroupList",
+		url:ctx+"/groupAction/getAllGroup",
 		valueField: 'id',
 		textField: 'name',
 		onSelect:function(value){
@@ -64,16 +64,6 @@ $(function(){
         </div>
         <div class="fitem">
             <label>用户组:</label>
-<%--             <select id="group" class="easyui-combobox" name="group" style="width:160px;" data-options="required:true">
-				<c:forEach var="group" items="${groupList}">
-					<option value="${group.id}" >${group.name}-${group.type}</option>
-				</c:forEach>
-			</select> 
-			<select id="group" name="group.id">
-				<c:forEach var="group" items="${groupList}">
-					<option value="${group.id}" ${user.group.id == group.id?'selected':'' }>${group.name}-${group.type}</option>
-				</c:forEach>
-			</select>--%>
 			<input id="group" name="group.id" class="easyui-textbox easyui-validatebox" />
 			<input name="group_name" id="group_name" type="hidden" />
         </div>
