@@ -185,9 +185,7 @@ public class PermissionAction {
 	 */
 	@RequestMapping(value = "/setPermission")
 	@ResponseBody
-	public Message setPermission(@RequestParam("procDefKey") String procDefKey,
-								HttpServletRequest request,
-								RedirectAttributes redirectAttribute) throws Exception{
+	public Message setPermission(@RequestParam("procDefKey") String procDefKey, HttpServletRequest request) throws Exception{
 		List<UserTask> list = this.userTaskService.findByWhere(procDefKey);
 		for(UserTask userTask : list){
 			String taskDefKey = userTask.getTaskDefKey();

@@ -180,7 +180,7 @@ function chooseGroup( taskDefKey ){
                     [ 
                       {field:'ck', title : '#',width : ($(this).width() - 50) * 0.1,align : 'center',
                     	  formatter:function(value,row){
-                    		  return '<input type="checkbox" id="check_'+row.id+'" value="'+row.id+'_'+row.name+'" name="ids" />';
+                    		  return '<input type="checkbox" id="check_'+row.id+'" value="'+row.id+'_'+row.name+'" name="groupIds" />';
         				  }
                       },
                       {field : 'name',title : '用户名',width : ($(this).width() - 50) * 0.45,align : 'center'},
@@ -218,11 +218,10 @@ function chooseGroup( taskDefKey ){
 function getValue(taskDefKey){
     var ids='';
     var names='';
-    var checked = $("input:checked");//获取所有被选中的标签元素
+    var checked = $("input[name=groupIds]:checked");//获取所有被选中的标签元素
     for(i=0;i<checked.length;i++){
      	//将所有被选中的标签元素的值保存成一个字符串，以逗号隔开
    	 	var obj = checked[i].value.split("_");
-   	 	alert(obj+" ******");
         if(i<checked.length-1){
            ids+=obj[0]+',';
            names+=obj[1]+',';
@@ -247,7 +246,7 @@ function outputData( obj ){
 	//普通用户节点
 	var modal = 
 	'<td>\
-		<table style="border: 2px solid;padding: 5px;margin: 5px; width: 280px;" class="easyui-propertygrid well well-small">\
+		<table style="border: 2px solid;padding: 5px;margin: 5px; width: 280px;" class="well well-small">\
 		<tr>\
 			<td>名称:</td>\
 			<td>'+obj.taskName+'</td>\
@@ -266,6 +265,7 @@ function outputData( obj ){
 			<td>选择:</td>\
 			<td>\
 				<input type="text" id="'+taskDefKey+'_name" name="'+taskDefKey+'_name" readonly class="easyui-textbox"/>\
+				<a href="#" onclick="clearChoose(\''+taskDefKey+'\');" class="easyui-linkbutton">清空</a>\
 				<input type="hidden" id="'+taskDefKey+'_id" name="'+taskDefKey+'_id" class="easyui-textbox"/>\
 			</td>\
 		</tr>\
@@ -318,7 +318,7 @@ function outputData( obj ){
 //初始化表单
 function formInit( procDefKey ) {
     model_form = $('#model_form').form({
-        url: ctx+"/permissionAction/setPermission?procDefKey="+procDefKey,
+    	url: ctx+"/permissionAction/setPermission?procDefKey="+procDefKey,
         onSubmit: function (param) {
             $.messager.progress({
                 title: '提示信息！',
@@ -334,7 +334,7 @@ function formInit( procDefKey ) {
             $.messager.progress('close');
             var json = $.parseJSON(data);
             if (json.status) {
-            	bpmn_dialog.dialog('destroy');//销毁对话框
+            	model_dialog.dialog('close');//销毁对话框
                 bpmn_datagrid.datagrid('reload');//重新加载列表数据
                 
             } 
@@ -369,7 +369,7 @@ function initModelTable( procDefKey ){
                         title: '提示信息！',
                         text: '数据处理中，请稍后....'
                     });
-					$('#model_form').submit();
+                    model_form.submit();
                 }
             },
             {
@@ -380,9 +380,6 @@ function initModelTable( procDefKey ){
                 }
             }
         ],
-        onLoad: function () {
-            formInit( procDefKey );
-        },
         onClose: function () {
         	$("#modelTable").html("");
         	model_width = 0;
@@ -417,8 +414,8 @@ function setAuthor(){
 					}
 					//显示model
 					initModelTable(row.key);
-
-					//$("#modelForm").attr("action","${ctx}/permissionAction/setPermission?processKey="+data[0].procDefKey);
+					formInit( row.key );
+//					$("#model_form").attr("action",ctx+"/permissionAction/setPermission?procDefKey="+row.key);
 				}
 			}
 		});
@@ -452,5 +449,10 @@ function destroy_chooseUser(taskDefKey){
 //选择人时，同时也对父页面赋值了。所以，确认键就只关闭页面就好--choose_user.jsp
 function set_chooseUser(){
 	bpmn_dialog.dialog('destroy');
+}
+
+function clearChoose(taskDefKey){
+	$("#"+taskDefKey+"_id").val("");
+	$("#"+taskDefKey+"_name").val("");
 }
 

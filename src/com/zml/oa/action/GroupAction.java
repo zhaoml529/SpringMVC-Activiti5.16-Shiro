@@ -176,7 +176,7 @@ public class GroupAction {
 	}
 	
 	/**
-	 * 候选人页面使用-easyui
+	 * 候选人页面、添加用户页面使用-easyui
 	 * @return
 	 * @throws Exception
 	 */
