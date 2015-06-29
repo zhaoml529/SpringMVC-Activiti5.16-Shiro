@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.zml.oa.entity.Vacation;
+import com.zml.oa.pagination.Page;
 
 public interface IVacationService {
 
@@ -17,5 +18,5 @@ public interface IVacationService {
 	
 	public Vacation findById(Integer id) throws Exception;
 	
-	public List<Vacation> findByStatus(Integer userId, String status) throws Exception; 
+	public List<Vacation> findByStatus(Integer userId, String status, Page<Vacation> page) throws Exception; 
 }

@@ -1,4 +1,4 @@
-function graphTrace( id) {
+function graphTrace(id) {
     // 获取图片资源
     var imageUrl = ctx + "/processAction/process/process-instance?pid=" + id + "&type=png";
     

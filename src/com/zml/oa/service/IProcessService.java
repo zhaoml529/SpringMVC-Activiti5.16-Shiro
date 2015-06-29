@@ -120,7 +120,7 @@ public interface IProcessService {
      * @return
      * @throws Exception
      */
-    public List<BaseVO> listRuningVacation(User user) throws Exception;
+    public List<BaseVO> listRuningVacation(User user, Page<Vacation> page) throws Exception;
     
     /**
      * 查看正在运行的报销流程
@@ -128,7 +128,7 @@ public interface IProcessService {
      * @return
      * @throws Exception
      */
-    public List<BaseVO> listRuningExpense(User user) throws Exception;
+    public List<BaseVO> listRuningExpense(User user, Page<ExpenseAccount> page) throws Exception;
     
     /**
      * 查看正在运行的薪资跳转流程
@@ -136,7 +136,7 @@ public interface IProcessService {
      * @return
      * @throws Exception
      */
-    public List<BaseVO> listRuningSalaryAdjust(User user) throws Exception;
+    public List<BaseVO> listRuningSalaryAdjust(User user, Page<SalaryAdjust> page) throws Exception;
     
     /**
      * 管理运行中流程

@@ -317,4 +317,18 @@ public class VacationAction {
 		
     	return "redirect:/processAction/todoTaskList_page";
     }
+	
+	/**
+	 * 一下是EasyUI的页面需求
+	 * 
+	 */
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/toDetails")
+	public String toDetails(){
+		return "/vacation/details_vacation";
+	}
 }

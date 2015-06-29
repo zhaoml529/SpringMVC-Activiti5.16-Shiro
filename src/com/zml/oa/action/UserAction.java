@@ -151,9 +151,9 @@ public class UserAction {
 	@RequiresPermissions("admin:user:toUpdate")
 	@RequestMapping(value = "/toUpdate/{id}", method = RequestMethod.POST)
 	public String toUpdate(@PathVariable("id") Integer id,Model model) throws Exception{
-		List<Group> list = this.groupService.getGroupList();
+//		List<Group> list = this.groupService.getGroupList();
 		User user = this.userService.getUserById(id);
-		model.addAttribute("groupList", list);
+//		model.addAttribute("groupList", list);
 		model.addAttribute("user", user);
 		return "user/update_user";
 	}

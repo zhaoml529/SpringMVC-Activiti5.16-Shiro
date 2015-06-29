@@ -329,8 +329,8 @@ public class ProcessServiceImp implements IProcessService{
      * @throws Exception
      */
     @Override
-    public List<BaseVO> listRuningVacation(User user) throws Exception{
-    	List<Vacation> listVacation = this.vacationService.findByStatus(user.getId(), BaseVO.PENDING);
+    public List<BaseVO> listRuningVacation(User user, Page<Vacation> page) throws Exception{
+    	List<Vacation> listVacation = this.vacationService.findByStatus(user.getId(), BaseVO.PENDING, page);
 		List<BaseVO> result = new ArrayList<BaseVO>();
 		if(listVacation != null ){
 			for (Vacation vac : listVacation) {
@@ -364,8 +364,8 @@ public class ProcessServiceImp implements IProcessService{
      * @throws Exception
      */
     @Override
-    public List<BaseVO> listRuningExpense(User user) throws Exception{
-    	List<ExpenseAccount> listVacation = this.expenseService.findByStatus(user.getId(), BaseVO.PENDING);
+    public List<BaseVO> listRuningExpense(User user, Page<ExpenseAccount> page) throws Exception{
+    	List<ExpenseAccount> listVacation = this.expenseService.findByStatus(user.getId(), BaseVO.PENDING, page);
 		List<BaseVO> result = new ArrayList<BaseVO>();
 		if(listVacation != null ){
 			for (ExpenseAccount expense : listVacation) {
@@ -399,8 +399,8 @@ public class ProcessServiceImp implements IProcessService{
      * @throws Exception
      */
     @Override
-	public List<BaseVO> listRuningSalaryAdjust(User user) throws Exception {
-    	List<SalaryAdjust> listSalary = this.saService.findByStatus(user.getId(), BaseVO.PENDING);
+	public List<BaseVO> listRuningSalaryAdjust(User user, Page<SalaryAdjust> page) throws Exception {
+    	List<SalaryAdjust> listSalary = this.saService.findByStatus(user.getId(), BaseVO.PENDING, page);
     	List<BaseVO> result = new ArrayList<BaseVO>();
     	if(listSalary != null ){
     		for(SalaryAdjust sa : listSalary){

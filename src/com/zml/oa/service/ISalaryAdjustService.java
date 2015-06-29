@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.zml.oa.entity.SalaryAdjust;
+import com.zml.oa.pagination.Page;
 
 public interface ISalaryAdjustService {
 
@@ -19,5 +20,5 @@ public interface ISalaryAdjustService {
 	
 	public SalaryAdjust findById(Integer id) throws Exception;
 	
-	public List<SalaryAdjust> findByStatus(Integer userId, String status) throws Exception; 
+	public List<SalaryAdjust> findByStatus(Integer userId, String status, Page<SalaryAdjust> page) throws Exception; 
 }

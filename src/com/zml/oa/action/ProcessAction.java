@@ -2,7 +2,6 @@ package com.zml.oa.action;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -45,9 +43,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.Datagrid;
+import com.zml.oa.entity.ExpenseAccount;
 import com.zml.oa.entity.Message;
 import com.zml.oa.entity.ProcessInstanceEntity;
+import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
+import com.zml.oa.entity.Vacation;
 import com.zml.oa.pagination.Page;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
@@ -205,36 +206,36 @@ public class ProcessAction {
     }
     
     /**
-     * 读取运行中的流程
+     * 读取运行中的流程 -- 主线程 可删除
      * @param businessType
      * @param session
      * @param model
      * @return
      * @throws Exception
      */
-    @RequiresPermissions("user:process:running*") //process:vacation,salary,expense:running
-    @RequestMapping(value="/process/runingProcessInstance/{businessType}/list_page")
-    public String getRuningProcessInstance(@PathVariable("businessType") String businessType,HttpSession session , Model model) throws Exception{
-    	User user = UserUtil.getUserFromSession(session);
-    	List<BaseVO> baseVO = null;
-    	if(BaseVO.VACATION.equals(businessType)){
-    		//请假
-    		baseVO = this.processService.listRuningVacation(user);
-    		model.addAttribute("businessType", BaseVO.VACATION);
-    	}else if(BaseVO.SALARY.equals(businessType)){
-    		//调薪
-    		baseVO = this.processService.listRuningSalaryAdjust(user);
-    		model.addAttribute("businessType", BaseVO.SALARY);
-    	}else if(BaseVO.EXPENSE.equals(businessType)){
-    		//报销
-    		baseVO = this.processService.listRuningExpense(user);
-    		model.addAttribute("businessType", BaseVO.EXPENSE);
-    	}
-    	Pagination pagination = PaginationThreadUtils.get();
-		model.addAttribute("page", pagination.getPageStr());
-    	model.addAttribute("baseList", baseVO);
-    	return "apply/list_running";
-    }
+//    @RequiresPermissions("user:process:running*") //process:vacation,salary,expense:running
+//    @RequestMapping(value="/process/runingProcessInstance/{businessType}/list")
+//    public String getRuningProcessInstance_(@PathVariable("businessType") String businessType,HttpSession session , Model model) throws Exception{
+//    	User user = UserUtil.getUserFromSession(session);
+//    	List<BaseVO> baseVO = null;
+//    	if(BaseVO.VACATION.equals(businessType)){
+//    		//请假
+//    		baseVO = this.processService.listRuningVacation(user);
+//    		model.addAttribute("businessType", BaseVO.VACATION);
+//    	}else if(BaseVO.SALARY.equals(businessType)){
+//    		//调薪
+//    		baseVO = this.processService.listRuningSalaryAdjust(user);
+//    		model.addAttribute("businessType", BaseVO.SALARY);
+//    	}else if(BaseVO.EXPENSE.equals(businessType)){
+//    		//报销
+//    		baseVO = this.processService.listRuningExpense(user);
+//    		model.addAttribute("businessType", BaseVO.EXPENSE);
+//    	}
+//    	Pagination pagination = PaginationThreadUtils.get();
+//		model.addAttribute("page", pagination.getPageStr());
+//    	model.addAttribute("baseList", baseVO);
+//    	return "apply/list_running";
+//    }
     
     
     
@@ -333,8 +334,9 @@ public class ProcessAction {
      */
 	@RequestMapping("/process/listProcess")
 	@ResponseBody
-    public Datagrid<com.zml.oa.entity.ProcessDefinitionEntity> listProcess(@RequestParam(value = "page", required = false) Integer page,
-    									  @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+    public Datagrid<com.zml.oa.entity.ProcessDefinitionEntity> listProcess(
+    		@RequestParam(value = "page", required = false) Integer page,
+    		@RequestParam(value = "rows", required = false) Integer rows) throws Exception{
     	ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
     	Page<Object[]> p = new Page<Object[]>(page, rows);
     	int[] pageParams = p.getPageParams(processDefinitionQuery.list().size());
@@ -577,5 +579,64 @@ public class ProcessAction {
         repositoryService.addModelEditorSource(modelData.getId(), modelNode.toString().getBytes("utf-8"));
 
         return new Message(Boolean.TRUE, "转换成功！请到[ 流程设计模型 ]菜单中查看！");
+    }
+    @RequiresPermissions("user:listApply")
+    @RequestMapping(value = "/process/toListApply")
+    public String toListApply(){
+    	return "apply/list_apply";
+    }
+    
+    /**
+     * 查看请假申请、薪资调整申请、报销申请 - easyui
+     * @param page
+     * @param rows
+     * @param businessType
+     * @param session
+     * @return
+     * @throws Exception
+     */
+   // @RequiresPermissions("user:*:list") //process:vacation,salary,expense:running
+    @RequestMapping(value="/process/runingProcessInstance/{businessType}/list")
+    @ResponseBody
+    public Datagrid<Object> getRuningProcessInstance(
+    		@RequestParam(value = "page", required = false) Integer page,
+    		@RequestParam(value = "rows", required = false) Integer rows,
+    		@PathVariable("businessType") String businessType,HttpSession session) throws Exception{
+    	User user = UserUtil.getUserFromSession(session);
+    	List<BaseVO> baseVO = new ArrayList<BaseVO>();
+    	Integer total = 0;
+    	if(BaseVO.VACATION.equals(businessType)){
+    		//请假
+    		Page<Vacation> p = new Page<Vacation>(page, rows);
+    		baseVO = this.processService.listRuningVacation(user, p);
+    		total = p.getTotal();
+    	}else if(BaseVO.SALARY.equals(businessType)){
+    		//调薪
+    		Page<SalaryAdjust> p = new Page<SalaryAdjust>(page, rows);
+    		baseVO = this.processService.listRuningSalaryAdjust(user, p);
+    		total = p.getTotal();
+    	}else if(BaseVO.EXPENSE.equals(businessType)){
+    		//报销
+    		Page<ExpenseAccount> p = new Page<ExpenseAccount>(page, rows);
+    		baseVO = this.processService.listRuningExpense(user, p);
+    		total = p.getTotal();
+    	}
+    	List<Object> jsonList=new ArrayList<Object>(); 
+    	for(BaseVO base : baseVO){
+    		Map<String, Object> map=new HashMap<String, Object>();
+    		map.put("taskName", base.getTask().getName());
+    		map.put("taskCreateTime", base.getTask().getCreateTime());
+    		map.put("userName", base.getUser_name());
+    		map.put("title", base.getTitle());
+    		map.put("pd_version", base.getProcessDefinition().getVersion());
+    		map.put("pi_id", base.getProcessInstance().getId());
+    		map.put("pi_processDefinitionId", base.getProcessInstance().getProcessDefinitionId());
+    		map.put("pi_suspended", base.getProcessInstance().isSuspended());
+    		map.put("businessType", base.getBusinessType());
+    		map.put("businessKey", base.getBusinessKey());
+    		jsonList.add(map);
+    	}
+    	
+    	return new Datagrid<Object>(total, jsonList);
     }
 }

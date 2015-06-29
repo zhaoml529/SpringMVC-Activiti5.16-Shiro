@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.zml.oa.entity.ExpenseAccount;
+import com.zml.oa.pagination.Page;
 
 public interface IExpenseService {
 
@@ -17,6 +18,6 @@ public interface IExpenseService {
 	
 	public ExpenseAccount findById(Integer id) throws Exception;
 	
-	public List<ExpenseAccount> findByStatus(Integer userId, String status) throws Exception; 
+	public List<ExpenseAccount> findByStatus(Integer userId, String status, Page<ExpenseAccount> page) throws Exception; 
 
 }
