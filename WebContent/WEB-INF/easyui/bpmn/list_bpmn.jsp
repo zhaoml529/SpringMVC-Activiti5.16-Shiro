@@ -36,8 +36,7 @@
 				</tr>
 			</table>
 		</div>
-		<table id="bpmn_datagrid" title="流程定义列表">
-		</table>
+		<table id="bpmn_datagrid" title="流程定义列表"></table>
 	</div>
 	
     <div id="dialog-form" title="设定审批人员" class="easyui-dialog" closed="true" style="margin-top: 5px;">

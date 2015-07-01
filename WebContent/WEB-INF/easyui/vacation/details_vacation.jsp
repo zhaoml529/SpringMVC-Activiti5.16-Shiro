@@ -1,9 +1,10 @@
 ﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
-<<script type="text/javascript">
+<script type="text/javascript">
 $(function(){
-	$("#vacationType").combobox('select', '${vacation.vacationType}');
+	//$("#vacationType").combobox('select', '${vacation.vacationType}');
+	$("#vacationType").combobox('select', '2');
 })
 </script>
 <style type="text/css">
@@ -43,7 +44,7 @@ $(function(){
         </div>
         <div class="fitem">
             <label>请假天数:</label>
-            <input id="days" name="days" value = "${vacation.days }" class="textbox-text easyui-validatebox" required="true">
+            <input id="days" name="days" class="textbox-text easyui-validatebox" required="true">
         </div>
         <div class="fitem">
             <label>休假类型:</label>

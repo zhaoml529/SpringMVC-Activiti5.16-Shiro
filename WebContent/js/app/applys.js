@@ -2,12 +2,10 @@
  * 查看请假申请、薪资调整申请、报销申请
  */
 
-var vacation_datagrid;
-var salary_datagrid;
-var expense_datagrid;
-
 var apply_datagrid;
 var details_dialog;
+
+var vacation_form;
 
 
 $(function() {
@@ -41,7 +39,7 @@ function fixWidth(percent)
 
 function showApply( businessType ){
 	var url_ = ctx+"/processAction/process/runingProcessInstance/"+businessType+"/list";
-	vacation_datagrid = $("#"+businessType+"_datagrid").datagrid({
+	apply_datagrid = $("#"+businessType+"_datagrid").datagrid({
         url: url_,
         width : 'auto',
 		height :  $(this).height()-135,
@@ -52,7 +50,7 @@ function showApply( businessType ){
 		striped:true,
 		columns : [ 
 		    [ 
-                {field : 'userName',title : '申请人',width : fixWidth(0.1),align : 'center' , editor : {type:'validatebox',options:{required:true}}},
+                {field : 'userName',title : '申请人',width : fixWidth(0.1),align : 'center'},
                 {field : 'title',title : '标题',width : fixWidth(0.3),align : 'center'},
                 {field : 'taskName',title : '当前节点',width : fixWidth(0.2),align : 'center',
                 	formatter:function(value, row){
@@ -88,46 +86,106 @@ function showApply( businessType ){
 				    }
                 }
             ] 
-		]
+		],
+		toolbar: "#toolbar"
 	});
 }
 
-function showDetails( row ){
-	alert(row.businessType);
-	var url_;
-	if("vacation" == row.businessType){
-		url_ = ctx + "/vacationAction/details/"+row.businessKey;
-	}else if("salary" == row.businessType){
-		url_ = ctx + "/salaryAction/details/"+row.businessKey;
-	}else{
-		url_ = ctx + "/expenseAction/details/"+row.businessKey;
-	}
-	details_dialog = $('<div/>').dialog({
-    	title : "申请信息",
-		top: 20,
-		width : 500,
-		height : 200,
-        modal: true,
-        minimizable: true,
-        maximizable: true,
-        href: _url,
-        onLoad: function () {
-        	if(row){
-        		//$('#vacation_form').form('load', row);
-        	}
-        },
-        buttons: [
-            {
-                text: '关闭',
-                iconCls: 'icon-cancel',
-                handler: function () {
-                    details_dialog.dialog('destroy');
-                }
+//初始化表单
+function formInit(row) {
+	var _url = ctx+"/userAction/doAdd";
+	alert("formInit");
+	vacation_form = $('#vacation_form').form({
+        url: _url,
+        onSubmit: function (param) {
+            $.messager.progress({
+                title: '提示信息！',
+                text: '数据处理中，请稍后....'
+            });
+            var isValid = $(this).form('validate');
+            if (!isValid) {
+                $.messager.progress('close');
             }
-        ],
-        onClose: function () {
-            details_dialog.dialog('destroy');
+            return isValid;
+        },
+        success: function (data) {
+            $.messager.progress('close');
+            var json = $.parseJSON(data);
+            if (json.status) {
+                user_dialog.dialog('destroy');//销毁对话框
+                user_datagrid.datagrid('reload');//重新加载列表数据
+            } 
+            $.messager.show({
+				title : json.title,
+				msg : json.message,
+				timeout : 1000 * 2
+			});
         }
     });
+}
+
+function showDetails(){
+	var row = apply_datagrid.datagrid('getSelected');
+    if (row) {
+    	var _url;
+    	alert("showDetails");
+    	if("vacation" == row.businessType){
+    		_url = ctx + "/vacationAction/toDetails";
+    	}else if("salary" == row.businessType){
+    		_url = ctx + "/salaryAction/details/"+row.businessKey;
+    	}else{
+    		_url = ctx + "/expenseAction/details/"+row.businessKey;
+    	}
+    	
+    	//弹出对话窗口
+    	details_dialog = $('<div/>').dialog({
+        	title : "用户信息",
+    		top: 20,
+    		width : 600,
+    		height : 300,
+            modal: true,
+            minimizable: true,
+            maximizable: true,
+            href: _url,
+            onLoad: function () {
+                formInit(row);
+                alert(row.businessType);
+                if (row) {
+                	if("vacation" == row.businessType){
+    					vacation_form.form('load', row);
+    		    	}else if("salary" == row.businessType){
+    		    		$('#salary_form').form('load', row);
+    		    	}else{
+    		    		$('#expense_form').form('load', row);
+    		    	}
+                } else {
+                	alert("no row!");
+                }
+
+            },
+            buttons: [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        user_form.submit();
+                    }
+                },
+                {
+                    text: '关闭',
+                    iconCls: 'icon-cancel',
+                    handler: function () {
+                    	details_dialog.dialog('destroy');
+                    }
+                }
+            ],
+            onClose: function () {
+            	details_dialog.dialog('destroy');
+            }
+        });
+    } else {
+        $.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
+    }
+	
 }
 
