@@ -107,15 +107,13 @@ public class ProcessServiceImp implements IProcessService{
      * @return
      */
 	@Override
-    public List<BaseVO> findTodoTask(User user, Model model){
+    public List<BaseVO> findTodoTask(User user, Page<BaseVO> page){
 		//taskCandidateOrAssigned查询某个人的待办任务，包含已签收、候选任务<候选人范围和候选组范围>
 		TaskQuery taskQuery = this.taskService.createTaskQuery().taskCandidateOrAssigned(user.getId().toString());
 		Integer totalSum = taskQuery.list().size();
-		int[] pageParams = PaginationThreadUtils.setPage(totalSum);
-		Pagination pagination = PaginationThreadUtils.get();
+		int[] pageParams = page.getPageParams(totalSum);
 		List<Task> tasks = taskQuery.orderByTaskCreateTime().desc().listPage(pageParams[0], pageParams[1]);
 		List<BaseVO> taskList = getBaseVOList(tasks);
-		model.addAttribute("page", pagination.getPageStr());
 		return taskList;
     } 
 

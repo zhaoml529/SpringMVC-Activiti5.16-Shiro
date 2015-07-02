@@ -1,88 +1,72 @@
 ﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%@ include file="/WEB-INF/taglibs/taglibs.jsp"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>薪资调整审批</title>
-<script type="text/javascript">
-function complete( flag ) {
-	$("#completeFlag").val(flag);
-	$("#audit").submit();
-}
-</script>
-</head>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+<style type="text/css">
+    #fm{
+        margin:0;
+        padding:10px 30px;
+    }
+    .ftitle{
+        font-size:14px;
+        font-weight:bold;
+        padding:5px 0;
+        margin-bottom:10px;
+        border-bottom:1px solid #ccc;
+    }
+    .fitem{
+        margin-bottom:5px;
+    }
+    .fitem label{
+        display:inline-block;
+        width:80px;
+    }
+    .fitem input{
+        width:160px;
+    }
+</style>
 
-<body>
-<form id="audit" action="<c:url value="/salaryAction/complate/${salary.task.id }"/>" method="post">
-	<input type="hidden" name="userId" value="${user.id }" />
-	<input type="hidden" name="salaryAdjustId" value="${salary.id }" />
-	<input type="hidden" id="completeFlag" name="completeFlag" value="" />
-	<div id="main">
-        <div class="where">
-            <ul>
-            </ul>
+<div id="dlg" class="easyui-layout" style="padding:10px 20px">
+    <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 请假申请审批</div>
+    <form id="audit_form" method="post" >
+    	<input type="hidden" name="userId" value="${user.id }" />
+		<input type="hidden" name="salaryAdjustId" value="${salary.id }" />
+		<input type="hidden" id="completeFlag" name="completeFlag" value="" />
+        <div class="fitem">
+            <label>姓名：</label>
+            <input id="beginDate" name="beginDate" value = "${salary.user_name }" readonly="readonly" class="textbox-text easyui-validatebox" required="true">
         </div>
-        
-      <div class="sort_switch">
-          <ul id="TabsNav">
-          	  <li class="selected"><a href="#">薪资调整审批</a></li>
-          </ul>
-      </div>
-      
-      <div id="tagContent0" class="sort_content">
-			
-        	<div class="currency_area hue9">
-            	<div class="the_content">
-                	<table class="tableHue2" width="100%" border="1" bordercolor="#dddddd" cellspacing="0" cellpadding="0">
-                      <tbody>
-                        <tr>
-							<td width="15%" class="title1">员工姓名：</td>
-							<td class="left"><input name="user_name" type="text" value="${salary.user_name }" class="input_text2" size="30" /></td>
-                        </tr>
-                        <tr>
-							<td width="15%" class="title1">调薪金额 ：</td>
-							<td class="left"><input name="adjustMoney" type="text" value="${salary.adjustMoney }" class="input_text2" size="30" /></td>
-                        </tr>
-                        <tr>
-                        <td width="15%" class="title1">描述：</td>
-                          	<td class="left">
-								<textarea cols="33" rows="5" name="dscp">${salary.dscp }</textarea>
-							</td>
-                        </tr>
-                        <td width="15%" class="title1">评论：</td>
-                          	<td class="left">
-                          		
-								<table>
-									<c:forEach var="comment" items="${commentList}">
-									<tr>
-										<td>${comment.userName}- <fmt:formatDate value="${comment.time }" type="date" /> </td>
-									</tr>
-									<tr>
-										<td>${comment.content}</td>
-									</tr>
-									</c:forEach>
-								</table>
-							</td>
-                        </tr>
-                        <tr>
-                          <td width="15%" class="title1">我的意见：</td>
-                          	<td class="left">
-								<textarea cols="33" rows="5" name="content"></textarea>
-							</td>
-                        </tr>
-                      </tbody>
-                   </table>
-                </div>
-            </div>
-            
-            <div class="fun_area" style="text-align:center;">
-            	<input type="button" onclick="complete(true);" value="同 意" class="input_button1"/>
-            	<input type="button" onclick="complete(false);" value="不同意" class="input_button1"/>
-            </div>
-
-      </div>
+        <div class="fitem">
+            <label>调薪金额:</label>
+            <input id="adjustMoney" name="adjustMoney" value = "${salary.adjustMoney }" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
+        </div>
+        <div class="fitem">
+            <label>描述:</label>
+            <textarea readonly="readonly" rows="4" cols="50">${salary.dscp }</textarea>
+        </div>
+        <div class="fitem">
+            <label>评论:</label>
+            <c:choose>
+         		<c:when test="${empty commentList }">
+         			暂无评论！
+           		</c:when>
+            	<c:otherwise>
+            		<table style="margin: 5px;">
+						<c:forEach var="comment" items="${commentList}">
+						<tr>
+							<td>${comment.userName}- <fmt:formatDate value="${comment.time }" type="date" /> </td>
+						</tr>
+						<tr>
+							<td>${comment.content}</td>
+						</tr>
+						</c:forEach>
+					</table>
+            	</c:otherwise>
+            </c:choose>
+        </div>
+        <div class="fitem">
+            <label>我的意见:</label>
+            <textarea rows="4" cols="50"  name="content"></textarea>
+        </div>
+    </form>
 </div>
-</form>
-</body>
-</html>

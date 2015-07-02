@@ -117,18 +117,13 @@ function userFormInit( multiSelect, taskDefKey ) {
             if (json.status) {
                 user_dialog.dialog('destroy');//销毁对话框
                 user_datagrid.datagrid('reload');//重新加载列表数据
-                $.messager.show({
-					title : json.title,
-					msg : json.message,
-					timeout : 1000 * 2
-				});
-            } else {
-				$.messager.show({
-					title :  json.title,
-					msg : json.message,
-					timeout : 1000 * 2
-				});
+
             } 
+            $.messager.show({
+				title : json.title,
+				msg : json.message,
+				timeout : 1000 * 2
+			});
         }
     });
 }

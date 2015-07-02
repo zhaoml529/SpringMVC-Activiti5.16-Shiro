@@ -26,11 +26,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
+import com.zml.oa.entity.Message;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
 import com.zml.oa.service.IProcessService;
@@ -208,7 +210,8 @@ public class SalaryAction {
     
 	@RequiresPermissions("user:salary:complate")
     @RequestMapping("/complate/{taskId}")
-    public String complate(
+	@ResponseBody
+    public Message complate(
     		@RequestParam("salaryAdjustId") Integer salaryAdjustId,
     		@RequestParam("content") String content,
     		@RequestParam("completeFlag") Boolean completeFlag,
@@ -231,8 +234,10 @@ public class SalaryAction {
     	this.saService.doUpdate(salaryAdjust);
 		variables.put("isPass", completeFlag);
 		this.processService.complete(taskId, content, user.getId().toString(), variables);
-		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
-		return "redirect:/processAction/todoTaskList_page";
+		
+		
+		//redirectAttributes.addFlashAttribute("message", "任务办理完成！");
+		return new Message(Boolean.TRUE, "审批成功！");
 
     }
     

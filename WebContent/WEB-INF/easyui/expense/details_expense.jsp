@@ -38,7 +38,7 @@
         </div>
         <div class="fitem">
             <label>描述:</label>
-            <textarea rows="4" cols="50">${expense.remark }</textarea>
+            <textarea readonly="readonly" rows="4" cols="50">${expense.remark }</textarea>
         </div>
     </form>
 </div>

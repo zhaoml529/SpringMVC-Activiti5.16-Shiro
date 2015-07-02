@@ -30,7 +30,7 @@
     <form id="vacation_form" method="post" >
         <div class="fitem">
             <label>开始日期：</label>
-            <input id="beginDate" name="beginDate" value = "${vacation.beginDate }" readonly="readonly" class="textbox-text easyui-validatebox" required="true">
+            <input id="beginDate" name="beginDate" value = "${vacation.beginDate }" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
         </div>
         <div class="fitem">
             <label>结束日期:</label>
@@ -38,7 +38,7 @@
         </div>
         <div class="fitem">
             <label>请假天数:</label>
-            <input id="days" name="days" value="${vacation.days }" readonly="readonly" class="textbox-text easyui-validatebox" required="true">
+            <input id="days" name="days" value="${vacation.days }" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
         </div>
         <div class="fitem">
             <label>休假类型:</label>
@@ -51,7 +51,7 @@
         </div>
         <div class="fitem">
             <label>原因:</label>
-            <textarea rows="4" cols="50">${vacation.reason }</textarea>
+            <textarea readonly="readonly" rows="4" cols="50">${vacation.reason }</textarea>
             <%-- <input id="reason" name="reason"  value = "${vacation.reason }" class="easyui-textbox" required="true"> --%>
         </div>
     </form>

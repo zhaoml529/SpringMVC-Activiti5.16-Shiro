@@ -85,24 +85,6 @@ public class ProcessAction {
 	@Autowired
 	private WorkflowDeployService workflowProcessDefinitionService;
     
-    /**
-	 * 查询待办任务
-	 * @param session
-	 * @param redirectAttributes
-	 * @param model
-	 * @return
-	 * @throws Exception
-	 */
-	@RequiresPermissions("user:task:todoTask")
-	@RequestMapping(value = "/todoTaskList_page", method = {RequestMethod.POST, RequestMethod.GET})
-	public String todoTaskList_page(HttpSession session, Model model) throws Exception{
-		String userId = UserUtil.getUserFromSession(session).getId().toString();
-		User user = this.userService.getUserById(new Integer(userId));
-		List<BaseVO> taskList = this.processService.findTodoTask(user, model);
-        model.addAttribute("tasklist", taskList);
-		model.addAttribute("taskType", BaseVO.CANDIDATE);
-		return "task/list_task";
-	}
 	
     /**
      * 查看已完成任务列表
@@ -244,6 +226,48 @@ public class ProcessAction {
      * 
      * @author ZML
      */
+    @RequestMapping(value = "/todoTaskList")
+    public String todoTaskList(){
+    	return "task/list_task";
+    }
+    
+    /**
+	 * 查询待办任务
+	 * @param session
+	 * @param redirectAttributes
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequiresPermissions("user:task:todoTask")
+	@RequestMapping(value = "/todoTask", method = {RequestMethod.POST})
+	@ResponseBody
+	public Datagrid<Object> todoTask(
+			@RequestParam(value = "page", required = false) Integer page,
+		  	@RequestParam(value = "rows", required = false) Integer rows,HttpSession session) throws Exception{
+		String userId = UserUtil.getUserFromSession(session).getId().toString();
+		User user = this.userService.getUserById(new Integer(userId));
+		Page<BaseVO> p = new Page<BaseVO>(page, rows);
+		List<BaseVO> taskList = this.processService.findTodoTask(user, p);
+		List<Object> jsonList=new ArrayList<Object>(); 
+		for(BaseVO base : taskList){
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("businessType", base.getBusinessType());
+			map.put("user_name", base.getUser_name());
+			map.put("title", base.getTitle());
+			map.put("taskId", base.getTask().getId());
+			map.put("taskName", base.getTask().getName());
+			map.put("createTime", base.getTask().getCreateTime());
+			map.put("assign", base.getTask().getAssignee());
+			map.put("processInstanceId", base.getProcessInstance().getId());
+			map.put("processDefinitionId", base.getProcessInstance().getProcessDefinitionId());
+			map.put("supended", base.getProcessInstance().isSuspended());
+			map.put("version", base.getProcessDefinition().getVersion());
+			jsonList.add(map);
+		}
+		return new Datagrid<Object>(p.getTotal(), jsonList);
+	}
+    
     
     /**
      * 跳转流程管理页面
@@ -264,8 +288,9 @@ public class ProcessAction {
     @RequiresPermissions("admin:process:*")
     @RequestMapping(value="/process/runningProcess")
     @ResponseBody
-    public Datagrid<ProcessInstanceEntity> listRuningProcess(@RequestParam(value = "page", required = false) Integer page,
-			  						 @RequestParam(value = "rows", required = false) Integer rows, HttpSession session) throws Exception{
+    public Datagrid<ProcessInstanceEntity> listRuningProcess(
+    			@RequestParam(value = "page", required = false) Integer page,
+			  	@RequestParam(value = "rows", required = false) Integer rows) throws Exception{
     	Page<ProcessInstance> p = new Page<ProcessInstance>(page, rows);
     	List<ProcessInstance> list = this.processService.listRuningProcess(p);
     	List<ProcessInstanceEntity> pieList = new ArrayList<ProcessInstanceEntity>();

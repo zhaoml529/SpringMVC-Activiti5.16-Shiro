@@ -49,7 +49,7 @@ public interface IProcessService {
 	 * @param model
 	 * @return
 	 */
-	public List<BaseVO> findTodoTask(User user, Model model) throws Exception;
+	public List<BaseVO> findTodoTask(User user, Page<BaseVO> page) throws Exception;
 	
     /**
      * 签收任务
