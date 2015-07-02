@@ -26,7 +26,7 @@
 </style>
 
 <div id="dlg" class="easyui-layout" style="padding:10px 20px">
-    <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 用户信息</div>
+    <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 请假信息</div>
     <form id="vacation_form" method="post" >
         <div class="fitem">
             <label>开始日期：</label>

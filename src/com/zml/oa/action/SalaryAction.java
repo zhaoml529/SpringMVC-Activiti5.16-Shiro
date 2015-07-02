@@ -98,7 +98,9 @@ public class SalaryAction {
 	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
 		SalaryAdjust salaryAd = this.saService.findById(id);
 		model.addAttribute("salary", salaryAd);
-		return "/salary/details_salary";
+		User user = this.userService.getUserById(salaryAd.getUserId());
+		model.addAttribute("user_name", user.getName());
+		return "/salary/details_salaryAdjust";
 	}
 	
 	/**
@@ -269,18 +271,7 @@ public class SalaryAction {
         String userName = salary.getUser_name();
         User user = this.userService.getUserByName(userName);
         
-        Map<String, Object> variables = new HashMap<String, Object>();
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        Map<String, Object> variables = new HashMap<String, Object>();     
         
         if(reApply){
         	if(!BeanUtils.isBlank(user)){
