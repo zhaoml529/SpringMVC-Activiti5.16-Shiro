@@ -94,7 +94,7 @@ public class SalaryAction {
 	 * @throws Exception
 	 */
 	@RequiresPermissions("user:salary:details")
-	@RequestMapping(value="/details/{id}", method = RequestMethod.GET)
+	@RequestMapping(value="/details/{id}")
 	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
 		SalaryAdjust salaryAd = this.saService.findById(id);
 		model.addAttribute("salary", salaryAd);

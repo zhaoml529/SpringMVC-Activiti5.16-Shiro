@@ -1,12 +1,6 @@
 ﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
-<script type="text/javascript">
-$(function(){
-	//$("#vacationType").combobox('select', '${vacation.vacationType}');
-	$("#vacationType").combobox('select', '2');
-})
-</script>
 <style type="text/css">
     #fm{
         margin:0;
@@ -36,19 +30,20 @@ $(function(){
     <form id="vacation_form" method="post" >
         <div class="fitem">
             <label>开始日期：</label>
-            <input id="beginDate" name="beginDate" value = "${vacation.beginDate }"  class="textbox-text easyui-validatebox" required="true">
+            <input id="beginDate" name="beginDate" value = "${vacation.beginDate }" readonly="readonly" class="textbox-text easyui-validatebox" required="true">
         </div>
         <div class="fitem">
             <label>结束日期:</label>
-            <input id="endDate" name="endDate" value = "${vacation.endDate }" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="endDate" name="endDate" value = "${vacation.endDate }" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
         </div>
         <div class="fitem">
             <label>请假天数:</label>
-            <input id="days" name="days" class="textbox-text easyui-validatebox" required="true">
+            <input id="days" name="days" value="${vacation.days }" readonly="readonly" class="textbox-text easyui-validatebox" required="true">
         </div>
         <div class="fitem">
             <label>休假类型:</label>
-			<select id="vacationType" class="easyui-combobox" name="vacationType" style="width:200px;">
+            <input type="hidden" id="vacationType" value="${vacation.vacationType }">
+			<select id="type" class="easyui-combobox" disabled="disabled" name="vacationType" style="width:160px;">
 			    <option value="0">年假</option>
 			    <option value="1">事假</option>
 			    <option value="2">病假</option>
@@ -56,8 +51,8 @@ $(function(){
         </div>
         <div class="fitem">
             <label>原因:</label>
-            <input id="days" name="days" value = "${vacation.days }" class="easyui-textbox" required="true">
+            <textarea rows="4" cols="50">${vacation.reason }</textarea>
+            <%-- <input id="reason" name="reason"  value = "${vacation.reason }" class="easyui-textbox" required="true"> --%>
         </div>
     </form>
 </div>
-

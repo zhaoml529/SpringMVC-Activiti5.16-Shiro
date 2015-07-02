@@ -156,9 +156,15 @@
 	<div type="closeAll">关闭所有</div>
 </div>
 <div id="theme" class="easyui-menu" style="width:120px;display: none">  
-		    <div id="default" data-options="iconCls:'icon-save'">default</div>  
-		    <div id="black" data-options="iconCls:'icon-save'">black</div> 
-		    <div id="bootstrap" data-options="iconCls:'icon-save'">bootstrap</div>  
-		    <div id="gray" data-options="iconCls:'icon-save'">gray</div>  
-		    <div id="metro" data-options="iconCls:'icon-save'">metro</div>  
+		    <div id="default" data-options="iconCls:'icon-save'">Default</div>  
+		    <div id="black" data-options="iconCls:'icon-save'">Black</div> 
+		    <div id="bootstrap" data-options="iconCls:'icon-save'">Bootstrap</div>  
+		    <div id="gray" data-options="iconCls:'icon-save'">Gray</div>  
+		    <div id="metro" data-options="iconCls:'icon-save'">Metro</div>  
+		    <div class="menu-sep"></div>
+		    <div id="metro-blue" data-options="iconCls:'icon-save'">Metro-blue</div> 
+		    <div id="metro-gray" data-options="iconCls:'icon-save'">Metro-gray</div> 
+		    <div id="metro-green" data-options="iconCls:'icon-save'">Metro-green</div> 
+		    <div id="metro-orange" data-options="iconCls:'icon-save'">Metro-orange</div> 
+		    <div id="metro-red" data-options="iconCls:'icon-save'">Metro-red</div> 
 </div>

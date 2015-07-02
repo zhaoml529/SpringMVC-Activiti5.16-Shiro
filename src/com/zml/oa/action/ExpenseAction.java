@@ -85,7 +85,7 @@ public class ExpenseAction {
 	 * @throws Exception
 	 */
 	@RequiresPermissions("user:expense:details")
-	@RequestMapping(value="/details/{id}", method = RequestMethod.GET)
+	@RequestMapping(value="/details/{id}")
 	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
 		ExpenseAccount expense = this.expenseService.findById(id);
 		model.addAttribute("expense", expense);

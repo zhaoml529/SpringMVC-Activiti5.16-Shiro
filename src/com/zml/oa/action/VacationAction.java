@@ -107,22 +107,6 @@ public class VacationAction {
         }
 		return new ModelAndView("vacation/add_vacation").addObject(model);
 	}
-	
-	/**
-	 * 详细信息
-	 * @param id
-	 * @param model
-	 * @return
-	 * @throws Exception
-	 */
-	@RequiresPermissions("user:vacation:details")
-	@RequestMapping(value="/details/{id}", method = RequestMethod.GET)
-	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
-		Vacation vacation = this.vacationService.findById(id);
-		model.addAttribute("vacation", vacation);
-		return "/vacation/details_vacation";
-	}
-	
     /**
      * 添加并启动请假流程
      *
@@ -324,11 +308,18 @@ public class VacationAction {
 	 */
 	
 	/**
-	 * 
+	 * 详细信息
+	 * @param id
+	 * @param model
 	 * @return
+	 * @throws Exception
 	 */
-	@RequestMapping(value = "/toDetails")
-	public String toDetails(){
+	@RequiresPermissions("user:vacation:details")
+	@RequestMapping(value="/details/{id}")
+	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
+		Vacation vacation = this.vacationService.findById(id);
+		model.addAttribute("vacation", vacation);
 		return "/vacation/details_vacation";
 	}
+
 }
