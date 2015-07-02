@@ -1,0 +1,9 @@
+.numberbox {
+  border: 1px solid #f6c1bc;
+  margin: 0;
+  padding: 0 2px;
+  vertical-align: middle;
+}
+.textbox {
+  padding: 0;
+}
