@@ -27,7 +27,7 @@
 
 <div id="dlg" class="easyui-layout" style="padding:10px 20px">
     <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 报销申请信息</div>
-    <form id="vacation_form" method="post" >
+    <form id="expense_form" method="post" >
         <div class="fitem">
             <label>发生日期：</label>
             <input id="occurDate" name="occurDate" value = "${expense.occurDate }" readonly="readonly" class="textbox-text easyui-validatebox" required="true">
