@@ -19,6 +19,8 @@ import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
+import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -30,7 +32,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,8 +51,6 @@ import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
 import com.zml.oa.pagination.Page;
-import com.zml.oa.pagination.Pagination;
-import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.activiti.WorkflowDeployService;
@@ -86,36 +85,6 @@ public class ProcessAction {
 	private WorkflowDeployService workflowProcessDefinitionService;
     
 	
-    /**
-     * 查看已完成任务列表
-     *
-     * @return
-     * @throws Exception 
-     */
-    @RequiresPermissions("user:process:finished")
-    @RequestMapping(value = "/finishedTask_page")
-    public String findFinishedTaskInstances(HttpSession session, Model model) throws Exception {
-    	User user = UserUtil.getUserFromSession(session);
-    	List<BaseVO> tasklist = this.processService.findFinishedTaskInstances(user, model);
-    	model.addAttribute("tasklist", tasklist);
-    	model.addAttribute("taskType", BaseVO.FINISHED);
-    	return "task/end_task";
-    }
-
-	
-	/**
-	 * 签收任务
-	 * @return
-	 */
-	@RequiresPermissions("user:task:claim")
-	@RequestMapping("/claim/{taskId}")
-	public String claim(@PathVariable("taskId") String taskId, HttpSession session, RedirectAttributes redirectAttributes) throws Exception{
-		User user = UserUtil.getUserFromSession(session);
-		this.processService.doClaim(user, taskId);
-        redirectAttributes.addFlashAttribute("message", "任务已签收");
-        return "redirect:/processAction/todoTaskList_page";
-	}
-    
     /**
      * 显示流程图,带流程跟踪
      * @param processInstanceId
@@ -188,49 +157,21 @@ public class ProcessAction {
     }
     
     /**
-     * 读取运行中的流程 -- 主线程 可删除
-     * @param businessType
-     * @param session
-     * @param model
-     * @return
-     * @throws Exception
-     */
-//    @RequiresPermissions("user:process:running*") //process:vacation,salary,expense:running
-//    @RequestMapping(value="/process/runingProcessInstance/{businessType}/list")
-//    public String getRuningProcessInstance_(@PathVariable("businessType") String businessType,HttpSession session , Model model) throws Exception{
-//    	User user = UserUtil.getUserFromSession(session);
-//    	List<BaseVO> baseVO = null;
-//    	if(BaseVO.VACATION.equals(businessType)){
-//    		//请假
-//    		baseVO = this.processService.listRuningVacation(user);
-//    		model.addAttribute("businessType", BaseVO.VACATION);
-//    	}else if(BaseVO.SALARY.equals(businessType)){
-//    		//调薪
-//    		baseVO = this.processService.listRuningSalaryAdjust(user);
-//    		model.addAttribute("businessType", BaseVO.SALARY);
-//    	}else if(BaseVO.EXPENSE.equals(businessType)){
-//    		//报销
-//    		baseVO = this.processService.listRuningExpense(user);
-//    		model.addAttribute("businessType", BaseVO.EXPENSE);
-//    	}
-//    	Pagination pagination = PaginationThreadUtils.get();
-//		model.addAttribute("page", pagination.getPageStr());
-//    	model.addAttribute("baseList", baseVO);
-//    	return "apply/list_running";
-//    }
-    
-    
-    
-    /**
      * 以下方法是对应easyui的写法
      * 
      * @author ZML
      */
-    @RequestMapping(value = "/todoTaskList")
-    public String todoTaskList(){
+    
+    /**
+     * 跳转待办任务、已完成任务页面
+     * @return
+     */
+    @RequestMapping(value = "/userTaskList")
+    public String userTaskList(){
     	return "task/list_task";
     }
     
+
     /**
 	 * 查询待办任务
 	 * @param session
@@ -244,7 +185,7 @@ public class ProcessAction {
 	@ResponseBody
 	public Datagrid<Object> todoTask(
 			@RequestParam(value = "page", required = false) Integer page,
-		  	@RequestParam(value = "rows", required = false) Integer rows,HttpSession session) throws Exception{
+		  	@RequestParam(value = "rows", required = false) Integer rows, HttpSession session) throws Exception{
 		String userId = UserUtil.getUserFromSession(session).getId().toString();
 		User user = this.userService.getUserById(new Integer(userId));
 		Page<BaseVO> p = new Page<BaseVO>(page, rows);
@@ -268,6 +209,64 @@ public class ProcessAction {
 		return new Datagrid<Object>(p.getTotal(), jsonList);
 	}
     
+	
+    /**
+     * 查看已完成任务列表
+     *
+     * @return
+     * @throws Exception 
+     */
+    @RequiresPermissions("user:process:finished")
+    @RequestMapping(value = "/endTask")
+    @ResponseBody
+    public Datagrid<Object> findFinishedTaskInstances(
+			@RequestParam(value = "page", required = false) Integer page,
+		  	@RequestParam(value = "rows", required = false) Integer rows, HttpSession session) throws Exception {
+    	User user = UserUtil.getUserFromSession(session);
+    	Page<BaseVO> p = new Page<BaseVO>(page, rows);
+    	List<BaseVO> taskList = this.processService.findFinishedTaskInstances(user, p);
+    	List<Object> jsonList=new ArrayList<Object>(); 
+    	for(BaseVO base : taskList){
+    		Map<String, Object> map = new HashMap<String, Object>();
+    		map.put("businessType", base.getBusinessType());
+    		map.put("user_name", base.getUser_name());
+    		map.put("title", base.getTitle());
+    		map.put("startTime", base.getHistoricTaskInstance().getStartTime());
+    		map.put("claimTime", base.getHistoricTaskInstance().getClaimTime());
+    		map.put("endTime", base.getHistoricTaskInstance().getEndTime());
+    		map.put("deleteReason", base.getHistoricTaskInstance().getDeleteReason());
+    		map.put("version", base.getProcessDefinition().getVersion());
+    		jsonList.add(map);
+    	}
+    	return new Datagrid<Object>(p.getTotal(), jsonList);
+    }
+    
+	/**
+	 * 签收任务
+	 * @return
+	 */
+	@RequiresPermissions("user:task:claim")
+	@RequestMapping("/claim/{taskId}")
+	@ResponseBody
+	public Message claim(@PathVariable("taskId") String taskId, HttpSession session) {
+		Message message = new Message();
+		try {
+			User user = UserUtil.getUserFromSession(session);
+			this.processService.doClaim(user, taskId);
+			message.setStatus(Boolean.TRUE);
+			message.setMessage("任务签收成功！");
+		}catch (ActivitiObjectNotFoundException e){
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务不存在！任务签收失败！");
+		}catch (ActivitiTaskAlreadyClaimedException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务已被其他组成员签收！请刷新页面重新查看！");
+		}catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("任务签收失败！请联系管理员！");
+		} 
+        return message;
+	}
     
     /**
      * 跳转流程管理页面

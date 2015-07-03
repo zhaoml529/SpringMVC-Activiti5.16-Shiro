@@ -155,11 +155,10 @@ public class ProcessServiceImp implements IProcessService{
      * @throws Exception
      */
 	@Override
-	public List<BaseVO> findFinishedTaskInstances(User user, Model model) throws Exception {
+	public List<BaseVO> findFinishedTaskInstances(User user, Page<BaseVO> page) throws Exception {
 		HistoricTaskInstanceQuery historQuery = historyService.createHistoricTaskInstanceQuery().taskAssignee(user.getId().toString()).finished();
 		Integer totalSum = historQuery.list().size();
-        int[] pageParams = PaginationThreadUtils.setPage(totalSum);
-    	Pagination pagination = PaginationThreadUtils.get();
+        int[] pageParams = page.getPageParams(totalSum);
     	List<HistoricTaskInstance> list = historQuery.orderByHistoricTaskInstanceEndTime().desc().listPage(pageParams[0], pageParams[1]);
     	List<BaseVO> taskList = new ArrayList<BaseVO>();
     	
@@ -176,7 +175,6 @@ public class ProcessServiceImp implements IProcessService{
 				}
 			}
     	}
-    	model.addAttribute("page", pagination.getPageStr());
 		return taskList;
 	}
     

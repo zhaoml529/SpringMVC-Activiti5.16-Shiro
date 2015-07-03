@@ -4,7 +4,6 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <script type="text/javascript" charset="utf-8">
 	function logout(b) {
-		alert("${ctx}");
 		$.messager.confirm("提示", "确认退出吗?",function(r){
 			if(r){
 				window.location.href="${ctx}/logout";

@@ -19,10 +19,12 @@
 	}
 	
 	long sysInitTime = Constants.SYSY_INIT_TIME;
+	System.out.println(sysInitTime+"-----"+Constants.SYSY_INIT_TIME);
     //系统启动时间
     request.setAttribute("sysInitTime",sysInitTime);
 %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+<c:set var="sysInitTime" value="${sysInitTime}" />
 
 <link rel="stylesheet" type="text/css" href="${ctx}/css/themes/<%=easyuiThemeName %>/easyui.css">
 <script type="text/javascript" src="${ctx}/js/jquery.min.js"></script>
@@ -43,6 +45,8 @@
 <script type="text/javascript" charset="utf-8">
     var ctx = "${ctx}";
     var ctxStatic = "${ctxStatic}";
+    //var t = new Date().getTime();  
+    //alert("sysInitTime: "+"${sysInitTime }"+"script_t: "+t);
 </script>
 
 <style type="text/css">

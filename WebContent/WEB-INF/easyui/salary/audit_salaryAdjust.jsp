@@ -27,7 +27,7 @@
 </style>
 
 <div id="dlg" class="easyui-layout" style="padding:10px 20px">
-    <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 请假申请审批</div>
+    <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 薪资调整审批</div>
     <form id="audit_form" method="post" >
     	<input type="hidden" name="userId" value="${user.id }" />
 		<input type="hidden" name="salaryAdjustId" value="${salary.id }" />

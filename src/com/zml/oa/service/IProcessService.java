@@ -112,7 +112,7 @@ public interface IProcessService {
      * @return
      * @throws Exception
      */
-    public List<BaseVO> findFinishedTaskInstances(User user, Model model) throws Exception;
+    public List<BaseVO> findFinishedTaskInstances(User user, Page<BaseVO> page) throws Exception;
     
     /**
      * 查看正在运行的请假流程

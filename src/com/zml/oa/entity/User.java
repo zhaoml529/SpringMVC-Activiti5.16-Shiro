@@ -77,7 +77,7 @@ public class User implements Serializable{
 //    private List<Group> group;
 
 	//多对一，@JoinColumn与@column类似，指定映射的数据库字段
-	@ManyToOne(targetEntity = Group.class, fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Group.class)
 	@JoinColumn(name="GROUP_ID")
 	@JsonIgnore
     private Group group;

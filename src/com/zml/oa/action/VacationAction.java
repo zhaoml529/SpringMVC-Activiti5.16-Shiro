@@ -37,6 +37,7 @@ import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
+import com.zml.oa.util.Constants;
 import com.zml.oa.util.UserUtil;
 
 /**
@@ -155,6 +156,7 @@ public class VacationAction {
             }
         } catch (Exception e) {
             logger.error("启动请假流程失败：", e);
+            long a = Constants.SYSY_INIT_TIME;
             redirectAttributes.addFlashAttribute("error", "系统内部错误！");
         }
 		return "redirect:/vacationAction/toAdd";
