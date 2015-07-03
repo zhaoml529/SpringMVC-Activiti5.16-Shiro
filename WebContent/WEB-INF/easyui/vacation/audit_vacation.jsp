@@ -56,16 +56,33 @@
         </div>
         <div class="fitem">
             <label>评论:</label>
-            <table style="margin: 5px;">
-				<c:forEach var="comment" items="${commentList}">
-				<tr>
-					<td>${comment.userName}- <fmt:formatDate value="${comment.time }" type="date" /> </td>
-				</tr>
-				<tr>
-					<td>${comment.content}</td>
-				</tr>
-				</c:forEach>
-			</table>
+			<c:choose>
+         		<c:when test="${empty commentList }">
+         			暂无评论！
+           		</c:when>
+            	<c:otherwise>
+            		<div style="display: inline-block;">
+            		<table class="easyui-datagrid" style="width:450px;" data-options="fitColumns:true,singleSelect:true">
+					    <thead>
+							<tr>
+								<th data-options="field:'userName',width:100,align:'center'">评论人</th>
+								<th data-options="field:'time',width:100,align:'center'">评论时间</th>
+								<th data-options="field:'content',width:200,align:'center'">评论内容</th>
+							</tr>
+					    </thead>
+					    <tbody>
+					    	<c:forEach var="comment" items="${commentList}">
+								<tr>
+									<td>${comment.userName}</td>
+									<td><fmt:formatDate value="${comment.time }" type="date" /></td>
+									<td>${comment.content}</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+					</div>
+            	</c:otherwise>
+            </c:choose>
         </div>
         <div class="fitem">
             <label>我的意见:</label>

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
@@ -177,7 +178,7 @@ public class SalaryAction {
 	}
 	
 	/**
-     * 审批报销流程
+     * 审批薪资调整流程
      * @param taskId
      * @param model
      * @return
@@ -220,24 +221,38 @@ public class SalaryAction {
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	String groupType = user.getGroup().getType();
-    	SalaryAdjust salaryAdjust = this.saService.findById(salaryAdjustId);
-    	SalaryAdjust baseSalary = (SalaryAdjust) this.runtimeService.getVariable(salaryAdjust.getProcessInstanceId(), "entity");
-    	Map<String, Object> variables = new HashMap<String, Object>();
-    	if("boss".equals(groupType) && completeFlag){
-    		salaryAdjust.setStatus(BaseVO.APPROVAL_SUCCESS);
-    	}else if(!completeFlag){
-    		baseSalary.setTitle(baseSalary.getUser_name()+" 的申请失败，需修改后重新提交！");
-    		salaryAdjust.setStatus(BaseVO.APPROVAL_FAILED);
-    		variables.put("entity", baseSalary);
-    	}
-    	//如果用同一个salary，Hibernage报错a different object with the same identifier value was already associated with the session:
-    	this.saService.doUpdate(salaryAdjust);
-		variables.put("isPass", completeFlag);
-		this.processService.complete(taskId, content, user.getId().toString(), variables);
-		
-		
-		//redirectAttributes.addFlashAttribute("message", "任务办理完成！");
-		return new Message(Boolean.TRUE, "审批成功！");
+    	Message message = new Message();
+    	try {
+    		SalaryAdjust salaryAdjust = this.saService.findById(salaryAdjustId);
+        	SalaryAdjust baseSalary = (SalaryAdjust) this.runtimeService.getVariable(salaryAdjust.getProcessInstanceId(), "entity");
+        	Map<String, Object> variables = new HashMap<String, Object>();
+        	if("boss".equals(groupType) && completeFlag){
+        		salaryAdjust.setStatus(BaseVO.APPROVAL_SUCCESS);
+        	}else if(!completeFlag){
+        		baseSalary.setTitle(baseSalary.getUser_name()+" 的申请失败，需修改后重新提交！");
+        		salaryAdjust.setStatus(BaseVO.APPROVAL_FAILED);
+        		variables.put("entity", baseSalary);
+        	}
+        	//如果用同一个salary，Hibernage报错a different object with the same identifier value was already associated with the session:
+        	this.saService.doUpdate(salaryAdjust);
+    		variables.put("isPass", completeFlag);
+    		this.processService.complete(taskId, content, user.getId().toString(), variables);
+			message.setStatus(Boolean.TRUE);
+			message.setMessage("任务办理完成！");
+		} catch (ActivitiObjectNotFoundException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务不存在，请联系管理员！");
+			throw e;
+		} catch (ActivitiException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务正在协办，您不能办理此任务！");
+			throw e;
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("任务办理失败，请联系管理员！");
+			throw e;
+		}
+		return message;
 
     }
     

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -24,12 +25,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.ExpenseAccount;
+import com.zml.oa.entity.Message;
 import com.zml.oa.entity.User;
 import com.zml.oa.service.IExpenseService;
 import com.zml.oa.service.IProcessService;
@@ -175,33 +178,44 @@ public class ExpenseAction {
     	return "expense/audit_expense";
     }
     
-    /**
-     * 完成任务
-     * @param content
-     * @param completeFlag
-     * @param taskId
-     * @param redirectAttributes
-     * @param session
-     * @return
-     * @throws Exception
-     */
+	/**
+	 * 完成任务
+	 * @param expenseId
+	 * @param taskId
+	 * @param session
+	 * @return
+	 */
 	@RequiresPermissions("user:expense:complate")
     @RequestMapping("/complate/{taskId}")
-    public String complate(
+	@ResponseBody
+    public Message complate(
     		@RequestParam("expenseId") Integer expenseId,
     		@PathVariable("taskId") String taskId, 
-    		RedirectAttributes redirectAttributes,
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
-    	
-        ExpenseAccount expense = this.expenseService.findById(expenseId);
-		Map<String, Object> variables = new HashMap<String, Object>();
-//		variables.put("auditGroup", "finance");
-		expense.setStatus(BaseVO.APPROVAL_SUCCESS);
-		this.expenseService.doUpdate(expense);
-		// 完成任务
-		this.processService.complete(taskId, null, user.getId().toString(), variables);
-		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
-    	return "redirect:/processAction/todoTaskList_page";
+    	Message message = new Message();
+		try {
+			ExpenseAccount expense = this.expenseService.findById(expenseId);
+			Map<String, Object> variables = new HashMap<String, Object>();
+			expense.setStatus(BaseVO.APPROVAL_SUCCESS);
+			this.expenseService.doUpdate(expense);
+			// 完成任务
+			this.processService.complete(taskId, null, user.getId().toString(), variables);
+			message.setStatus(Boolean.TRUE);
+			message.setMessage("任务办理完成！");
+		} catch (ActivitiObjectNotFoundException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务不存在，请联系管理员！");
+			throw e;
+		} catch (ActivitiException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务正在协办，您不能办理此任务！");
+			throw e;
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("任务办理失败，请联系管理员！");
+			throw e;
+		}
+    	return  message;
     }
 }

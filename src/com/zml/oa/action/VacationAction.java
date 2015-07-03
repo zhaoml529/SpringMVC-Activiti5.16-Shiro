@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -25,11 +26,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
+import com.zml.oa.entity.Message;
 import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
 import com.zml.oa.pagination.Pagination;
@@ -206,7 +209,8 @@ public class VacationAction {
      */
 	@RequiresPermissions("user:vacation:complate")  //数据库中权限字符串为user:*:complate， 通配符*匹配到vacation所以有权限操作 
     @RequestMapping("/complate/{taskId}")
-    public String complate(
+	@ResponseBody
+    public Message complate(
     		@RequestParam("vacationId") Integer vacationId,
     		@RequestParam("content") String content,
     		@RequestParam("completeFlag") Boolean completeFlag,
@@ -215,30 +219,45 @@ public class VacationAction {
     		HttpSession session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	String groupType = user.getGroup().getType();
-        Vacation vacation = this.vacationService.findById(vacationId);
-        Vacation baseVacation = (Vacation) this.runtimeService.getVariable(vacation.getProcessInstanceId(), "entity");
-		Map<String, Object> variables = new HashMap<String, Object>();
-		variables.put("isPass", completeFlag);
-		if(completeFlag){
-			//由userTask自动分配审批权限
-			//variables.put("auditGroup", "hr");
-			
-			//此处需要修改，不能根据人来判断审批是否结束。应该根据流程实例id(processInstanceId)来判定。
-			//判断指定ID的实例是否存在，如果结果为空，则代表流程结束，实例已被删除(移到历史库中)
-			if("hr".equals(groupType)){
-				vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
-			}
-		}else{
-			baseVacation.setTitle(baseVacation.getUser_name()+" 的请假申请失败,需修改后重新提交！");
-			vacation.setStatus(BaseVO.APPROVAL_FAILED);
-			variables.put("entity", baseVacation);
+    	Message message = new Message();
+    	try {
+    		Vacation vacation = this.vacationService.findById(vacationId);
+            Vacation baseVacation = (Vacation) this.runtimeService.getVariable(vacation.getProcessInstanceId(), "entity");
+    		Map<String, Object> variables = new HashMap<String, Object>();
+    		variables.put("isPass", completeFlag);
+    		if(completeFlag){
+    			//由userTask自动分配审批权限
+    			//variables.put("auditGroup", "hr");
+    			
+    			//此处需要修改，不能根据人来判断审批是否结束。应该根据流程实例id(processInstanceId)来判定。
+    			//判断指定ID的实例是否存在，如果结果为空，则代表流程结束，实例已被删除(移到历史库中)
+    			if("hr".equals(groupType)){
+    				vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
+    			}
+    		}else{
+    			baseVacation.setTitle(baseVacation.getUser_name()+" 的请假申请失败,需修改后重新提交！");
+    			vacation.setStatus(BaseVO.APPROVAL_FAILED);
+    			variables.put("entity", baseVacation);
+    		}
+    		this.vacationService.doUpdate(vacation);
+    		// 完成任务
+    		this.processService.complete(taskId, content, user.getId().toString(), variables);
+			message.setStatus(Boolean.TRUE);
+			message.setMessage("任务办理完成！");
+		} catch (ActivitiObjectNotFoundException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务不存在，请联系管理员！");
+			throw e;
+		} catch (ActivitiException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务正在协办，您不能办理此任务！");
+			throw e;
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("任务办理失败，请联系管理员！");
+			throw e;
 		}
-		this.vacationService.doUpdate(vacation);
-		// 完成任务
-		this.processService.complete(taskId, content, user.getId().toString(), variables);
-		
-		redirectAttributes.addFlashAttribute("message", "任务办理完成！");
-    	return "redirect:/processAction/todoTaskList_page";
+		return message;
     }
     
     /**

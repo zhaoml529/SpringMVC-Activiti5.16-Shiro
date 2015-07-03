@@ -210,8 +210,8 @@ function handleTask(){
     		audit_dialog = $('<div/>').dialog({
     			title : "任务信息",
     			top: 20,
-    			width : 600,
-    			height : 420,
+    			width : 700,
+    			height : 500,
     			modal: true,
     			minimizable: true,
     			maximizable: true,

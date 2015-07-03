@@ -42,7 +42,7 @@
         </div>
         <div class="fitem">
             <label>描述:</label>
-            <textarea readonly="readonly" rows="4" cols="50">${salary.dscp }</textarea>
+            <textarea readonly="readonly" rows="4" cols="61">${salary.dscp }</textarea>
         </div>
         <div class="fitem">
             <label>评论:</label>
@@ -51,22 +51,32 @@
          			暂无评论！
            		</c:when>
             	<c:otherwise>
-            		<table style="margin: 5px;">
-						<c:forEach var="comment" items="${commentList}">
-						<tr>
-							<td>${comment.userName}- <fmt:formatDate value="${comment.time }" type="date" /> </td>
-						</tr>
-						<tr>
-							<td>${comment.content}</td>
-						</tr>
-						</c:forEach>
+            		<div style="display: inline-block;">
+            		<table class="easyui-datagrid" style="width:450px;" data-options="fitColumns:true,singleSelect:true">
+					    <thead>
+							<tr>
+								<th data-options="field:'userName',width:100,align:'center'">评论人</th>
+								<th data-options="field:'time',width:100,align:'center'">评论时间</th>
+								<th data-options="field:'content',width:200,align:'center'">评论内容</th>
+							</tr>
+					    </thead>
+					    <tbody>
+					    	<c:forEach var="comment" items="${commentList}">
+								<tr>
+									<td>${comment.userName}</td>
+									<td><fmt:formatDate value="${comment.time }" type="date" /></td>
+									<td>${comment.content}</td>
+								</tr>
+							</c:forEach>
+						</tbody>
 					</table>
+					</div>
             	</c:otherwise>
             </c:choose>
         </div>
         <div class="fitem">
             <label>我的意见:</label>
-            <textarea rows="4" cols="50"  name="content"></textarea>
+            <textarea rows="4" cols="61"  name="content"></textarea>
         </div>
     </form>
 </div>

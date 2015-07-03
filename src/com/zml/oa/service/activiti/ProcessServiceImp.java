@@ -490,7 +490,7 @@ public class ProcessServiceImp implements IProcessService{
 	}
 
 	@Override
-	public void complete(String taskId, String content, String userid, Map<String, Object> variables) {
+	public void complete(String taskId, String content, String userid, Map<String, Object> variables) throws Exception{
 		Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
 		// 根据任务查询流程实例
     	String processInstanceId = task.getProcessInstanceId();
