@@ -200,10 +200,12 @@ public class ProcessAction {
 			map.put("taskName", base.getTask().getName());
 			map.put("createTime", base.getTask().getCreateTime());
 			map.put("assign", base.getTask().getAssignee());
+			map.put("taskDefinitionKey", base.getTask().getTaskDefinitionKey());
 			map.put("processInstanceId", base.getProcessInstance().getId());
 			map.put("processDefinitionId", base.getProcessInstance().getProcessDefinitionId());
 			map.put("supended", base.getProcessInstance().isSuspended());
 			map.put("version", base.getProcessDefinition().getVersion());
+			
 			jsonList.add(map);
 		}
 		return new Datagrid<Object>(p.getTotal(), jsonList);

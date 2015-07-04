@@ -178,6 +178,11 @@ public class SalaryAction {
 	}
 	
 	/**
+	 * 以下为EasyUI对应方法
+	 */
+	
+	
+	/**
      * 审批薪资调整流程
      * @param taskId
      * @param model
@@ -209,6 +214,17 @@ public class SalaryAction {
     	return result;
     }
     
+	/**
+	 * 审批任务
+	 * @param salaryAdjustId
+	 * @param content
+	 * @param completeFlag
+	 * @param taskId
+	 * @param redirectAttributes
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
 	@RequiresPermissions("user:salary:complate")
     @RequestMapping("/complate/{taskId}")
 	@ResponseBody
@@ -256,83 +272,85 @@ public class SalaryAction {
 
     }
     
-    /**
-     * 修改薪资调整
-     * @param salary
-     * @param results
-     * @param taskId
-     * @param salaryId
-     * @param reApply
-     * @param processInstanceId
-     * @param redirectAttributes
-     * @param session
-     * @param model
-     * @return
-     * @throws Exception 
-     */
+	/**
+	 * 修改薪资调整
+	 * @param salary
+	 * @param taskId
+	 * @param reApply
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
 	@RequiresPermissions("user:salary:modify")
     @RequestMapping("/modifySalary/{taskId}")
-    public String modifySalary(
-    		@ModelAttribute("salary") @Valid SalaryAdjust salary,
-			BindingResult results,
+	@ResponseBody
+    public Message modifySalary(
+    		@ModelAttribute("salary") SalaryAdjust salary,
 			@PathVariable("taskId") String taskId,
 			@RequestParam("reApply") Boolean reApply,
-			RedirectAttributes redirectAttributes,
-			HttpSession session,
-			Model model) throws Exception{
-    	
-    	
-    	if(results.hasErrors()){
-        	model.addAttribute("salary", salary);
-        	return "salary/modify_salaryjust";
-        }
+			HttpSession session) throws Exception{
 		
 		User currentUser = UserUtil.getUserFromSession(session);
         String userName = salary.getUser_name();
-        User user = this.userService.getUserByName(userName);
-        
-        Map<String, Object> variables = new HashMap<String, Object>();     
-        
-        if(reApply){
-        	if(!BeanUtils.isBlank(user)){
-        		if(user.getName().equals(currentUser.getName())){
-		        	//修改薪资调整
-		        	salary.setUserId(user.getId());
-		        	salary.setUser_id(currentUser.getId());
-		        	salary.setUser_name(currentUser.getName());
-		        	salary.setTitle(user.getName()+" 的薪资调整申请！");
-		        	salary.setBusinessType(BaseVO.SALARY);
-		        	salary.setStatus(BaseVO.PENDING);
-		        	salary.setApplyDate(new Date());
-		        	salary.setBusinessKey(salary.getId().toString());
-	//		        variables.put("auditGroup", "director");//返回总监重新审批
-			        redirectAttributes.addFlashAttribute("message", "任务办理完成，薪资调整申请已重新提交！");
+        Message message = new Message();
+        try {
+        	User user = this.userService.getUserByName(userName);
+        	Map<String, Object> variables = new HashMap<String, Object>();     
+        	if(reApply){
+        		if(!BeanUtils.isBlank(user)){
+        			if(user.getName().equals(currentUser.getName())){
+        				//修改薪资调整
+        				salary.setUserId(user.getId());
+        				salary.setUser_id(currentUser.getId());
+        				salary.setUser_name(currentUser.getName());
+        				salary.setTitle(user.getName()+" 的薪资调整申请！");
+        				salary.setBusinessType(BaseVO.SALARY);
+        				salary.setStatus(BaseVO.PENDING);
+        				salary.setApplyDate(new Date());
+        				salary.setBusinessKey(salary.getId().toString());
+        				message.setStatus(Boolean.TRUE);
+        				message.setMessage("任务办理完成，薪资调整申请已重新提交！");
+        			}else{
+        				message.setStatus(Boolean.FALSE);
+        				message.setMessage("申请错误，只能申请调整自己的薪资！");
+        				return message;
+        			}
         		}else{
-        			redirectAttributes.addFlashAttribute("error", "申请错误，只能申请调整自己的薪资！");
-                	return "redirect:/salaryAction/toApproval/"+taskId;
+        			message.setStatus(Boolean.FALSE);
+        			message.setMessage("此用户不存在，不能调整薪资！");
+        			return message;
         		}
         	}else{
-            	redirectAttributes.addFlashAttribute("error", "此用户不存在，不能调整薪资！");
-            	return "redirect:/salaryAction/toApproval/"+taskId;
-            }
-        }else{
-        	salary.setUserId(user.getId());
-        	salary.setUser_id(currentUser.getId());
-        	salary.setUser_name(currentUser.getName());
-        	salary.setTitle(user.getName()+" 的薪资调整申请已取消！");
-        	salary.setBusinessType(BaseVO.SALARY);
-        	salary.setStatus(BaseVO.APPROVAL_FAILED);
-        	salary.setApplyDate(new Date());
-        	salary.setBusinessKey(salary.getId().toString());
-        	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的薪资调整申请！");
-        }
-        this.saService.doUpdate(salary);
-        variables.put("entity", salary);
-        variables.put("reApply", reApply);
-        //完成任务
-        this.processService.complete(taskId, null, user.getId().toString(), variables);
-        
-        return "redirect:/processAction/todoTaskList_page";
+        		salary.setUserId(user.getId());
+        		salary.setUser_id(currentUser.getId());
+        		salary.setUser_name(currentUser.getName());
+        		salary.setTitle(user.getName()+" 的薪资调整申请已取消！");
+        		salary.setBusinessType(BaseVO.SALARY);
+        		salary.setStatus(BaseVO.APPROVAL_FAILED);
+        		salary.setApplyDate(new Date());
+        		salary.setBusinessKey(salary.getId().toString());
+        		message.setStatus(Boolean.TRUE);
+        		message.setMessage("任务办理完成，已经取消您的薪资调整申请！");
+        	}
+        	this.saService.doUpdate(salary);
+        	variables.put("entity", salary);
+        	variables.put("reApply", reApply);
+        	//完成任务
+			this.processService.complete(taskId, null, user.getId().toString(), variables);
+		} catch (ActivitiObjectNotFoundException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务不存在，请联系管理员！");
+			throw e;
+		} catch (ActivitiException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务正在协办，您不能办理此任务！");
+			throw e;
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("任务办理失败，请联系管理员！");
+			throw e;
+		}
+		return message;
     	
     }
     

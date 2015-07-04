@@ -197,6 +197,12 @@ public class VacationAction {
     	return result;
     }
     
+	
+	/**
+	 * 一下是EasyUI的页面需求
+	 * 
+	 */
+	
     /**
      * 完成任务
      * @param content
@@ -259,39 +265,31 @@ public class VacationAction {
 		}
 		return message;
     }
-    
-    /**
-     * 调整请假申请
-     * @param vacation
-     * @param results
-     * @param taskId
-     * @param session
-     * @param reApply
-     * @param model
-     * @return
-     * @throws Exception 
-     */
+	
+	
+	/**
+	 * 调整请假申请
+	 * @param vacation
+	 * @param taskId
+	 * @param processInstanceId
+	 * @param reApply
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
 	@RequiresPermissions("user:vacation:modify")
 	@RequestMapping(value = "/modifyVacation/{taskId}", method = RequestMethod.POST)
-	public String modifyVacation(
-			@ModelAttribute("vacation") @Valid Vacation vacation,
-			BindingResult results,
+	@ResponseBody
+	public Message modifyVacation(
+			@ModelAttribute("vacation") Vacation vacation,
 			@PathVariable("taskId") String taskId,
 			@RequestParam("processInstanceId") String processInstanceId,
 			@RequestParam("reApply") Boolean reApply,
-			RedirectAttributes redirectAttributes,
-			HttpSession session,
-			Model model
-			) throws Exception {
-		
-		if(results.hasErrors()){
-        	model.addAttribute("vacation", vacation);
-        	return "vacation/modify_vacation";
-        }
+			HttpSession session) throws Exception{
 		
 		User user = UserUtil.getUserFromSession(session);
-        
-
+		Message message = new Message();
+		
         Map<String, Object> variables = new HashMap<String, Object>();
         vacation.setUserId(user.getId());
         vacation.setUser_name(user.getName());
@@ -309,24 +307,36 @@ public class VacationAction {
 //            }else{
 //            	variables.put("auditGroup", "director");
 //            }
-	        redirectAttributes.addFlashAttribute("message", "任务办理完成，请假申请已重新提交！");
+	        message.setStatus(Boolean.TRUE);
+			message.setMessage("任务办理完成，请假申请已重新提交！");
         }else{
         	vacation.setTitle(user.getName()+" 的请假申请已取消！");
         	vacation.setStatus(BaseVO.APPROVAL_FAILED);
-        	redirectAttributes.addFlashAttribute("message", "任务办理完成，已经取消您的请假申请！");
+	        message.setStatus(Boolean.TRUE);
+			message.setMessage("任务办理完成，已经取消您的请假申请！");
         }
-        this.vacationService.doUpdate(vacation);
-        variables.put("entity", vacation);
-        variables.put("reApply", reApply);
-		this.processService.complete(taskId, null, user.getId().toString(), variables);
+        try {
+			this.vacationService.doUpdate(vacation);
+			variables.put("entity", vacation);
+			variables.put("reApply", reApply);
+			this.processService.complete(taskId, null, user.getId().toString(), variables);
+			
+		} catch (ActivitiObjectNotFoundException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务不存在，请联系管理员！");
+			throw e;
+		} catch (ActivitiException e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务正在协办，您不能办理此任务！");
+			throw e;
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("任务办理失败，请联系管理员！");
+			throw e;
+		}
 		
-    	return "redirect:/processAction/todoTaskList_page";
+    	return message;
     }
-	
-	/**
-	 * 一下是EasyUI的页面需求
-	 * 
-	 */
 	
 	/**
 	 * 详细信息

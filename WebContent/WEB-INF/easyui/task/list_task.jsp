@@ -40,5 +40,6 @@
 			<table id="endTask" title="已完成任务"></table>
 		</div>
 	</div>
+	
   </body>
 </html>

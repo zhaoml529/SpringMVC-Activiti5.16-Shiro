@@ -129,7 +129,11 @@ function showEndTask(){
                 },
                 {field : 'claimTime',title : '任务签收时间',width : fixWidth(0.1),align : 'center',
                 	formatter:function(value,row){
-                		return moment(value).format("YYYY-MM-DD HH:mm:ss");
+                		if(value != null){
+                			return moment(value).format("YYYY-MM-DD HH:mm:ss");
+                		}else{
+                			return "无需签收"
+                		}
                 	}
                 },
                 {field : 'endTime',title : '任务结束时间',width : fixWidth(0.1),align : 'center',
@@ -151,13 +155,24 @@ function showEndTask(){
 }
 
 //初始化审批表单
-function approvalFormInit( businessType, taskId ) {
+function approvalFormInit( taskDefinitionKey, businessType, taskId ) {
 	var _url;
 	if("vacation" == businessType){
+		//正常审批
 		_url = ctx+'/vacationAction/complate/'+taskId;
+		if("modifyApply" == taskDefinitionKey){
+			//申请人修改申请
+			_url = ctx+'/vacationAction/modifyVacation/'+taskId;
+		}
 	}else if("salary" == businessType){
+		//正常审批
 		_url = ctx+'/salaryAction/complate/'+taskId;
+		if("modifyApply" == taskDefinitionKey){
+			//申请人修改申请
+			_url = ctx+'/salaryAction/modifySalary/'+taskId;
+		}
 	}else if("expense" == businessType){
+		//正常审批
 		_url = ctx+'/expenseAction/complate/'+taskId;
 	}
 	audit_form = $('#audit_form').form({
@@ -217,7 +232,10 @@ function handleTask(){
     			maximizable: true,
     			href: _url,
     			onLoad: function () {
-    				approvalFormInit( row.businessType, row.taskId );
+    				approvalFormInit( row.taskDefinitionKey, row.businessType, row.taskId );
+    				if("vacation" == row.businessType){
+    					$("#type").combobox('select', type);
+    				}
     			},
     			buttons: [
     			          {
@@ -242,12 +260,43 @@ function handleTask(){
     			        	  handler: function () {
     			        		  audit_dialog.dialog('destroy');
     			        	  }
-    			          },
-    			          ],
-    			          onClose: function () {
-    			        	  audit_dialog.dialog('destroy');
     			          }
+    			],
+	            onClose: function () {
+	        	    audit_dialog.dialog('destroy');
+	            }
     		});
+    		
+    		if(row.taskDefinitionKey.indexOf("modify") != -1){
+    			audit_dialog.dialog({
+    				buttons: [
+        			          {
+        			        	  text: '重新申请',
+        			        	  iconCls: 'icon-ok',
+        			        	  handler: function () {
+        			        		  $("#reApply").val("true");
+        			        		  audit_form.submit();
+        			        	  }
+        			          },
+        			          {
+        			        	  text: '取消申请',
+        			        	  iconCls: 'icon-remove',
+        			        	  handler: function () {
+        			        		  $("#reApply").val("false");
+        			        		  audit_form.submit();
+        			        	  }
+        			          },
+        			          {
+        			        	  text: '关闭',
+        			        	  iconCls: 'icon-cancel',
+        			        	  handler: function () {
+        			        		  audit_dialog.dialog('destroy');
+        			        	  }
+        			          }
+        			]
+    			})
+    			alert(row.taskDefinitionKey);
+    		}
     	}
     } else {
         $.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");

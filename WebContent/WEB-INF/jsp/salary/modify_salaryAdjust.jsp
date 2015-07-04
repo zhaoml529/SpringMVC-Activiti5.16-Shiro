@@ -30,9 +30,7 @@
           	  <li class="selected"><a href="#">调整薪资申请</a></li>
           </ul>
       </div>
-      
       <div id="tagContent0" class="sort_content">
-			
         	<div class="currency_area hue9">
             	<div class="the_content">
                 	<table class="tableHue2" width="100%" border="1" bordercolor="#dddddd" cellspacing="0" cellpadding="0">

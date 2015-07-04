@@ -27,7 +27,7 @@
 
 <div id="dlg" class="easyui-layout" style="padding:10px 20px">
     <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 调薪申请信息</div>
-    <form id="vacation_form" method="post" >
+    <form id="salary_form" method="post" >
         <div class="fitem">
             <label>姓名：</label>
             <input id="beginDate" name="beginDate" value = "${user_name }" readonly="readonly" class="textbox-text easyui-validatebox" required="true">
