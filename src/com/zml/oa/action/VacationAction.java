@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
@@ -20,7 +19,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +38,6 @@ import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
-import com.zml.oa.util.Constants;
 import com.zml.oa.util.UserUtil;
 
 /**
@@ -98,72 +95,6 @@ public class VacationAction {
 		return "vacation/list_vacation";
 	}
 	
-	/**
-	 * 跳转添加页面
-	 * @param model
-	 * @return
-	 */
-	@RequiresPermissions("user:vacation:toAdd")
-	@RequestMapping(value = "/toAdd", method = RequestMethod.GET)
-	public ModelAndView toAdd(Model model){
-		if(!model.containsAttribute("vacation")) {
-            model.addAttribute("vacation", new Vacation());
-        }
-		return new ModelAndView("vacation/add_vacation").addObject(model);
-	}
-    /**
-     * 添加并启动请假流程
-     *
-     * @param leave
-     */
-	@RequiresPermissions("user:vacation:doAdd")
-	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
-	public String doAdd(
-			@ModelAttribute("vacation") @Valid Vacation vacation,BindingResult results, 
-			RedirectAttributes redirectAttributes, 
-			HttpSession session, 
-			Model model) throws Exception{
-        User user = UserUtil.getUserFromSession(session);
-        
-        if(results.hasErrors()){
-        	model.addAttribute("vacation", vacation);
-        	return "vacation/add_vacation";
-        }
-        
-        
-        // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
-        if (user == null || user.getId() == null) {
-        	model.addAttribute("msg", "登录超时，请重新登录!");
-            return "login";
-        }
-        vacation.setUserId(user.getId());
-        vacation.setUser_name(user.getName());
-        vacation.setTitle(user.getName()+" 的请假申请");
-        vacation.setBusinessType(BaseVO.VACATION); 			//业务类型：请假申请
-        vacation.setStatus(BaseVO.PENDING);					//审批中
-        vacation.setApplyDate(new Date());
-        this.vacationService.doAdd(vacation);
-        String businessKey = vacation.getId().toString();
-        vacation.setBusinessKey(businessKey);
-        try {
-        	String processInstanceId = this.processService.startVacation(vacation);
-            redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
-            logger.info("processInstanceId: "+processInstanceId);
-        } catch (ActivitiException e) {
-            if (e.getMessage().indexOf("no processes deployed with key") != -1) {
-                logger.warn("没有部署流程!", e);
-                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>-待完成");
-            } else {
-                logger.error("启动请假流程失败：", e);
-                redirectAttributes.addFlashAttribute("error", "系统内部错误！");
-            }
-        } catch (Exception e) {
-            logger.error("启动请假流程失败：", e);
-            long a = Constants.SYSY_INIT_TIME;
-            redirectAttributes.addFlashAttribute("error", "系统内部错误！");
-        }
-		return "redirect:/vacationAction/toAdd";
-	}
 	
     /**
      * 审批请假流程
@@ -202,6 +133,74 @@ public class VacationAction {
 	 * 一下是EasyUI的页面需求
 	 * 
 	 */
+	
+	
+	/**
+	 * 跳转添加页面
+	 * @param model
+	 * @return
+	 */
+	@RequiresPermissions("user:vacation:toAdd")
+	@RequestMapping(value = "/toAdd")
+	public ModelAndView toAdd(Model model){
+		if(!model.containsAttribute("vacation")) {
+            model.addAttribute("vacation", new Vacation());
+        }
+		return new ModelAndView("vacation/add_vacation").addObject(model);
+	}	
+	
+	/**
+     * 添加并启动请假流程
+     *
+     * @param leave
+     */
+	@RequiresPermissions("user:vacation:doAdd")
+	@RequestMapping(value = "/doAdd")
+	@ResponseBody
+	public Message doAdd(
+			@ModelAttribute("vacation") Vacation vacation,
+			HttpSession session) throws Exception{
+        User user = UserUtil.getUserFromSession(session);
+        
+        // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
+//        if (user == null || user.getId() == null) {
+//        	model.addAttribute("msg", "登录超时，请重新登录!");
+//            return "login";
+//        }
+        Message message = new Message();
+        vacation.setUserId(user.getId());
+        vacation.setUser_name(user.getName());
+        vacation.setTitle(user.getName()+" 的请假申请");
+        vacation.setBusinessType(BaseVO.VACATION); 			//业务类型：请假申请
+        vacation.setStatus(BaseVO.PENDING);					//审批中
+        vacation.setApplyDate(new Date());
+        this.vacationService.doAdd(vacation);
+        String businessKey = vacation.getId().toString();
+        vacation.setBusinessKey(businessKey);
+        try {
+//        	String processInstanceId = this.processService.startVacation(vacation);
+        	String processInstanceId = "123";
+            message.setStatus(Boolean.TRUE);
+			message.setMessage("流程已启动，流程ID：" + processInstanceId);
+            logger.info("processInstanceId: "+processInstanceId);
+        } catch (ActivitiException e) {
+        	message.setStatus(Boolean.FALSE);
+            if (e.getMessage().indexOf("no processes deployed with key") != -1) {
+                logger.warn("没有部署流程!", e);
+    			message.setMessage("没有部署流程，请联系系统管理员，在[流程定义]中部署相应流程文件！");
+            } else {
+                logger.error("启动请假流程失败：", e);
+                message.setMessage("启动请假流程失败，系统内部错误！");
+            }
+            throw e;
+        } catch (Exception e) {
+            logger.error("启动请假流程失败：", e);
+            message.setStatus(Boolean.FALSE);
+            message.setMessage("启动请假流程失败，系统内部错误！");
+            throw e;
+        }
+		return message;
+	}
 	
     /**
      * 完成任务
