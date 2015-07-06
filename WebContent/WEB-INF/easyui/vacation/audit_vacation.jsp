@@ -29,13 +29,16 @@
 <div id="dlg" class="easyui-layout" style="padding:10px 20px">
     <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 请假申请审批</div>
     <form id="audit_form" method="post" >
+   		<input type="hidden" name="userId" value="${user.id }" />
+		<input type="hidden" name="vacationId" value="${vacation.id }" />
+		<input type="hidden" id="completeFlag" name="completeFlag" value="" />
         <div class="fitem">
             <label>开始日期：</label>
-            <input id="beginDate" name="beginDate" value = "${vacation.beginDate }" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="beginDate" name="beginDate" value = "<fmt:formatDate value="${vacation.beginDate }" type="date" />" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
         </div>
         <div class="fitem">
             <label>结束日期:</label>
-            <input id="endDate" name="endDate" value = "${vacation.endDate }" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="endDate" name="endDate" value = "<fmt:formatDate value="${vacation.endDate }" type="date" />" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
         </div>
         <div class="fitem">
             <label>请假天数:</label>
@@ -88,9 +91,5 @@
             <label>我的意见:</label>
             <textarea cols="33" rows="5" name="content"></textarea>
         </div>
-        <div region="south" border="false" style="text-align:right;height:30px;line-height:30px;">
-				<a class="easyui-linkbutton" icon="icon-ok" href="javascript:void(0)" onclick="set_chooseUser();">同意</a>
-				<a class="easyui-linkbutton" icon="icon-cancel" href="javascript:void(0)" onclick="destroy_chooseUser('${taskDefKey }');">不同意</a>
-		</div>
     </form>
 </div>

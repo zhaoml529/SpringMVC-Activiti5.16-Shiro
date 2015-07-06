@@ -178,10 +178,9 @@ public class VacationAction {
         String businessKey = vacation.getId().toString();
         vacation.setBusinessKey(businessKey);
         try {
-//        	String processInstanceId = this.processService.startVacation(vacation);
-        	String processInstanceId = "123";
+        	String processInstanceId = this.processService.startVacation(vacation);
             message.setStatus(Boolean.TRUE);
-			message.setMessage("流程已启动，流程ID：" + processInstanceId);
+			message.setMessage("请假流程已启动，流程ID：" + processInstanceId);
             logger.info("processInstanceId: "+processInstanceId);
         } catch (ActivitiException e) {
         	message.setStatus(Boolean.FALSE);

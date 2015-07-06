@@ -5,13 +5,7 @@
 var vacation_form;
 
 //初始化表单
-/*$(function(){
-	
-})*/
-
-//表单提交
-function submitForm(){
-	alert("submit");
+$(function(){
 	vacation_form = $('#vacation_form').form({
 	    url: ctx+"/vacationAction/doAdd",
 	    onSubmit: function () {
@@ -29,9 +23,8 @@ function submitForm(){
 	        $.messager.progress('close');
 	        var json = $.parseJSON(data);
 	        if (json.status) {
-	        	audit_dialog.dialog('destroy');//销毁对话框
-	        	todoTask_datagrid.datagrid('reload');//重新加载列表数据
-
+	        	$("#save").linkbutton('disable');
+	        	$("#clear").linkbutton('disable');
 	        } 
 	        $.messager.show({
 				title : json.title,
@@ -40,6 +33,31 @@ function submitForm(){
 			});
 	    }
 	});
+	//只能选取今天以后的日期
+	$('#beginDate').datebox().datebox('calendar').calendar({
+		validator: function(date){
+			var now = new Date();
+			var d1 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			return d1<=date;
+		}
+	});
+	
+	//只能选取beginDate之后的日期
+	$('#beginDate').datebox({
+		onSelect: function(beginDate){
+			$('#endDate').datebox().datebox('calendar').calendar({
+				validator: function(date){
+					var d1 = new Date(beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate());
+					return d1<=date;
+				}
+			});
+		}
+	});
+	
+})
+
+//表单提交
+function submitForm(){
 	vacation_form.submit();
 }
 

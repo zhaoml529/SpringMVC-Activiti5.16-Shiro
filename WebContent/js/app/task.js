@@ -234,6 +234,7 @@ function handleTask(){
     			onLoad: function () {
     				approvalFormInit( row.taskDefinitionKey, row.businessType, row.taskId );
     				if("vacation" == row.businessType){
+    					var type = $("#vacationType").val();
     					$("#type").combobox('select', type);
     				}
     			},

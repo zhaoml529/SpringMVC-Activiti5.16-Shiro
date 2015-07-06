@@ -63,7 +63,7 @@ function fixWidth(percent)
 
 //初始化所有
 function initialization(){
-	$.messager.confirm('此操作将会删除所有已设定的审批人员，确定初始化所有流程定义的审批人员吗？', function (result) {
+	$.messager.confirm('提示','此操作将会删除所有已设定的审批人员，确定初始化所有流程定义的审批人员吗？', function (result) {
 		if(result){
 			$.ajax({
 				type: "POST",

@@ -10,7 +10,7 @@
 	<meta http-equiv="expires" content="0">    
 	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
 	<meta http-equiv="description" content="This is my page">
-<%-- 	<script type="text/javascript" src="${ctx}/js/app/vacation.js?_=${sysInitTime}"></script> --%>
+	<script type="text/javascript" src="${ctx}/js/app/vacation.js?_=${sysInitTime}"></script>
 	<style type="text/css">
 	    #fm{
 	        margin:0;
@@ -36,53 +36,18 @@
 	        margin-left: 150px;
 	    }
 	</style>
-	<script type="text/javascript">
-		function onSubmit(){
-			alert("!!");
-			vacation_form = $('#vacation_form').form({
-			    onSubmit: function () {
-			        $.messager.progress({
-			            title: '提示信息！',
-			            text: '数据处理中，请稍后....'
-			        });
-			        var isValid = $(this).form('enableValidation').form('validate');
-			        alert("isValid: "+isValid);
-			        if (!isValid) {
-			            $.messager.progress('close');
-			        }
-			        return isValid;
-			    },
-			    success: function (data) {
-			        $.messager.progress('close');
-			        var json = $.parseJSON(data);
-			        if (json.status) {
-			        	audit_dialog.dialog('destroy');//销毁对话框
-			        	todoTask_datagrid.datagrid('reload');//重新加载列表数据
-
-			        } 
-			        $.messager.show({
-						title : json.title,
-						msg : json.message,
-						timeout : 1000 * 2
-					});
-			    }
-			});
-			vacation_form.submit();
-			//$("#vacation_form").submit();
-		}
-	</script>
   </head>
   <body>
   	<div id="dlg" class="easyui-layout" style="padding:10px 20px">
 	    <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 请假信息</div>
-	    <form id="vacation_form" action="${ctx }/vacationAction/doAdd" method="post" data-options="novalidate:true">
+	    <form id="vacation_form" method="post">
 	        <div class="fitem">
 	            <label>开始日期:</label>
-	            <input id="beginDate" name="beginDate" class="easyui-datebox easyui-validatebox" required="true" style="width: 160px;">
+	            <input id="beginDate" name="beginDate" class="easyui-datebox" required="true" style="width: 160px;">
 	        </div>
 	        <div class="fitem">
 	            <label>结束日期:</label>
-	            <input id="endDate" name="endDate" class="easyui-datebox easyui-validatebox" required="true" style="width: 160px;">
+	            <input id="endDate" name="endDate" class="easyui-datebox" required="true" style="width: 160px;">
 	        </div>
 	        <div class="fitem">
 	            <label>请假天数:</label>
@@ -101,9 +66,8 @@
 	            <input id="reason" name="reason" class="easyui-textbox" data-options="multiline:true" style="height:70px; width: 300px">
 	        </div>
 	        <div style="padding:20px 0px 0px 0px;">
-<!-- 				<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save'" onclick="submitForm()" style="width:80px">保存</a> -->
-				<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save'" onclick="onSubmit()" style="width:80px">保存</a>
-				<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="clearForm()" style="width:80px">重置</a>
+				<a href="#" id="save" class="easyui-linkbutton" data-options="iconCls:'icon-save'" onclick="submitForm()" style="width:80px">保存</a>
+				<a href="#" id="clear" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="clearForm()" style="width:80px">重置</a>
 			</div>
 	    </form>
 	</div>
