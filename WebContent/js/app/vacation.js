@@ -1,5 +1,5 @@
 /**
- * 请假管理
+ * 添加请假申请
  */
 
 var vacation_form;
