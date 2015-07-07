@@ -25,46 +25,24 @@
         width:160px;
     }
 </style>
-<script type="text/javascript">
-$(function(){
-	function myformatter(date){
-		var y = date.getFullYear();
-		var m = date.getMonth()+1;
-		var d = date.getDate();
-		return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
-	}
-	function myparser(s){
-		if (!s) return new Date();
-		var ss = (s.split('-'));
-		var y = parseInt(ss[0],10);
-		var m = parseInt(ss[1],10);
-		var d = parseInt(ss[2],10);
-		if (!isNaN(y) && !isNaN(m) && !isNaN(d)){
-			return new Date(y,m-1,d);
-		} else {
-			return new Date();
-		}
-	}
-});
-</script>
 <div id="dlg" class="easyui-layout" style="padding:10px 20px">
     <div class="ftitle"><img src="${ctx }/extend/fromedit.png" style="margin-bottom: -3px;"/> 请假信息</div>
-    <form id="vacation_form" method="post" >
+    <form id="audit_form" method="post" >
     	<input type="hidden" name="id" value="${vacation.id }" />
 		<input type="hidden" name="processInstanceId" value="${vacation.processInstanceId }" />
 		<input type="hidden" name="userId" value="${user.id }" />
 		<input type="hidden" id="reApply" name="reApply" value="" />
         <div class="fitem">
             <label>开始日期：</label>
-            <input id="beginDate" name="beginDate" value = "${vacation.beginDate }" data-options="formatter:myformatter,parser:myparser" class="easyui-datebox easyui-validatebox" required="true">
+            <input id="beginDate" name="beginDate" value = "<fmt:formatDate value="${vacation.beginDate }" type="date" />" class="easyui-datebox" required="true">
         </div>
         <div class="fitem">
             <label>结束日期:</label>
-            <input id="endDate" name="endDate" value = "${vacation.endDate }" data-options="formatter:myformatter,parser:myparser" class="easyui-datebox easyui-validatebox" required="true">
+            <input id="endDate" name="endDate" value = "<fmt:formatDate value="${vacation.endDate }" type="date" />" class="easyui-datebox" required="true">
         </div>
         <div class="fitem">
             <label>请假天数:</label>
-            <input id="days" name="days" value="${vacation.days }" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="days" name="days" value="${vacation.days }" class="easyui-numberspinner easyui-validatebox" required="true" data-options="min:1,max:60">
         </div>
         <div class="fitem">
             <label>休假类型:</label>
@@ -77,7 +55,7 @@ $(function(){
         </div>
         <div class="fitem">
             <label>原因:</label>
-            <textarea name="reason" rows="4" cols="50">${vacation.reason }</textarea>
+            <input id="reason" name="reason" class="easyui-textbox" value="${vacation.reason }" data-options="multiline:true" style="height:70px; width: 300px">
         </div>
         <div class="fitem">
             <label>评论:</label>

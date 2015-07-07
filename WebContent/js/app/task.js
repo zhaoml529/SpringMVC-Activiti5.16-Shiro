@@ -163,6 +163,27 @@ function approvalFormInit( taskDefinitionKey, businessType, taskId ) {
 		if("modifyApply" == taskDefinitionKey){
 			//申请人修改申请
 			_url = ctx+'/vacationAction/modifyVacation/'+taskId;
+			
+			//只能选取今天以后的日期
+			$('#beginDate').datebox().datebox('calendar').calendar({
+				validator: function(date){
+					var now = new Date();
+					var d1 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+					return d1<=date;
+				}
+			});
+			
+			//只能选取beginDate之后的日期
+			$('#beginDate').datebox({
+				onSelect: function(beginDate){
+					$('#endDate').datebox().datebox('calendar').calendar({
+						validator: function(date){
+							var d1 = new Date(beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate());
+							return d1<=date;
+						}
+					});
+				}
+			});
 		}
 	}else if("salary" == businessType){
 		//正常审批
@@ -296,7 +317,6 @@ function handleTask(){
         			          }
         			]
     			})
-    			alert(row.taskDefinitionKey);
     		}
     	}
     } else {

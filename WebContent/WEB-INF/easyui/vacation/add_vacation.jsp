@@ -51,7 +51,7 @@
 	        </div>
 	        <div class="fitem">
 	            <label>请假天数:</label>
-	            <input id="days" name="days" class="easyui-numberspinner easyui-validatebox" required="true" style="width: 160px;">
+	            <input id="days" name="days" class="easyui-numberspinner easyui-validatebox" required="true" data-options="min:1,max:60" style="width: 160px;">
 	        </div>
 	        <div class="fitem">
 	            <label>休假类型:</label>
@@ -66,7 +66,7 @@
 	            <input id="reason" name="reason" class="easyui-textbox" data-options="multiline:true" style="height:70px; width: 300px">
 	        </div>
 	        <div style="padding:20px 0px 0px 0px;">
-				<a href="#" id="save" class="easyui-linkbutton" data-options="iconCls:'icon-save'" onclick="submitForm()" style="width:80px">保存</a>
+				<a href="#" id="save" class="easyui-linkbutton" data-options="iconCls:'icon-save'" onclick="submitForm()" style="width:80px">申请</a>
 				<a href="#" id="clear" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="clearForm()" style="width:80px">重置</a>
 			</div>
 	    </form>
