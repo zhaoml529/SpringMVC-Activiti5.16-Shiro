@@ -65,6 +65,10 @@ public class ExpenseAction {
 	@Autowired
 	private IProcessService processService;
 	
+    
+	/**
+	 * 一下为EasyUI方法
+	 */
 	
 	/**
 	 * 跳转添加页面
@@ -72,27 +76,9 @@ public class ExpenseAction {
 	 * @return
 	 */
 	@RequiresPermissions("user:expense:toAdd")
-	@RequestMapping(value = "/toAdd", method = RequestMethod.GET)
-	public ModelAndView toAdd(Model model){
-		if(!model.containsAttribute("expense")) {
-            model.addAttribute("expense", new ExpenseAccount());
-        }
-		return new ModelAndView("expense/add_expense").addObject(model);
-	}
-	
-	/**
-	 * 详细信息
-	 * @param id
-	 * @param model
-	 * @return
-	 * @throws Exception
-	 */
-	@RequiresPermissions("user:expense:details")
-	@RequestMapping(value="/details/{id}")
-	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
-		ExpenseAccount expense = this.expenseService.findById(id);
-		model.addAttribute("expense", expense);
-		return "/expense/details_expense";
+	@RequestMapping(value = "/toAdd")
+	public String toAdd(Model model){
+		return "expense/add_expense";
 	}
 	
 	/**
@@ -107,25 +93,19 @@ public class ExpenseAction {
 	 */
 	@RequiresPermissions("user:expense:doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
-	public String doAdd(
-			@ModelAttribute("expense") @Valid ExpenseAccount expense,BindingResult results, 
+	@ResponseBody
+	public Message doAdd(
+			@ModelAttribute("expense") ExpenseAccount expense,
 			RedirectAttributes redirectAttributes, 
-			HttpSession session, 
-			Model model) throws Exception{
+			HttpSession session) throws Exception{
         User user = UserUtil.getUserFromSession(session);
         
-        if(results.hasErrors()){
-        	model.addAttribute("expense", expense);
-        	return "expense/add_expense";
-        }
-        
-        
         // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
-        if (user == null || user.getId() == null) {
-        	model.addAttribute("msg", "登录超时，请重新登录!");
-            return "login";
-        }
-        
+//        if (user == null || user.getId() == null) {
+//        	model.addAttribute("msg", "登录超时，请重新登录!");
+//            return "login";
+//        }
+        Message message = new Message();
         expense.setApplyDate(new Date());
         expense.setUserId(user.getId());
         expense.setUser_name(user.getName());
@@ -137,23 +117,27 @@ public class ExpenseAction {
         expense.setBusinessKey(businessKey);
         try{
         	String processInstanceId = this.processService.startExpense(expense);
-            redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
+        	message.setStatus(Boolean.TRUE);
+			message.setMessage("报销流程已启动，流程ID：" + processInstanceId);
             logger.info("processInstanceId: "+processInstanceId);
         }catch (ActivitiException e) {
+        	message.setStatus(Boolean.FALSE);
             if (e.getMessage().indexOf("no processes deployed with key") != -1) {
                 logger.warn("没有部署流程!", e);
-                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>");
+                message.setMessage("没有部署流程，请联系系统管理员，在[流程定义]中部署相应流程文件！");
             } else {
                 logger.error("启动报销流程失败：", e);
-                redirectAttributes.addFlashAttribute("error", "系统内部错误！");
+                message.setMessage("启动请假流程失败，系统内部错误！");
             }
+            throw e;
         } catch (Exception e) {
             logger.error("启动报销流程失败：", e);
-            redirectAttributes.addFlashAttribute("error", "系统内部错误！");
+            message.setStatus(Boolean.FALSE);
+            message.setMessage("启动请假流程失败，系统内部错误！");
+            throw e;
         }
-        return "redirect:/expenseAction/toAdd";
+        return message;
 	}
-
 	
 	/**
      * 审批报销流程
@@ -177,7 +161,7 @@ public class ExpenseAction {
 		model.addAttribute("expense", expense);
     	return "expense/audit_expense";
     }
-    
+	
 	/**
 	 * 完成任务
 	 * @param expenseId
@@ -218,4 +202,21 @@ public class ExpenseAction {
 		}
     	return  message;
     }
+	
+	
+	/**
+	 * 详细信息
+	 * @param id
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	@RequiresPermissions("user:expense:details")
+	@RequestMapping(value="/details/{id}")
+	public String details(@PathVariable("id") Integer id, Model model) throws Exception{
+		ExpenseAccount expense = this.expenseService.findById(id);
+		model.addAttribute("expense", expense);
+		return "/expense/details_expense";
+	}
+	
 }

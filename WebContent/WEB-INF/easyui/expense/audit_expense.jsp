@@ -33,11 +33,11 @@
 		<input type="hidden" name="expenseId" value="${expense.id }" />
         <div class="fitem">
             <label>发生日期：</label>
-            <input id="occurDate" name="occurDate" value = "<fmt:formatDate value="${expense.occurDate }" type="date" />" readonly="readonly" class="textbox-text easyui-validatebox" required="true">
+            <input id="occurDate" name="occurDate" value = "<fmt:formatDate value="${expense.occurDate }" type="date" />" readonly="readonly" class="easyui-datebox" required="true">
         </div>
         <div class="fitem">
             <label>金额:</label>
-            <input id="money" name="money" value = "${expense.money }" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="money" name="money" value = "${expense.money }" readonly="readonly" class="easyui-numberbox easyui-validatebox" required="true" data-options="min:0,precision:2,groupSeparator:',',prefix:'￥'">
         </div>
         <div class="fitem">
             <label>描述:</label>

@@ -96,39 +96,6 @@ public class VacationAction {
 	}
 	
 	
-    /**
-     * 审批请假流程
-     * @param taskId
-     * @param model
-     * @return
-     * @throws NumberFormatException
-     * @throws Exception
-     */
-	@RequiresPermissions("user:vacation:toApproval") 	//*代表 经理、总监、人力
-    @RequestMapping("/toApproval/{taskId}")
-    public String toApproval(@PathVariable("taskId") String taskId, Model model) throws NumberFormatException, Exception{
-    	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
-		// 根据任务查询流程实例
-    	String processInstanceId = task.getProcessInstanceId();
-		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-		Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
-		vacation.setTask(task);
-		vacation.setProcessInstanceId(processInstanceId);
-		List<CommentVO> commentList = this.processService.getComments(processInstanceId);
-		String taskDefinitionKey = task.getTaskDefinitionKey();
-		logger.info("taskDefinitionKey: "+taskDefinitionKey);
-		String result = null;
-		if("modifyApply".equals(taskDefinitionKey)){
-			result = "vacation/modify_vacation";
-		}else{
-			result = "vacation/audit_vacation";
-		}
-		model.addAttribute("vacation", vacation);
-		model.addAttribute("commentList", commentList);
-    	return result;
-    }
-    
-	
 	/**
 	 * 一下是EasyUI的页面需求
 	 * 
@@ -142,11 +109,8 @@ public class VacationAction {
 	 */
 	@RequiresPermissions("user:vacation:toAdd")
 	@RequestMapping(value = "/toAdd")
-	public ModelAndView toAdd(Model model){
-		if(!model.containsAttribute("vacation")) {
-            model.addAttribute("vacation", new Vacation());
-        }
-		return new ModelAndView("vacation/add_vacation").addObject(model);
+	public String toAdd(){
+		return "vacation/add_vacation";
 	}	
 	
 	/**
@@ -200,6 +164,39 @@ public class VacationAction {
         }
 		return message;
 	}
+	
+	/**
+     * 审批请假流程
+     * @param taskId
+     * @param model
+     * @return
+     * @throws NumberFormatException
+     * @throws Exception
+     */
+	@RequiresPermissions("user:vacation:toApproval") 	//*代表 经理、总监、人力
+    @RequestMapping("/toApproval/{taskId}")
+    public String toApproval(@PathVariable("taskId") String taskId, Model model) throws NumberFormatException, Exception{
+    	Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
+		// 根据任务查询流程实例
+    	String processInstanceId = task.getProcessInstanceId();
+		ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+		Vacation vacation = (Vacation) this.runtimeService.getVariable(pi.getId(), "entity");
+		vacation.setTask(task);
+		vacation.setProcessInstanceId(processInstanceId);
+		List<CommentVO> commentList = this.processService.getComments(processInstanceId);
+		String taskDefinitionKey = task.getTaskDefinitionKey();
+		logger.info("taskDefinitionKey: "+taskDefinitionKey);
+		String result = null;
+		if("modifyApply".equals(taskDefinitionKey)){
+			result = "vacation/modify_vacation";
+		}else{
+			result = "vacation/audit_vacation";
+		}
+		model.addAttribute("vacation", vacation);
+		model.addAttribute("commentList", commentList);
+    	return result;
+    }
+	
 	
     /**
      * 完成任务
