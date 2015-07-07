@@ -38,7 +38,7 @@
         </div>
         <div class="fitem">
             <label>调薪金额:</label>
-            <input id="adjustMoney" name="adjustMoney" value = "${salary.adjustMoney }" readonly="readonly" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="adjustMoney" name="adjustMoney" value = "${salary.adjustMoney }" readonly="readonly" class="easyui-numberbox easyui-validatebox" required="true" data-options="min:0,precision:2,groupSeparator:',',prefix:'￥'">
         </div>
         <div class="fitem">
             <label>描述:</label>

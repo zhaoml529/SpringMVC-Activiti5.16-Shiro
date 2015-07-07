@@ -118,24 +118,19 @@ public class SalaryAction {
 	 */
 	@RequiresPermissions("user:salary:doAdd")
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
-	public String doAdd(
-			@ModelAttribute("salary") @Valid SalaryAdjust salary,BindingResult results, 
-			RedirectAttributes redirectAttributes, 
-			HttpSession session, 
-			Model model) throws Exception{
+	@ResponseBody
+	public Message doAdd(
+			@ModelAttribute("salary") SalaryAdjust salary,
+			HttpSession session) throws Exception{
         User currentUser = UserUtil.getUserFromSession(session);
-        
-        if(results.hasErrors()){
-        	model.addAttribute("salary", salary);
-        	return "salary/add_salary";
-        }
+
         
         // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
-        if (currentUser == null || currentUser.getId() == null) {
-        	model.addAttribute("msg", "登录超时，请重新登录!");
-            return "login";
-        }
-        
+//        if (currentUser == null || currentUser.getId() == null) {
+//        	model.addAttribute("msg", "登录超时，请重新登录!");
+//            return "login";
+//        }
+        Message message = new Message();
         String userName = salary.getUser_name();
         User user = this.userService.getUserByName(userName);
         if(!BeanUtils.isBlank(user)){
@@ -152,29 +147,35 @@ public class SalaryAction {
 		        salary.setBusinessKey(businessKey);
 		        try{
 		        	String processInstanceId = this.processService.startSalaryAdjust(salary);
-		            redirectAttributes.addFlashAttribute("message", "流程已启动，流程ID：" + processInstanceId);
+		        	message.setStatus(Boolean.TRUE);
+					message.setMessage("薪资调整流程已启动，流程ID：" + processInstanceId);
 		            logger.info("processInstanceId: "+processInstanceId);
 		        }catch (ActivitiException e) {
+		        	message.setStatus(Boolean.FALSE);
 		            if (e.getMessage().indexOf("no processes deployed with key") != -1) {
 		                logger.warn("没有部署流程!", e);
-		                redirectAttributes.addFlashAttribute("error", "没有部署流程，请在[工作流]->[流程管理]页面点击<重新部署流程>");
+		                message.setMessage("没有部署流程，请联系系统管理员，在[流程定义]中部署相应流程文件！");
 		            } else {
 		                logger.error("启动薪资调整流程失败：", e);
-		                redirectAttributes.addFlashAttribute("error", "系统内部错误！");
+		                message.setMessage("启动请假流程失败，系统内部错误！");
 		            }
 		        } catch (Exception e) {
 		            logger.error("启动薪资调整流程失败：", e);
-		            redirectAttributes.addFlashAttribute("error", "系统内部错误！");
+		            message.setStatus(Boolean.FALSE);
+		            message.setMessage("启动请假流程失败，系统内部错误！");
+		            throw e;
 		        } finally {
 		            identityService.setAuthenticatedUserId(null);
 		        }
         	}else{
-        		redirectAttributes.addFlashAttribute("error", "申请错误，只能申请调整自己的薪资！");
+        		 message.setStatus(Boolean.FALSE);
+		         message.setMessage("申请错误，只能申请调整自己的薪资！");
         	}
         }else{
-        	redirectAttributes.addFlashAttribute("error", "此用户不存在，不能调整薪资！");
+        	message.setStatus(Boolean.FALSE);
+	        message.setMessage("此用户不存在，不能调整薪资！");
         }
-        return "redirect:/salaryAction/toAdd";
+        return message;
 	}
 	
 	/**
