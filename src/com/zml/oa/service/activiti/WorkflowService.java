@@ -145,7 +145,7 @@ public class WorkflowService {
 
             boolean currentActiviti = false;
             String id = activity.getId();
-
+            
             // 当前节点
             if (id.equals(activityId)) {
                 currentActiviti = true;
@@ -281,7 +281,7 @@ public class WorkflowService {
      * @param processInstance
      * @return
      */
-    private Task getCurrentTaskInfo(ProcessInstance processInstance) {
+    public Task getCurrentTaskInfo(ProcessInstance processInstance) {
         Task currentTask = null;
         try {
             String activitiId = (String) PropertyUtils.getProperty(processInstance, "activityId");

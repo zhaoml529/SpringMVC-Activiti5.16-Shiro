@@ -68,6 +68,13 @@ public interface IProcessService {
     public void complete(String taskId, String content, String userid, Map<String, Object> variables) throws Exception;
     
     /**
+     * 撤销任务
+     * @param historyTaskId
+     * @throws Exception
+     */
+    public Integer revoke(String historyTaskId, String processInstanceId) throws Exception;
+    
+    /**
      * 获取评论
      * @param processInstanceId
      * @return

@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import com.zml.oa.ProcessTask.RevokeTask.RevokeTask;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.ExpenseAccount;
@@ -99,6 +100,7 @@ public class ProcessServiceImp implements IProcessService{
 	
 	@Autowired
 	private ISalaryService salaryService;
+	
 	
     /**
      * 查询代办任务
@@ -524,6 +526,12 @@ public class ProcessServiceImp implements IProcessService{
 	public void suspendProcessInstance(String processInstanceId)
 			throws Exception {
 		runtimeService.suspendProcessInstanceById(processInstanceId);
+	}
+
+	@Override
+	public Integer revoke(String historyTaskId, String processInstanceId) throws Exception {
+		return null;
+//		return this.revokeTaskService.revoke(historyTaskId, processInstanceId);
 	}
 
 

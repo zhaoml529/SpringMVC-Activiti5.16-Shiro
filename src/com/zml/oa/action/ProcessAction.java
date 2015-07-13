@@ -42,6 +42,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zml.oa.ProcessTask.RevokeTask.RevokeTask;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.ExpenseAccount;
@@ -84,6 +85,8 @@ public class ProcessAction {
 	@Autowired
 	private WorkflowDeployService workflowProcessDefinitionService;
     
+	@Autowired
+	private RevokeTask revokeTaskService;
 	
     /**
      * 显示流程图,带流程跟踪
@@ -233,6 +236,8 @@ public class ProcessAction {
     		map.put("businessType", base.getBusinessType());
     		map.put("user_name", base.getUser_name());
     		map.put("title", base.getTitle());
+    		map.put("taskId", base.getHistoricTaskInstance().getId());
+    		map.put("processInstanceId", base.getHistoricTaskInstance().getProcessInstanceId());
     		map.put("startTime", base.getHistoricTaskInstance().getStartTime());
     		map.put("claimTime", base.getHistoricTaskInstance().getClaimTime());
     		map.put("endTime", base.getHistoricTaskInstance().getEndTime());
@@ -270,6 +275,36 @@ public class ProcessAction {
         return message;
 	}
     
+	/**
+	 * 撤销任务
+	 * @return
+	 * @throws Exception 
+	 */
+	@RequestMapping("/process/revoke/{taskId}/{processInstanceId}")
+	@ResponseBody
+	public Message revoke(@PathVariable("taskId") String taskId, @PathVariable("processInstanceId") String processInstanceId) throws Exception{
+		Message message = new Message();
+		
+		try {
+			Integer revokeFlag = this.revokeTaskService.revoke(taskId, processInstanceId);
+			if(revokeFlag == 0){
+				message.setStatus(Boolean.TRUE);
+				message.setMessage("撤销任务成功！");
+			}else if(revokeFlag == 1){
+				message.setStatus(Boolean.FALSE);
+				message.setMessage("撤销任务失败 - [ 流程已经结束! ]");
+			}else if(revokeFlag == 2){
+				message.setStatus(Boolean.FALSE);
+				message.setMessage("撤销任务失败 - [ 下一结点已经通过,不能撤销! ]");
+			}
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("撤销任务失败 - [ 内部错误！]");
+			throw e;
+		}
+		return message;
+	}
+	
     /**
      * 跳转流程管理页面
      * @return

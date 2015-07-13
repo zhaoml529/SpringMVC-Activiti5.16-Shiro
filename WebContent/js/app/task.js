@@ -121,7 +121,7 @@ function showEndTask(){
 					}
                 },
                 {field : 'user_name',title : '申请人',width : fixWidth(0.1),align : 'center'},                
-                {field : 'title',title : '标题',width : fixWidth(0.3),align : 'center'},
+                {field : 'title',title : '标题',width : fixWidth(0.2),align : 'center'},
                 {field : 'startTime',title : '任务开始时间',width : fixWidth(0.1),align : 'center',
 					formatter:function(value,row){
 						return moment(value).format("YYYY-MM-DD HH:mm:ss");
@@ -147,7 +147,13 @@ function showEndTask(){
                 		return value;
                 	}
                 },
-                {field : 'version',title : '流程版本号',width : fixWidth(0.1),align : 'center'}
+                {field : 'version',title : '流程版本号',width : fixWidth(0.1),align : 'center'},
+                {field : 'revoke',title : '操作',width : fixWidth(0.1),align : 'center',
+                	formatter:function(value,row){
+                		return "<a id='tip' title='点击撤销' href='../processAction/process/revoke/"+row.taskId+"/"+row.processInstanceId+"'>撤回</a>"
+                	}
+                }
+                
             ] 
 		]
 	});
