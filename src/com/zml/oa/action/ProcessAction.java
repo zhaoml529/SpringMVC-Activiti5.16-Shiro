@@ -21,7 +21,9 @@ import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
+import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
@@ -85,8 +87,11 @@ public class ProcessAction {
 	@Autowired
 	private WorkflowDeployService workflowProcessDefinitionService;
     
-	@Autowired
-	private RevokeTask revokeTaskService;
+//	@Autowired
+//	private RevokeTask revokeTaskService;
+	
+//	@Autowired
+//	private ProcessEngine processEngine;
 	
     /**
      * 显示流程图,带流程跟踪
@@ -286,7 +291,12 @@ public class ProcessAction {
 		Message message = new Message();
 		
 		try {
-			Integer revokeFlag = this.revokeTaskService.revoke(taskId, processInstanceId);
+			Integer revokeFlag = this.processService.revoke(taskId, processInstanceId);
+//			Integer revokeFlag = this.revokeTaskService.revoke(taskId, processInstanceId);
+//			Command<Integer> cmd = new RevokeTask(taskId, processInstanceId);
+//			Integer revokeFlag = this.processEngine.getManagementService().executeCommand(cmd);
+			
+			
 			if(revokeFlag == 0){
 				message.setStatus(Boolean.TRUE);
 				message.setMessage("撤销任务成功！");

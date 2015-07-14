@@ -150,7 +150,7 @@ function showEndTask(){
                 {field : 'version',title : '流程版本号',width : fixWidth(0.1),align : 'center'},
                 {field : 'revoke',title : '操作',width : fixWidth(0.1),align : 'center',
                 	formatter:function(value,row){
-                		return "<a id='tip' title='点击撤销' href='../processAction/process/revoke/"+row.taskId+"/"+row.processInstanceId+"'>撤回</a>"
+                		return "<a href='javascript:void(0);' onclick=\"revoke('"+row.taskId+"','"+row.processInstanceId+"')\">撤销</a>";
                 	}
                 }
                 
@@ -368,4 +368,30 @@ function claimTask(){
     }
 }
 
-
+function revoke(taskId, processInstanceId){
+	$.ajax({
+		type: "POST",
+		url: ctx+"/processAction/process/revoke/"+taskId+"/"+processInstanceId,
+		data: {},
+		success: function (data) {
+			$.messager.progress("close");
+			if (data.status) {
+				todoTask_datagrid.datagrid("reload"); //reload the process data
+			} 
+			$.messager.show({
+				title : data.title,
+				msg : data.message,
+				timeout : 1000 * 2
+			});
+		},
+		beforeSend:function(){
+			$.messager.progress({
+				title: '提示信息！',
+				text: '数据处理中，请稍后....'
+			});
+		},
+		complete: function(){
+			$.messager.progress("close");
+		}
+	});
+}

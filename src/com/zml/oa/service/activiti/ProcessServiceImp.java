@@ -9,6 +9,7 @@ import java.util.Map;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -20,6 +21,7 @@ import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
@@ -81,13 +83,13 @@ public class ProcessServiceImp implements IProcessService{
 	protected IUserService userService;
 	
     @Autowired
-    ProcessEngineFactoryBean processEngine;
+    ProcessEngineFactoryBean processEngineFactory;
 
     @Autowired
     ProcessEngineConfiguration processEngineConfiguration;
     
     @Autowired
-    protected WorkflowService traceService;
+    protected WorkflowService workflowService;
     
 	@Autowired
 	private IVacationService vacationService;
@@ -100,6 +102,9 @@ public class ProcessServiceImp implements IProcessService{
 	
 	@Autowired
 	private ISalaryService salaryService;
+	
+	@Autowired
+	private ProcessEngine processEngine;
 	
 	
     /**
@@ -267,7 +272,7 @@ public class ProcessServiceImp implements IProcessService{
 //    	Context.setProcessEngineConfiguration(defaultProcessEngine.getProcessEngineConfiguration());
 
         // 使用spring注入引擎请使用下面的这行代码
-        processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+        processEngineConfiguration = processEngineFactory.getProcessEngineConfiguration();
         Context.setProcessEngineConfiguration((ProcessEngineConfigurationImpl) processEngineConfiguration);
 
         //通过引擎生成png图片，并标记当前节点,并把当前节点用红色边框标记出来，弊端和直接部署流程文件生成的图片问题一样-乱码！。
@@ -530,8 +535,9 @@ public class ProcessServiceImp implements IProcessService{
 
 	@Override
 	public Integer revoke(String historyTaskId, String processInstanceId) throws Exception {
-		return null;
-//		return this.revokeTaskService.revoke(historyTaskId, processInstanceId);
+		Command<Integer> cmd = new RevokeTask(historyTaskId, processInstanceId, this.runtimeService, this.workflowService, this.historyService );
+		Integer revokeFlag = this.processEngine.getManagementService().executeCommand(cmd);
+		return revokeFlag;
 	}
 
 
