@@ -28,6 +28,7 @@
 				<td style="padding-left:2px">
 					<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-ok" plain="true" onclick="handleTask();">办理</a>
 					<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-ok" plain="true" onclick="claimTask();">签收</a>
+					<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-ok" plain="true" onclick="delegateTask();">委派</a>
 				</td>
 			</tr>
 		</table>
@@ -41,5 +42,16 @@
 		</div>
 	</div>
 	
+	<div id="delegateTask" class="easyui-dialog" title="选择委派人" closed="true" style="width:400px;height:200px;">
+		<form style="margin: 10px 10px" method="post">
+			<p>ID: <input id="userId" name="userId" type="text" onclick="chooseUser();">
+			<a class="easyui-linkbutton" icon="icon-search" href="javascript:void(0)" onclick="chooseUser();">选择委派人</a></p>
+			<p>NAME: <input id="userName" type="test"></p>
+			<div style="padding:5px;text-align:center;">
+				<a href="#" class="easyui-linkbutton" icon="icon-ok">Ok</a>
+				<a href="#" class="easyui-linkbutton" icon="icon-cancel">Cancel</a>
+			</div>
+		</form>
+	</div>
   </body>
 </html>

@@ -295,6 +295,19 @@ public class UserAction {
 	}
 	
 	/**
+	 * 跳转选择任务委派人页面-easyui
+	 * @return
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/toChooseDelegateUser")
+	public ModelAndView toChooseDelegateUser() throws Exception{
+		ModelAndView mv = new ModelAndView("task/delegate_user");
+		List<Group> groupList = this.groupService.getGroupList();
+		mv.addObject("groupList", groupList);
+		return mv;
+	}
+	
+	/**
 	 * 在tabs中根据groupId显示用户列表
 	 * @return
 	 */
@@ -307,6 +320,18 @@ public class UserAction {
 		mv.addObject("groupId", groupId);
 		mv.addObject("multiSelect", multiSelect);
 		mv.addObject("taskDefKey", taskDefKey);
+		return mv;
+	}
+	
+	/**
+	 * 在tabs中根据groupId显示用户列表
+	 * @return
+	 */
+	@RequestMapping(value = "/toShowDelegateUser")
+	public ModelAndView toShowDelegateUser(
+			@RequestParam("groupId") String groupId){
+		ModelAndView mv = new ModelAndView("task/show_user");
+		mv.addObject("groupId", groupId);
 		return mv;
 	}
 	

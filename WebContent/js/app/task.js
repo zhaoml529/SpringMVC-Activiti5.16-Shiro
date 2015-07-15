@@ -6,6 +6,9 @@ var todoTask_datagrid;
 var endTask_datagrid;
 var audit_form;
 
+var delegate_dialog;
+var user_dialog;
+
 var process_dialog;
 
 $(function() {
@@ -368,6 +371,66 @@ function claimTask(){
     }
 }
 
+//选择委派人窗口
+function chooseUser(){
+	//弹出对话窗口
+	user_dialog = $('<div/>').dialog({
+    	title : "选择任务委派人",
+		top: 20,
+		width : 1000,
+		height : 400,
+        modal: true,
+        minimizable: true,
+        maximizable: true,
+        href: ctx+"/userAction/toChooseDelegateUser",
+        onClose: function () {
+        	user_dialog.dialog('destroy');
+        }
+    });
+}
+
+
+//根据groupId显示人员列表的标签--delegate_user.jsp
+function addTab(title, groupId){
+	if ($('#userTabs').tabs('exists', title)){
+		$('#userTabs').tabs('select', title);
+	} else {
+		var url = ctx+"/userAction/toShowDelegateUser?groupId="+groupId;
+		var content = '<iframe scrolling="auto" frameborder="0"  src="'+url+'" style="width:100%;height:100%;"></iframe>';
+		$('#userTabs').tabs('add',{
+			title:title,
+			content:content,
+			closable:true
+		});
+	}
+}
+
+//取消选择--delegate_user.jsp
+function destroy_chooseUser(){
+	$("#userName").val("");
+	$("#userId").val("");
+	user_dialog.dialog('destroy');
+}
+
+//选择人时，同时也对父页面赋值了。所以，确认键就只是关闭页面--delegate_user.jsp
+function set_chooseUser(){
+	user_dialog.dialog('destroy');
+}
+
+//委派任务
+function delegateTask(){
+	delegate_dialog = $('#delegateTask').dialog({
+    	title : "委派任务",
+		top: 20,
+		//width : 600,
+		//height : 300,
+		closed: false,
+	    cache: false,
+        modal: true
+    });
+}
+
+//撤回已办任务到代办任务
 function revoke(taskId, processInstanceId){
 	$.ajax({
 		type: "POST",
