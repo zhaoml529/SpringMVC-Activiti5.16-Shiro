@@ -72,6 +72,40 @@ function deploy(){
 	$("#deployFieldset").toggle("normal");
 }
 
+//重新部署单个流程
+function redeploy(){
+	var row = process_datagrid.datagrid('getSelected');
+    if (row) {
+    	$.ajax({
+    		type: "POST",
+    		url: ctx+"/processAction/process/redeploy/single?resourceName="+row.resourceName+"&deploymentId="+row.deploymentId,
+    		data: {},
+    		success: function (data) {
+    			$.messager.progress("close");
+    			if (data.status) {
+    				process_datagrid.datagrid("reload"); //reload the process data
+    			} 
+    			$.messager.show({
+    				title : data.title,
+    				msg : data.message,
+    				timeout : 1000 * 2
+    			});
+    		},
+    		beforeSend:function(){
+    			$.messager.progress({
+    				title: '提示信息！',
+    				text: '数据处理中，请稍后....'
+    			});
+    		},
+    		complete: function(){
+    			$.messager.progress("close");
+    		}
+    	});
+    }else{
+    	$.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
+    }
+}
+
 //部署全部流程
 function deployAll(){
 	$.ajax({

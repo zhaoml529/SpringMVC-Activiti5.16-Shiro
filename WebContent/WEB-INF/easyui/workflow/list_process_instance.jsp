@@ -28,7 +28,7 @@
 			<table cellpadding="0" cellspacing="0">
 				<tr>
 					<td style="padding-left:2px">
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showResource();">加载</a>
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="redeploy();">加载</a>
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="convert_to_model();">转换为Model</a>
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="delRows();">删除</a>&nbsp;|&nbsp;
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="deploy();">部署流程</a>
