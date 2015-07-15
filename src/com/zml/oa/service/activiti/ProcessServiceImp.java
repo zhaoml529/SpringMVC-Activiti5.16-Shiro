@@ -33,7 +33,6 @@ import org.activiti.spring.ProcessEngineFactoryBean;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import com.zml.oa.ProcessTask.RevokeTask.RevokeTask;
 import com.zml.oa.entity.BaseVO;
@@ -44,8 +43,6 @@ import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
 import com.zml.oa.entity.Vacation;
 import com.zml.oa.pagination.Page;
-import com.zml.oa.pagination.Pagination;
-import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IExpenseService;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.ISalaryAdjustService;
@@ -231,7 +228,17 @@ public class ProcessServiceImp implements IProcessService{
     	this.identityService.setAuthenticatedUserId(user.getId().toString());
         this.taskService.claim(taskId, user.getId().toString());
     }
-    
+	
+    /**
+     * 委派任务
+     */
+	@Override
+	public void doDelegateTask(String userId, String taskId) throws Exception {
+		//API: If no owner is set on the task, the owner is set to the current assignee of the task.
+		//OWNER_（委托人）：受理人委托其他人操作该TASK的时候，受理人就成了委托人OWNER_，其他人就成了受理人ASSIGNEE_
+		//assignee容易理解，主要是owner字段容易误解，owner字段就是用于受理人委托别人操作的时候运用的字段
+		this.taskService.delegateTask(taskId, userId);
+	}
 	
 	/**
 	 * 获取评论
@@ -504,10 +511,11 @@ public class ProcessServiceImp implements IProcessService{
     	ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 		//评论人的id  一定要写，不然查看的时候会报错，没有用户
     	this.identityService.setAuthenticatedUserId(userid);
-		// 添加评论
-    	if(content != null){
-    		this.taskService.addComment(taskId, pi.getId(), content);
+		// 添加评论--意见为空时，默认“同意”。
+    	if(content == ""){
+    		content = "同意";
     	}
+    	this.taskService.addComment(taskId, pi.getId(), content);
 		// 完成任务
 		this.taskService.complete(taskId, variables);
 	}

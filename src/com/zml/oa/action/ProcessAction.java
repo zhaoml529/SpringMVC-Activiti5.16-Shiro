@@ -21,9 +21,7 @@ import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.ActivitiTaskAlreadyClaimedException;
-import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
@@ -44,7 +42,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.zml.oa.ProcessTask.RevokeTask.RevokeTask;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.ExpenseAccount;
@@ -281,6 +278,28 @@ public class ProcessAction {
 	}
     
 	/**
+	 * 委派任务
+	 * @param taskId	代办人
+	 * @param userId
+	 * @return
+	 */
+	public Message delegateTask(@PathVariable("taskId") String taskId, @PathVariable("userId") String userId){
+		Message message = new Message();
+		try {
+			this.processService.doDelegateTask(userId, taskId);
+			message.setStatus(Boolean.TRUE);
+			message.setMessage("委派任务成功！");
+		} catch (ActivitiObjectNotFoundException e){
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务不存在！委派任务失败！");
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("委派任务失败，系统错误！");
+		}
+		return message;
+	}
+	
+	/**
 	 * 撤销任务
 	 * @return
 	 * @throws Exception 
@@ -302,7 +321,7 @@ public class ProcessAction {
 				message.setMessage("撤销任务成功！");
 			}else if(revokeFlag == 1){
 				message.setStatus(Boolean.FALSE);
-				message.setMessage("撤销任务失败 - [ 流程已经结束! ]");
+				message.setMessage("撤销任务失败 - [ 此审批流程已结束! ]");
 			}else if(revokeFlag == 2){
 				message.setStatus(Boolean.FALSE);
 				message.setMessage("撤销任务失败 - [ 下一结点已经通过,不能撤销! ]");
@@ -532,24 +551,27 @@ public class ProcessAction {
      */
     @RequiresPermissions("admin:process:*")
     @RequestMapping(value = "/process/redeploy/single")
-    public String redeploySingle(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
+    @ResponseBody
+    public Message redeploySingle(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
     							@RequestParam("resourceName") String resourceName,
     							@RequestParam(value = "diagramResourceName", required = false) String diagramResourceName,
-    							@RequestParam("deploymentId") String deploymentId,
-    							RedirectAttributes redirectAttributes) throws Exception {
+    							@RequestParam("deploymentId") String deploymentId) throws Exception {
+    	Message message = new Message();
         try {
         	this.repositoryService.deleteDeployment(deploymentId, true);
         	//方法一：通过classpath/deploy目录下的.zip或.bar文件部署
         	String processKey = resourceName.substring(0, resourceName.indexOf('.'))+".zip";
-        	workflowProcessDefinitionService.redeploySingleFrom(exportDir, processKey);
+        	this.workflowProcessDefinitionService.redeploySingleFrom(exportDir, processKey);
         	//方法二：通过classpath/bpmn下的流程描述文件部署--流程图错乱，一直提倡用打包部署没有任何问题。
 //        	workflowProcessDefinitionService.redeployBpmn(exportDir, resourceName,diagramResourceName);
-        	redirectAttributes.addFlashAttribute("message", "已重新部署流程！");
+        	message.setStatus(Boolean.TRUE);
+        	message.setMessage("已重新部署选定流程！");
 		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("message", "重新部署流程失败！");
+			message.setStatus(Boolean.FALSE);
+        	message.setMessage("部署选定流程失败！");
 			throw e;
 		}
-        return "redirect:/processAction/process/listProcess_page";
+        return message;
     }
     
     /**
@@ -562,11 +584,12 @@ public class ProcessAction {
      */
     @RequiresPermissions("admin:process:*")
     @RequestMapping(value = "/process/deploy")
-    public String deploy(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, 
-    					  @RequestParam(value = "file", required = false) MultipartFile file,
-    					  RedirectAttributes redirectAttributes) {
+    @ResponseBody
+    public Message deploy(@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir, 
+    					  @RequestParam(value = "file", required = false) MultipartFile file) {
     	//@Value("${export.diagram.path}")
     	//@Value("#{APP_PROPERTIES['export.diagram.path']}") String exportDir,
+    	Message message = new Message();
         String fileName = file.getOriginalFilename();
         try {
             InputStream fileInputStream = file.getInputStream();
@@ -575,23 +598,25 @@ public class ProcessAction {
             String extension = FilenameUtils.getExtension(fileName);
             if (extension.equals("zip") || extension.equals("bar")) {
                 ZipInputStream zip = new ZipInputStream(fileInputStream);
-                deployment = repositoryService.createDeployment().addZipInputStream(zip).deploy();
+                deployment = this.repositoryService.createDeployment().addZipInputStream(zip).deploy();
             } else {
-                deployment = repositoryService.createDeployment().addInputStream(fileName, fileInputStream).deploy();
+                deployment = this.repositoryService.createDeployment().addInputStream(fileName, fileInputStream).deploy();
             }
 
-            List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).list();
+            List<ProcessDefinition> list = this.repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).list();
 
             for (ProcessDefinition processDefinition : list) {
-                WorkflowUtils.exportDiagramToFile(repositoryService, processDefinition, exportDir);
+                WorkflowUtils.exportDiagramToFile(this.repositoryService, processDefinition, exportDir);
             }
-            redirectAttributes.addFlashAttribute("message", "流程部署成功！");
+            message.setStatus(Boolean.TRUE);
+        	message.setMessage("流程部署成功！");
         } catch (Exception e) {
-        	redirectAttributes.addFlashAttribute("message", "流程部署失败！");
+        	message.setStatus(Boolean.FALSE);
+        	message.setMessage("流程部署失败！");
             logger.error("error on deploy process, because of file input stream", e);
         }
 
-        return "redirect:/processAction/process/toListProcess";
+        return message;
     }
     
     /**
@@ -606,7 +631,7 @@ public class ProcessAction {
     @RequestMapping(value = "/process/delete")
     @ResponseBody
     public Message delete(@RequestParam("deploymentId") String deploymentId) {
-        repositoryService.deleteDeployment(deploymentId, true);
+    	this.repositoryService.deleteDeployment(deploymentId, true);
         return new Message(Boolean.TRUE, "删除成功！");
     }
     

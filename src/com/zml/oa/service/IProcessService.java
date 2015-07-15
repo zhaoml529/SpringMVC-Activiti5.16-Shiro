@@ -59,6 +59,13 @@ public interface IProcessService {
     public void doClaim(User user, String taskId) throws Exception;
     
     /**
+     * 委派任务
+     * @param userId
+     * @throws Exception
+     */
+    public void doDelegateTask(String userId, String taskId) throws Exception;
+    
+    /**
      * 完成任务
      * @param taskId
      * @param content
