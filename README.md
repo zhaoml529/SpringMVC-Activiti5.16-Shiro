@@ -36,8 +36,10 @@ Shiro实现登录认证和权限控制，结合Ehcache缓存权限列表，毕�
 后续功能
 --------
 1.加入安全框架Shiro. ---已实现<br>
-2.加入缓存 ehcache. --已实现<br>
-3.前端页面 EasyUI<br>
+2.加入缓存 ehcache.  ---已实现<br>
+3.前端页面 EasyUI<br>---以实现<br>
+
+系统功能不断完善中，欢迎同学Fork并Pull Request
 
 系统页面
 --------
