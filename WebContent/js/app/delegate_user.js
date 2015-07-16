@@ -33,15 +33,15 @@ $(function() {
         //toolbar: "#toolbar"
     });
     //组下来菜单
-    group_combobox = $('#group').combobox({
-        url:ctx+'/groupAction/getAllGroup',
-        valueField:'id',
-        textField:'name',
-        onSelect: function(rec){
-            var url = ctx+"/userAction/chooseUser?groupId="+rec.id;
-            user_datagrid.datagrid('reload', url);
-        }
-    });
+//    group_combobox = $('#group').combobox({
+//        url:ctx+'/groupAction/getAllGroup',
+//        valueField:'id',
+//        textField:'name',
+//        onSelect: function(rec){
+//            var url = ctx+"/userAction/chooseUser?groupId="+rec.id;
+//            user_datagrid.datagrid('reload', url);
+//        }
+//    });
     
     //修正宽高
 	function fixHeight(percent)   

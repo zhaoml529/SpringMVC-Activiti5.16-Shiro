@@ -313,7 +313,7 @@ public class VacationAction {
 			this.vacationService.doUpdate(vacation);
 			variables.put("entity", vacation);
 			variables.put("reApply", reApply);
-			this.processService.complete(taskId, null, user.getId().toString(), variables);
+			this.processService.complete(taskId, "取消申请", user.getId().toString(), variables);
 			
 		} catch (ActivitiObjectNotFoundException e) {
 			message.setStatus(Boolean.FALSE);

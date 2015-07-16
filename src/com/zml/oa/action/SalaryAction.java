@@ -337,7 +337,7 @@ public class SalaryAction {
         	variables.put("entity", salary);
         	variables.put("reApply", reApply);
         	//完成任务
-			this.processService.complete(taskId, null, user.getId().toString(), variables);
+			this.processService.complete(taskId, "取消申请", user.getId().toString(), variables);
 		} catch (ActivitiObjectNotFoundException e) {
 			message.setStatus(Boolean.FALSE);
 			message.setMessage("此任务不存在，请联系管理员！");

@@ -66,6 +66,14 @@ public interface IProcessService {
     public void doDelegateTask(String userId, String taskId) throws Exception;
     
     /**
+     * 转办任务
+     * @param userId
+     * @param taskId
+     * @throws Exception
+     */
+    public void doTransferTask(String userId, String taskId) throws Exception;
+    
+    /**
      * 完成任务
      * @param taskId
      * @param content

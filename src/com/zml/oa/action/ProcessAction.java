@@ -204,7 +204,19 @@ public class ProcessAction {
 			map.put("taskId", base.getTask().getId());
 			map.put("taskName", base.getTask().getName());
 			map.put("createTime", base.getTask().getCreateTime());
-			map.put("assign", base.getTask().getAssignee());
+			String assign = base.getTask().getAssignee();
+			if(assign != null){
+				User u = this.userService.getUserById(new Integer(assign));
+				assign = u.getName();
+			}
+			String owner = base.getTask().getOwner();
+			if(owner != null){
+				User u = this.userService.getUserById(new Integer(owner));
+				owner = u.getName();
+			}
+			
+			map.put("assign", assign);
+			map.put("owner", owner);
 			map.put("taskDefinitionKey", base.getTask().getTaskDefinitionKey());
 			map.put("processInstanceId", base.getProcessInstance().getId());
 			map.put("processDefinitionId", base.getProcessInstance().getProcessDefinitionId());
@@ -279,11 +291,15 @@ public class ProcessAction {
     
 	/**
 	 * 委派任务
+	 * 委派也是代办、协办，你领导接到一个任务，让你代办，你办理完成后任务还是回归到你的领导，事情是你做的，功劳是你领导的，这就是代办。
+	 * 所以代办人完成任务后，任务还会回到原执行人，流程不会发生变化。
 	 * @param taskId	代办人
 	 * @param userId
 	 * @return
 	 */
-	public Message delegateTask(@PathVariable("taskId") String taskId, @PathVariable("userId") String userId){
+	@RequestMapping(value = "/process/delegateTask/{taskId}")
+	@ResponseBody
+	public Message delegateTask(@PathVariable("taskId") String taskId, @RequestParam("userId") String userId){
 		Message message = new Message();
 		try {
 			this.processService.doDelegateTask(userId, taskId);
@@ -295,6 +311,30 @@ public class ProcessAction {
 		} catch (Exception e) {
 			message.setStatus(Boolean.FALSE);
 			message.setMessage("委派任务失败，系统错误！");
+		}
+		return message;
+	}
+	
+	/**
+	 * 转办任务，办理完成后，流程会继续向下走。
+	 * @param taskId
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/process/transferTask/{taskId}")
+	@ResponseBody
+	public Message transferTask(@PathVariable("taskId") String taskId, @RequestParam("userId") String userId){
+		Message message = new Message();
+		try {
+			this.processService.doTransferTask(userId, taskId);
+			message.setStatus(Boolean.TRUE);
+			message.setMessage("转办任务成功！");
+		} catch (ActivitiObjectNotFoundException e){
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("此任务不存在！委派任务失败！");
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+			message.setMessage("转办任务失败，系统错误！");
 		}
 		return message;
 	}

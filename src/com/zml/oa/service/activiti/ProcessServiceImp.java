@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.ProcessEngine;
@@ -26,6 +27,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Comment;
+import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -238,6 +240,21 @@ public class ProcessServiceImp implements IProcessService{
 		//OWNER_（委托人）：受理人委托其他人操作该TASK的时候，受理人就成了委托人OWNER_，其他人就成了受理人ASSIGNEE_
 		//assignee容易理解，主要是owner字段容易误解，owner字段就是用于受理人委托别人操作的时候运用的字段
 		this.taskService.delegateTask(taskId, userId);
+	}
+	
+	/**
+	 * 转办任务
+	 */
+	@Override
+	public void doTransferTask(String userId, String taskId) throws Exception {
+		Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
+		if(task != null){
+			String assign = task.getAssignee();
+			this.taskService.setAssignee(taskId, userId);
+			this.taskService.setOwner(taskId, assign);
+		}else{
+			throw new ActivitiObjectNotFoundException("任务不存在！", this.getClass());
+		}
 	}
 	
 	/**
@@ -503,6 +520,9 @@ public class ProcessServiceImp implements IProcessService{
         return processInstanceId;
 	}
 
+	/**
+	 * 完成任务
+	 */
 	@Override
 	public void complete(String taskId, String content, String userid, Map<String, Object> variables) throws Exception{
 		Task task = this.taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -512,11 +532,20 @@ public class ProcessServiceImp implements IProcessService{
 		//评论人的id  一定要写，不然查看的时候会报错，没有用户
     	this.identityService.setAuthenticatedUserId(userid);
 		// 添加评论--意见为空时，默认“同意”。
-    	if(content == ""){
-    		content = "同意";
+    	
+    	if(content != null){
+    		if(content == ""){
+        		content = "同意";
+        	}
+    		this.taskService.addComment(taskId, pi.getId(), content);
     	}
-    	this.taskService.addComment(taskId, pi.getId(), content);
-		// 完成任务
+    	
+		// 完成委派任务
+    	if(DelegationState.PENDING == task.getDelegationState()){
+    		this.taskService.resolveTask(taskId, variables);
+    		return;
+    	}
+    	//正常完成任务
 		this.taskService.complete(taskId, variables);
 	}
 

@@ -35,15 +35,11 @@ public class UserTaskListener implements TaskListener {
     
 	@Override
 	public void notify(DelegateTask delegateTask) {
-
 		String processDefinitionId = delegateTask.getProcessDefinitionId();	//com.zml.oa.vacation:8:30012
-		System.out.println("processInstId: "+delegateTask.getProcessInstanceId()+" taskDefKey: "+delegateTask.getTaskDefinitionKey()+" id: "+delegateTask.getId()+" name: "+delegateTask.getName());
-		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: "+processDefinitionId+" repositoryService: "+repositoryService+" userTaskService: "+userTaskService);
 		ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
 //		String processDefinitionName = processDefinition.getName();			//请假流程
 		String processDefinitionKey = processDefinition.getKey();			//com.zml.oa.vacation
 		String taskDefinitionKey = delegateTask.getTaskDefinitionKey();		//directorAudit
-		System.out.println(processDefinitionKey+"-------------------------"+taskDefinitionKey);
 		try {
 			List<UserTask> taskList = this.userTaskService.findByWhere(processDefinitionKey);
 			for(UserTask userTask : taskList){

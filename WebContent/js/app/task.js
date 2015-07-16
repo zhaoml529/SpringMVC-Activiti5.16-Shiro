@@ -6,10 +6,12 @@ var todoTask_datagrid;
 var endTask_datagrid;
 var audit_form;
 
+//委派
 var delegate_dialog;
 var user_dialog;
 
-var process_dialog;
+//转办
+var transfer_dialog;
 
 $(function() {
 	showToDoTask();
@@ -72,12 +74,21 @@ function showToDoTask(){
 					}
                 },
                 {field : 'user_name',title : '申请人',width : fixWidth(0.2),align : 'center'},                
-                {field : 'title',title : '标题',width : fixWidth(0.3),align : 'center'},
+                {field : 'title',title : '标题',width : fixWidth(0.2),align : 'center'},
                 {field : 'taskName',title : '当前节点',width : fixWidth(0.1),align : 'center',
                 	formatter:function(value, row){
                 		return "<a class='trace' onclick=\"graphTrace('"+row.processInstanceId+"')\" id='diagram' href='#' pid='"+row.id+"' pdid='"+row.processDefinitionId+"' title='see'>"+value+"</a>";
                 	}
                 },
+                {field : 'owner',title : '负责人',width : fixWidth(0.1),align : 'center',
+                	formatter:function(value, row){
+                		if(value != null && value != row.assign){
+                			return row.assign+" (原执行人："+value+")";
+                		}else{
+                			return row.assign;
+                		}
+					}
+                },  
                 {field : 'createTime',title : '任务创建时间',width : fixWidth(0.1),align : 'center',
 					formatter:function(value,row){
 						return moment(value).format("YYYY-MM-DD HH:mm:ss");
@@ -240,7 +251,7 @@ function handleTask(){
 	var row = todoTask_datagrid.datagrid('getSelected');
     if (row) {
     	if(row.assign == null){
-    		$.messager.alert("提示", "此任务您还没有签收，请【签收】任务后再进行办理任务！");
+    		$.messager.alert("提示", "此任务您还没有签收，请【签收】任务后再处理任务！");
     	}else{
     		var _url;
     		if("vacation" == row.businessType){
@@ -417,18 +428,162 @@ function set_chooseUser(){
 	user_dialog.dialog('destroy');
 }
 
-//委派任务
+//委派任务小窗口
 function delegateTask(){
-	delegate_dialog = $('#delegateTask').dialog({
-    	title : "委派任务",
-		top: 20,
-		//width : 600,
-		//height : 300,
-		closed: false,
-	    cache: false,
-        modal: true
-    });
+	var row = todoTask_datagrid.datagrid('getSelected');
+    if (row) {
+    	if(row.assign == null){
+    		$.messager.alert("提示", "此任务您还没有签收，请【签收】任务后再处理任务！");
+    	}else{
+    		delegate_dialog = $('#task').dialog({
+    			title : "委派任务",
+    			top: 20,
+    			width : 300,
+    			height : 150,
+    			closed: false,
+    			cache: false,
+    			modal: true,
+    			buttons: [
+    			          {
+    			        	  text: '确认',
+    			        	  iconCls: 'icon-ok',
+    			        	  handler: function () {
+    			        		  var userName = $("#userName").val();
+    			        		  var userId = $("#userId").val();
+    			        		  if(userName == ""){
+    			        			  $.messager.alert("提示", "您未选择任何委派人，不能确认！"); 
+    			        			  return false;
+    			        		  }else if(userName == row.assign){
+    			        			  $.messager.alert("提示", "不能将此任务委派为自己，请重新选择委派人！"); 
+    			        			  return false;
+    			        		  }
+    			        		  
+    			        		  $.ajax({
+			        				  type: "POST",
+			        				  url: ctx+"/processAction/process/delegateTask/"+row.taskId,
+			        				  data: {userId : userId},
+			        				  success: function (data) {
+			        					  $.messager.progress("close");
+			        					  if (data.status) {
+			        						  $("#userName").val("");
+			        						  $("#userId").val("");
+			        						  delegate_dialog.dialog('close');
+			        						  todoTask_datagrid.datagrid("reload"); //reload the process data
+			        					  } 
+			        					  $.messager.show({
+			        						  title : data.title,
+			        						  msg : data.message,
+			        						  timeout : 1000 * 2
+			        					  });
+			        				  },
+			        				  beforeSend:function(){
+			        					  $.messager.progress({
+			        						  title: '提示信息！',
+			        						  text: '数据处理中，请稍后....'
+			        					  });
+			        				  },
+			        				  complete: function(){
+			        					  $.messager.progress("close");
+			        				  }
+			        			  });
+    			        		  
+    			        	  }
+    			          },
+    			          {
+    			        	  text: '关闭',
+    			        	  iconCls: 'icon-cancel',
+    			        	  handler: function () {
+    			        		  $("#userName").val("");
+    			        		  $("#userId").val("");
+    			        		  delegate_dialog.dialog('close');
+    			        	  }
+    			          }
+    			          ]
+    		});
+    	}
+    }else{
+    	 $.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
+    }
 }
+
+//转办任务小窗口
+function transferTask(){
+	var row = todoTask_datagrid.datagrid('getSelected');
+    if (row) {
+    	if(row.assign == null){
+    		$.messager.alert("提示", "此任务您还没有签收，请【签收】任务后再处理任务！");
+    	}else{
+    		transfer_dialog = $('#task').dialog({
+    			title : "转办任务",
+    			top: 20,
+    			width : 300,
+    			height : 150,
+    			closed: false,
+    			cache: false,
+    			modal: true,
+    			buttons: [
+			          {
+			        	  text: '确认',
+			        	  iconCls: 'icon-ok',
+			        	  handler: function () {
+			        		  var userName = $("#userName").val();
+			        		  var userId = $("#userId").val();
+			        		  if(userName == ""){
+			        			  $.messager.alert("提示", "您未选择任何转办人，不能确认！"); 
+			        			  return false;
+			        		  }else if(userName == row.assign){
+			        			  $.messager.alert("提示", "不能将此任务转办给自己，请重新选择转办人！"); 
+			        			  return false;
+			        		  }
+			        		  
+			        		  $.ajax({
+		        				  type: "POST",
+		        				  url: ctx+"/processAction/process/transferTask/"+row.taskId,
+		        				  data: {userId : userId},
+		        				  success: function (data) {
+		        					  $.messager.progress("close");
+		        					  if (data.status) {
+		        						  $("#userName").val("");
+		        						  $("#userId").val("");
+		        						  transfer_dialog.dialog('close');
+		        						  todoTask_datagrid.datagrid("reload"); //reload the process data
+		        					  } 
+		        					  $.messager.show({
+		        						  title : data.title,
+		        						  msg : data.message,
+		        						  timeout : 1000 * 2
+		        					  });
+		        				  },
+		        				  beforeSend:function(){
+		        					  $.messager.progress({
+		        						  title: '提示信息！',
+		        						  text: '数据处理中，请稍后....'
+		        					  });
+		        				  },
+		        				  complete: function(){
+		        					  $.messager.progress("close");
+		        				  }
+		        			  });
+			        		  
+			        	  }
+			          },
+			          {
+			        	  text: '关闭',
+			        	  iconCls: 'icon-cancel',
+			        	  handler: function () {
+			        		  $("#userName").val("");
+			        		  $("#userId").val("");
+			        		  transfer_dialog.dialog('close');
+			        	  }
+			          }
+		          ]
+    		});
+    	}
+    }else{
+    	 $.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
+    }
+}
+
 
 //撤回已办任务到代办任务
 function revoke(taskId, processInstanceId){
