@@ -107,21 +107,21 @@
      </bean>  
 
 	
-    <mvc:interceptors>
-    	<!-- 分页拦截器 -->
+<!--     <mvc:interceptors>
+    	分页拦截器
     	<mvc:interceptor>
 	    	<mvc:mapping path="/**" />
 	    	<bean class="com.zml.oa.interceptor.PaginationInterceptor" />
     	</mvc:interceptor>
-    	<!-- 设置国际化信息的拦截器 -->
-<!--     	<mvc:interceptor>
+    	设置国际化信息的拦截器
+    	<mvc:interceptor>
 	    	<mvc:mapping path="/**" />
 	    	<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
 	           <property name="paramName" value="language"/>
 	       </bean>
-    	</mvc:interceptor> -->
+    	</mvc:interceptor>
     	
-    </mvc:interceptors>
+    </mvc:interceptors> -->
 
 
 	<!-- 上传配置 -->

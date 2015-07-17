@@ -25,7 +25,7 @@ public class DeleteActiveTaskCmd implements Command<java.lang.Void> {
 	@Override
 	public Void execute(CommandContext commandContext) {
 		Context.getCommandContext().getTaskEntityManager()
-			.deleteTask(_currentTaskEntity, _deleteReason, _cascade);
+			.deleteTask(this._currentTaskEntity, this._deleteReason, this._cascade);
 		return null;
 	}
 

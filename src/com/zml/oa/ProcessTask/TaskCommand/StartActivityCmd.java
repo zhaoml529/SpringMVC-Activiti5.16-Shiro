@@ -20,8 +20,8 @@ public class StartActivityCmd implements Command<java.lang.Void> {
 	
 	@Override
 	public Void execute(CommandContext commandContext) {
-		ExecutionEntity execution = commandContext.getExecutionEntityManager().findExecutionById(_executionId);
-		execution.setActivity(_activity);
+		ExecutionEntity execution = commandContext.getExecutionEntityManager().findExecutionById(this._executionId);
+		execution.setActivity(this._activity);
 
 		execution.performOperation(AtomicOperation.ACTIVITY_START);
 		return null;
