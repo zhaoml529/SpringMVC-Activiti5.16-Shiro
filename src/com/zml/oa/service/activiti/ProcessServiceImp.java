@@ -23,6 +23,8 @@ import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
@@ -36,7 +38,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.zml.oa.ProcessTask.RevokeTask.RevokeTask;
+import com.zml.oa.ProcessTask.TaskCommand.DeleteActiveTaskCmd;
+import com.zml.oa.ProcessTask.TaskCommand.RevokeTaskCmd;
+import com.zml.oa.ProcessTask.TaskCommand.StartActivityCmd;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.ExpenseAccount;
@@ -570,12 +574,46 @@ public class ProcessServiceImp implements IProcessService{
 		runtimeService.suspendProcessInstanceById(processInstanceId);
 	}
 
+	/**
+	 * 撤回任务
+	 */
 	@Override
 	public Integer revoke(String historyTaskId, String processInstanceId) throws Exception {
-		Command<Integer> cmd = new RevokeTask(historyTaskId, processInstanceId, this.runtimeService, this.workflowService, this.historyService );
+		Command<Integer> cmd = new RevokeTaskCmd(historyTaskId, processInstanceId, this.runtimeService, this.workflowService, this.historyService );
 		Integer revokeFlag = this.processEngine.getManagementService().executeCommand(cmd);
 		return revokeFlag;
 	}
 
+	/**
+	 * 跳转（包括回退和向前）至指定活动节点
+	 */
+	@Override
+	public void moveTo(String currentTaskId, String targetTaskDefinitionKey)
+			throws Exception {
+		TaskEntity taskEntity = (TaskEntity) this.taskService.createTaskQuery().taskId(currentTaskId).singleResult();
+		moveTo(taskEntity, targetTaskDefinitionKey);
+		
+	}
+
+	/**
+	 * 跳转（包括回退和向前）至指定活动节点
+	 */
+	@Override
+	public void moveTo(TaskEntity currentTaskEntity,
+			String targetTaskDefinitionKey) throws Exception {
+//		ActivityImpl activity = ProcessDefinitionUtils.getActivity(_processEngine,
+//				currentTaskEntity.getProcessDefinitionId(), targetTaskDefinitionKey);
+
+//			moveTo(currentTaskEntity, activity);
+		
+	}
+	
+	private void moveTo(TaskEntity currentTaskEntity, ActivityImpl activity)
+	{
+		Command<Void> deleteCmd = new DeleteActiveTaskCmd(currentTaskEntity, "revoke", true);
+		Command<Void> StartCmd = new StartActivityCmd(currentTaskEntity.getExecutionId(), activity);
+		this.processEngine.getManagementService().executeCommand(deleteCmd);
+		this.processEngine.getManagementService().executeCommand(StartCmd);
+	}
 
 }

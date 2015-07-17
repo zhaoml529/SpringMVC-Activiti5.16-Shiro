@@ -4,8 +4,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.springframework.ui.Model;
 
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
@@ -96,6 +96,23 @@ public interface IProcessService {
      * @throws Exception
      */
     public List<CommentVO> getComments(String processInstanceId) throws Exception;
+    
+	/**
+	 * 跳转（包括回退和向前）至指定活动节点
+	 */
+	public void moveTo(String currentTaskId, String targetTaskDefinitionKey) throws Exception;
+
+	/**
+	 * 跳转（包括回退和向前）至指定活动节点
+	 * 
+	 * @param currentTaskEntity
+	 *            当前任务节点
+	 * @param targetTaskDefinitionKey
+	 *            目标任务节点（在模型定义里面的节点名称）
+	 * @throws Exception
+	 */
+	public void moveTo(TaskEntity currentTaskEntity, String targetTaskDefinitionKey) throws Exception;
+ 
     
     /**
      * 显示流程图,带流程跟踪

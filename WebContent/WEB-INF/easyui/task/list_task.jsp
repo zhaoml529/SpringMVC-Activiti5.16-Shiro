@@ -19,7 +19,9 @@
 	 <div class="well well-small" style="margin-left: 5px;margin-top: 5px;">
 		<span class="badge easyui-tooltip" title="提示">提示</span>
 		<p>
-			在此你可以在<span class="label-info"><strong>待办任务</strong></span>中办理待处理的任务，也可以查看<span class="label-info"><strong>已完成的任务</strong></span>列表。
+			在此你可以在<span class="label-info"><strong>待办任务</strong></span>中办理待处理的任务，也可以查看<span class="label-info"><strong>已完成的任务</strong></span>列表。<br/>
+			任务的<span class="label-info"><strong>转办</strong></span>可以把当前已经签收的任务转给其他人办理，任务办理完成后流程会继续向下走。<br/>
+			任务的<span class="label-info"><strong>委派</strong></span>可以把当前已经签收的任务委派其他人办理，任务办理完成后流程会回到原执行人，由原执行人继续办理。
 		</p>
 	 </div>	
 	 <div id="toolbar" style="padding:2px 0">

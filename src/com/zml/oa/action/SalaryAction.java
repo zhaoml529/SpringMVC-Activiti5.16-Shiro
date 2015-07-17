@@ -34,10 +34,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.zml.oa.entity.BaseVO;
 import com.zml.oa.entity.CommentVO;
 import com.zml.oa.entity.Message;
+import com.zml.oa.entity.Salary;
 import com.zml.oa.entity.SalaryAdjust;
 import com.zml.oa.entity.User;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.ISalaryAdjustService;
+import com.zml.oa.service.ISalaryService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.util.BeanUtils;
 import com.zml.oa.util.UserUtil;
@@ -55,6 +57,9 @@ public class SalaryAction {
 	
 	@Autowired
 	private ISalaryAdjustService saService;
+	
+	@Autowired
+	private ISalaryService salaryService;
 	
 	@Autowired
 	protected RuntimeService runtimeService;
@@ -135,38 +140,44 @@ public class SalaryAction {
         User user = this.userService.getUserByName(userName);
         if(!BeanUtils.isBlank(user)){
         	if(user.getName().equals(currentUser.getName())){
-		        salary.setApplyDate( new Date() );
-		        salary.setUserId(user.getId());
-		        salary.setUser_id(currentUser.getId());
-		        salary.setUser_name(currentUser.getName());
-		        salary.setTitle(user.getName()+" 的薪资调整申请");
-		        salary.setBusinessType(SalaryAdjust.SALARY);
-		        salary.setStatus(SalaryAdjust.PENDING);
-		        this.saService.doAdd(salary);
-		        String businessKey = salary.getId().toString();
-		        salary.setBusinessKey(businessKey);
-		        try{
-		        	String processInstanceId = this.processService.startSalaryAdjust(salary);
-		        	message.setStatus(Boolean.TRUE);
-					message.setMessage("薪资调整流程已启动，流程ID：" + processInstanceId);
-		            logger.info("processInstanceId: "+processInstanceId);
-		        }catch (ActivitiException e) {
-		        	message.setStatus(Boolean.FALSE);
-		            if (e.getMessage().indexOf("no processes deployed with key") != -1) {
-		                logger.warn("没有部署流程!", e);
-		                message.setMessage("没有部署流程，请联系系统管理员，在[流程定义]中部署相应流程文件！");
-		            } else {
-		                logger.error("启动薪资调整流程失败：", e);
-		                message.setMessage("启动请假流程失败，系统内部错误！");
-		            }
-		        } catch (Exception e) {
-		            logger.error("启动薪资调整流程失败：", e);
-		            message.setStatus(Boolean.FALSE);
-		            message.setMessage("启动请假流程失败，系统内部错误！");
-		            throw e;
-		        } finally {
-		            identityService.setAuthenticatedUserId(null);
-		        }
+        		Salary sa = this.salaryService.findByUserId(user.getId().toString());
+        		if(!BeanUtils.isBlank(sa)){
+        			salary.setApplyDate( new Date() );
+        			salary.setUserId(user.getId());
+        			salary.setUser_id(currentUser.getId());
+        			salary.setUser_name(currentUser.getName());
+        			salary.setTitle(user.getName()+" 的薪资调整申请");
+        			salary.setBusinessType(SalaryAdjust.SALARY);
+        			salary.setStatus(SalaryAdjust.PENDING);
+        			this.saService.doAdd(salary);
+        			String businessKey = salary.getId().toString();
+        			salary.setBusinessKey(businessKey);
+        			try{
+        				String processInstanceId = this.processService.startSalaryAdjust(salary);
+        				message.setStatus(Boolean.TRUE);
+        				message.setMessage("薪资调整流程已启动，流程ID：" + processInstanceId);
+        				logger.info("processInstanceId: "+processInstanceId);
+        			}catch (ActivitiException e) {
+        				message.setStatus(Boolean.FALSE);
+        				if (e.getMessage().indexOf("no processes deployed with key") != -1) {
+        					logger.warn("没有部署流程!", e);
+        					message.setMessage("没有部署流程，请联系系统管理员，在[流程定义]中部署相应流程文件！");
+        				} else {
+        					logger.error("启动薪资调整流程失败：", e);
+        					message.setMessage("启动请假流程失败，系统内部错误！");
+        				}
+        			} catch (Exception e) {
+        				logger.error("启动薪资调整流程失败：", e);
+        				message.setStatus(Boolean.FALSE);
+        				message.setMessage("启动请假流程失败，系统内部错误！");
+        				throw e;
+        			} finally {
+        				identityService.setAuthenticatedUserId(null);
+        			}
+        		}else{
+           		 message.setStatus(Boolean.FALSE);
+   		         message.setMessage("申请错误，工资表中暂无您的个人工资信息，请联系管理员！");
+        		}
         	}else{
         		 message.setStatus(Boolean.FALSE);
 		         message.setMessage("申请错误，只能申请调整自己的薪资！");

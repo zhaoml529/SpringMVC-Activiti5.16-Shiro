@@ -1,4 +1,4 @@
-package com.zml.oa.ProcessTask.RevokeTask;
+package com.zml.oa.ProcessTask.TaskCommand;
 
 import java.util.Date;
 import java.util.List;
@@ -37,9 +37,9 @@ import com.zml.oa.util.ApplicationContextHelper;
  */
 
 @Component
-public class RevokeTask implements Command<Integer> {
+public class RevokeTaskCmd implements Command<Integer> {
 
-	private static final Logger logger = LoggerFactory.getLogger(RevokeTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(RevokeTaskCmd.class);
     private WorkflowService workflowService;
 	
     private HistoryService historyService;
@@ -50,11 +50,11 @@ public class RevokeTask implements Command<Integer> {
 	
 	private String processInstanceId;
 	
-	public RevokeTask(){
+	public RevokeTaskCmd(){
 		
 	}
 	
-	public RevokeTask(String historyTaskId, String processInstanceId, RuntimeService runtimeService, WorkflowService workflowService,
+	public RevokeTaskCmd(String historyTaskId, String processInstanceId, RuntimeService runtimeService, WorkflowService workflowService,
 			HistoryService historyService){
 		this.historyTaskId = historyTaskId;
 		this.processInstanceId = processInstanceId;
@@ -81,10 +81,11 @@ public class RevokeTask implements Command<Integer> {
     	
         //获取当前节点
         String currentTaskId = null;
+        Task currentTask = null;
         ProcessInstance processInstance = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         if(processInstance != null){
         	
-        	Task currentTask = this.workflowService.getCurrentTaskInfo(processInstance);
+        	currentTask = this.workflowService.getCurrentTaskInfo(processInstance);
         	currentTaskId = currentTask.getId();
         	HistoricTaskInstance hti = this.historyService.createHistoricTaskInstanceQuery().taskId(currentTaskId).singleResult();
         	//下一结点已经通过,不能撤销。
@@ -96,7 +97,10 @@ public class RevokeTask implements Command<Integer> {
         	return 1;
         }
         // 删除所有活动中的task
-        this.deleteActiveTasks(processInstance.getProcessInstanceId());
+//        this.deleteActiveTasks(processInstance.getProcessInstanceId());
+        Command<Void> cmd = new DeleteActiveTaskCmd((TaskEntity)currentTask, "revoke", true);
+        Context.getCommandContext().getCommand().execute((CommandContext) cmd);
+        
         this.deleteHistoryActivities(this.historyTaskId, this.processInstanceId);
         // 恢复期望撤销的任务和历史
         this.processHistoryTask(historicTaskInstanceEntity,
