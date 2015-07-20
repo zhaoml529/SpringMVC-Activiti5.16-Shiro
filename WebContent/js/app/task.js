@@ -613,3 +613,40 @@ function revoke(taskId, processInstanceId){
 		}
 	});
 }
+
+function jumpTask1(){
+	var row = todoTask_datagrid.datagrid('getSelected');
+    if (row) {
+    	if(row.assign == null){
+    		$.messager.alert("提示", "此任务您还没有签收，请【签收】任务后再处理任务！");
+    	}else{
+    		$.ajax({
+    			type: "POST",
+    			url: ctx+"/processAction/process/jumpTask",
+    			data: {taskId : row.taskId, taskDefinitionKey : "bossAudit"},
+    			success: function (data) {
+    				$.messager.progress("close");
+    				if (data.status) {
+    					todoTask_datagrid.datagrid("reload"); //reload the process data
+    				} 
+    				$.messager.show({
+    					title : data.title,
+    					msg : data.message,
+    					timeout : 1000 * 2
+    				});
+    			},
+    			beforeSend:function(){
+    				$.messager.progress({
+    					title: '提示信息！',
+    					text: '数据处理中，请稍后....'
+    				});
+    			},
+    			complete: function(){
+    				$.messager.progress("close");
+    			}
+    		});
+    	}
+    }else{
+    	$.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
+    }
+}

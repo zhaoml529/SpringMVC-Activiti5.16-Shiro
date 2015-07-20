@@ -20,9 +20,11 @@ import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.history.HistoricVariableInstance;
+import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -601,16 +603,15 @@ public class ProcessServiceImp implements IProcessService{
 	@Override
 	public void moveTo(TaskEntity currentTaskEntity,
 			String targetTaskDefinitionKey) throws Exception {
-//		ActivityImpl activity = ProcessDefinitionUtils.getActivity(_processEngine,
-//				currentTaskEntity.getProcessDefinitionId(), targetTaskDefinitionKey);
+		ProcessDefinitionEntity pde = (ProcessDefinitionEntity) ((RepositoryServiceImpl)this.repositoryService).getDeployedProcessDefinition(currentTaskEntity.getProcessDefinitionId()); 
+		ActivityImpl activity = (ActivityImpl) pde.findActivity(targetTaskDefinitionKey);
 
-//			moveTo(currentTaskEntity, activity);
-		
+		moveTo(currentTaskEntity, activity);
 	}
 	
 	private void moveTo(TaskEntity currentTaskEntity, ActivityImpl activity)
 	{
-		Command<Void> deleteCmd = new DeleteActiveTaskCmd(currentTaskEntity, "revoke", true);
+		Command<Void> deleteCmd = new DeleteActiveTaskCmd(currentTaskEntity, "jump", true);
 		Command<Void> StartCmd = new StartActivityCmd(currentTaskEntity.getExecutionId(), activity);
 		this.processEngine.getManagementService().executeCommand(deleteCmd);
 		this.processEngine.getManagementService().executeCommand(StartCmd);

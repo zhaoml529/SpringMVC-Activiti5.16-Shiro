@@ -287,7 +287,7 @@ function outputData( obj ){
 		<tr>\
 			<td>选择:</td>\
 			<td>\
-				<input type="text" id="'+taskDefKey+'_name" value="任务发起人" name="'+taskDefKey+'_name" class="easyui-textbox"/>\
+				<input type="text" id="'+taskDefKey+'_name" value="任务发起人" name="'+taskDefKey+'_name" readonly="readonly" class="easyui-textbox"/>\
 				<input type="hidden" id="'+taskDefKey+'_id" value="0" name="'+taskDefKey+'_id" class="easyui-textbox"/>\
 			</td>\
 		</tr>\
@@ -394,7 +394,7 @@ function setAuthor(){
 				if(data.length == 0){
 					$.messager.show({
 						title:'提示',
-						msg:'请先加载所选流程定义文件，再设定审批人员！',
+						msg:'请先【加载】所选流程定义文件，再设定审批人员！',
 						showType:'fade',
 						style:{
 							right:'',

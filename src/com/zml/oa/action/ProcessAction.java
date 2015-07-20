@@ -775,4 +775,26 @@ public class ProcessAction {
     	
     	return new Datagrid<Object>(total, jsonList);
     }
+    
+    /**
+     * 任务跳转（包括回退和向前）至指定活动节点
+     * @param currentTaskId
+     * @param targetTaskDefinitionKey
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="/process/jumpTask")
+    @ResponseBody
+    public Message jumpTargetTask(@RequestParam("taskId") String currentTaskId, @RequestParam("taskDefinitionKey") String targetTaskDefinitionKey) throws Exception{
+    	Message message = new Message();
+    	try {
+			this.processService.moveTo(currentTaskId, targetTaskDefinitionKey);
+			message.setStatus(Boolean.TRUE);
+        	message.setMessage("任务跳转成功！");
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+        	message.setMessage("任务跳转失败！");
+		}
+    	return message;
+    }
 }
