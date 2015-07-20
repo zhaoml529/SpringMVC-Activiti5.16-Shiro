@@ -220,6 +220,7 @@ public class ProcessAction {
 			map.put("taskDefinitionKey", base.getTask().getTaskDefinitionKey());
 			map.put("processInstanceId", base.getProcessInstance().getId());
 			map.put("processDefinitionId", base.getProcessInstance().getProcessDefinitionId());
+			map.put("processDefinitionKey", base.getProcessDefinition().getKey());	//任务跳转用
 			map.put("supended", base.getProcessInstance().isSuspended());
 			map.put("version", base.getProcessDefinition().getVersion());
 			

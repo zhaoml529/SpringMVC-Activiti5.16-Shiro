@@ -62,7 +62,7 @@
 	<div id="jumpTask" class="easyui-dialog" closed="true">
 		<form id="jumpForm" style="margin: 10px 10px" method="post">
 			选择要跳转的节点：<br/>
-			<input id="jump" name="taskDefinitionKey" >
+			<input id=targetTaskDefinitionKey name="targetTaskDefinitionKey" >
 		</form>
 	</div>
   </body>

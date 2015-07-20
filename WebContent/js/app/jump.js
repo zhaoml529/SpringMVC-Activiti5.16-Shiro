@@ -11,13 +11,13 @@ function jumpTask(){
     	if(row.assign == null){
     		$.messager.alert("提示", "此任务您还没有签收，请【签收】任务后再处理任务！");
     	}else{
-    		$('#jump').combobox({
-			    url: ctx+"/permissionAction/listUserTask",
-			    data: {procDefKey: row.processDefinitionId},
+    		$('#targetTaskDefinitionKey').combobox({
+			    url: ctx+"/permissionAction/listUserTask?procDefKey="+row.processDefinitionKey,
 			    valueField:'taskDefKey',
 			    textField:'taskName',
-			    panelWidth: 350,
+			    panelWidth: 200,
 				panelHeight: 'auto',
+				groupField: 'procDefName',
 				formatter: function(row){
 					var s = '<span style="font-weight:bold">' + row.taskName + '</span><br/>' +
 							'<span style="color:#888"> TaskDefKey: ' + row.taskDefKey + '</span>';
@@ -26,7 +26,7 @@ function jumpTask(){
 			});
     		
     		jump_dialog = $('#jumpTask').dialog({
-    			title : "转办任务",
+    			title : "任务跳转",
     			top: 20,
     			width : 300,
     			height : 150,
@@ -38,7 +38,7 @@ function jumpTask(){
 			        	  text: '确认',
 			        	  iconCls: 'icon-ok',
 			        	  handler: function () {
-			        		  var targetTaskDefinitionKey = $("#jump").val();
+			        		  var targetTaskDefinitionKey = $('#targetTaskDefinitionKey').combobox('getValue');
 			        		  if(targetTaskDefinitionKey == ""){
 			        			  $.messager.alert("提示", "您未选择任何跳转节点，不能确认！"); 
 			        			  return false;
@@ -51,7 +51,7 @@ function jumpTask(){
 		        				  success: function (data) {
 		        					  $.messager.progress("close");
 		        					  if (data.status) {
-		        						  $("#jump").val("");
+		        						  $("#targetTaskDefinitionKey").val("");
 		        						  jump_dialog.dialog('close');
 		        						  todoTask_datagrid.datagrid("reload"); //reload the process data
 		        					  } 
