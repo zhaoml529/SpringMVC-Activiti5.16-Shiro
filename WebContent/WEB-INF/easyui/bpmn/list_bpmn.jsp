@@ -18,7 +18,7 @@
 		<div class="well well-small">
 			<span class="badge" iconCls="icon-save" plain="true" id="tishi" title="提示">提示</span>
 			<p>
-				再次您可以<span class="label-info"><strong>动态的</strong></span>为每个<span class="label-info"><strong>流程定义</strong></span>文件设定审批人员。
+				在此您可以<span class="label-info"><strong>动态的</strong></span>为每个<span class="label-info"><strong>流程定义</strong></span>文件设定审批人员。
 				<span class="label-info"><strong>提示：</strong></span>如果bpmn文件结构没有改变，则不需要<span class="label-info"><strong>初始化所有</strong></span>。
 				如果哪个文件发生变化，则选中此文件单个<span class="label-info"><strong>加载</strong></span>，再设定人员即可。
 			</p>
