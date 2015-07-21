@@ -24,7 +24,7 @@ function jumpTask(){
 					return s;
 				}
 			});
-    		
+    		$("#currentTaskName").html(row.taskName);
     		jump_dialog = $('#jumpTask').dialog({
     			title : "任务跳转",
     			top: 20,

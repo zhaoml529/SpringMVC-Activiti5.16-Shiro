@@ -61,6 +61,7 @@
 	
 	<div id="jumpTask" class="easyui-dialog" closed="true">
 		<form id="jumpForm" style="margin: 10px 10px" method="post">
+			当前任务节点：<span class="label-info"><strong><label id="currentTaskName"></label></strong></span><br/>
 			选择要跳转的节点：<br/>
 			<input id=targetTaskDefinitionKey name="targetTaskDefinitionKey" >
 		</form>
