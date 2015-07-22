@@ -86,6 +86,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
 		//pwd 为修改后的
 		passwordHelper.encryptPassword(user);
 		update(user);
+		updateMembership(user);
 	}
 
 	/**
@@ -265,6 +266,15 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements IUserServi
             // 角色和用户的关系
             addMembershipToIdentify(userId, groupId);
         }
+    }
+    
+    /**
+     * 更新用户时同事更新membership
+     * @param user
+     * @throws Exception
+     */
+    private void updateMembership(User user) throws Exception{
+    	this.activitiBaseService.updateMembership(user.getId().toString(), user.getGroup().getId().toString());
     }
 
 	@Override

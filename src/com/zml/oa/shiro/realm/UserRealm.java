@@ -27,7 +27,7 @@ import com.zml.oa.service.IGroupAndResourceService;
 import com.zml.oa.service.IResourceService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.util.BeanUtils;
-import com.zml.oa.util.Constants;
+import com.zml.oa.util.UserUtil;
 
 /**
  * Shiro从从Realm获取安全数据 （如用户、 角色、 权限）
@@ -85,6 +85,12 @@ public class UserRealm extends AuthorizingRealm{
 
     /**
      * 认证
+     * 该方法主要执行以下操作:
+     * 1、检查提交的进行认证的令牌信息(token)
+     * 2、根据令牌信息从数据源(通常为数据库)中获取用户信息
+     * 3、对用户信息进行匹配验证。
+     * 4、验证通过将返回一个封装了用户信息的 AuthenticationInfo 实例。
+     * 5、验证失败则抛出 AuthenticationException 异常信息。
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
@@ -95,7 +101,6 @@ public class UserRealm extends AuthorizingRealm{
 		try {
 			user = this.userService.getUserByName(username);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -106,21 +111,22 @@ public class UserRealm extends AuthorizingRealm{
         if(Boolean.TRUE.equals(user.getLocked())) {
             throw new LockedAccountException(); //帐号锁定
         }
-        Session currentSession = SecurityUtils.getSubject().getSession();
         //Authenticator的职责是验证用户帐号，是Shiro API中身份验证核心的入口点
         //交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配
+        //CredentialsMatcher使用盐加密传入的明文密码和此处的密文密码进行匹配。
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
                 user.getName(), //用户名
                 user.getPasswd(), //密码
                 ByteSource.Util.bytes(user.getCredentialsSalt()),//salt=username+salt
                 getName()  //realm name
         );
-        currentSession.setAttribute(Constants.CURRENT_USER, user);
+        Session currentSession = SecurityUtils.getSubject().getSession();
+        UserUtil.saveUserToSession(currentSession, user);
         return authenticationInfo;
     	
     }
 
-    //系统登出后 会自动清理授权和认证缓存
+    //系统登出后 会自动调用以下方法清理授权和认证缓存
     @Override
     public void clearCachedAuthorizationInfo(PrincipalCollection principals) {
         super.clearCachedAuthorizationInfo(principals);

@@ -20,10 +20,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +49,7 @@ import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IGroupService;
 import com.zml.oa.service.IUserService;
+import com.zml.oa.shiro.realm.UserRealm;
 import com.zml.oa.util.BeanUtils;
 import com.zml.oa.util.Constants;
 import com.zml.oa.util.DateUtil;
@@ -109,7 +112,7 @@ public class UserAction {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String login(@RequestParam("name")String name, @RequestParam("passwd")String passwd, HttpServletRequest request, Model model) throws Exception{
 		logger.info("login - username=" + name + ", password=" + passwd);
-		HttpSession session = request.getSession();
+		Session session = SecurityUtils.getSubject().getSession();
 		User user = userService.getUserByName(name);
 		if(!BeanUtils.isBlank(user)){
 			if(passwd.equals(user.getPasswd())){
@@ -193,6 +196,11 @@ public class UserAction {
 		}
 		if(message.getStatus()){
 			this.userService.doUpdate(user);
+			//清空认证缓存
+			Subject currentUser = SecurityUtils.getSubject();
+			UserRealm ur = new UserRealm();
+			ur.clearCachedAuthenticationInfo(currentUser.getPrincipals());
+			
 			message.setStatus(Boolean.TRUE);
 			message.setMessage("修改成功！");
 		}
@@ -209,6 +217,11 @@ public class UserAction {
 			User user = new User();
 			user.setId(id);
 			this.userService.doDelete(user, synToActiviti);
+			//清空认证和权限缓存
+			Subject currentUser = SecurityUtils.getSubject();
+			UserRealm ur = new UserRealm();
+			ur.clearCache(currentUser.getPrincipals());
+			
 			return new Message(Boolean.TRUE, "删除成功！");
 		}else{
 			return new Message(Boolean.FALSE, "删除失败！ID为空！");
@@ -261,12 +274,26 @@ public class UserAction {
         return message;
     }
 	
+	/**
+	 * 同步所有用户到activiti表
+	 * @param redirectAttributes
+	 * @return
+	 * @throws Exception
+	 */
 	@RequiresPermissions("admin:user:syncUser")
 	@RequestMapping("/syncUserToActiviti")
-	public String syncUserToActiviti(RedirectAttributes redirectAttributes) throws Exception {
-		this.userService.synAllUserAndRoleToActiviti();
-		redirectAttributes.addFlashAttribute("msg", "成功同步用户、角色数据到工作流！");
-		return "redirect:/userAction/toList_page";
+	@ResponseBody
+	public Message syncUserToActiviti() throws Exception {
+		Message message = new Message();
+		try {
+			this.userService.synAllUserAndRoleToActiviti();
+			message.setStatus(Boolean.TRUE);
+            message.setMessage("同步用户信息成功！");
+		} catch (Exception e) {
+			message.setStatus(Boolean.FALSE);
+            message.setMessage("同步用户信息失败！");
+		}
+		return message;
 	}
 	
 	//如果执行删除，工作流审批中的代办任务和待签收任务将无法使用。（在act_ru_identitylink将查不到act_id_user、act_id_group和act_id_membership的信息）

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.IdentityService;
@@ -16,6 +14,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -78,7 +77,7 @@ public class VacationAction {
 	 */
 	@RequiresPermissions("user:vacation:list")
 	@RequestMapping("/toList_page")
-	public String toList(HttpSession session, Model model) throws Exception{
+	public String toList(Session session, Model model) throws Exception{
 		User user = UserUtil.getUserFromSession(session);
 		List<Vacation> list = this.vacationService.toList(user.getId());
 //		for(Vacation v : list){
@@ -122,7 +121,7 @@ public class VacationAction {
 	@ResponseBody
 	public Message doAdd(
 			@ModelAttribute("vacation") Vacation vacation,
-			HttpSession session) throws Exception{
+			Session session) throws Exception{
         User user = UserUtil.getUserFromSession(session);
         
         // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
@@ -216,7 +215,7 @@ public class VacationAction {
     		@RequestParam("completeFlag") Boolean completeFlag,
     		@PathVariable("taskId") String taskId, 
     		RedirectAttributes redirectAttributes,
-    		HttpSession session) throws Exception{
+    		Session session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	String groupType = user.getGroup().getType();
     	Message message = new Message();
@@ -279,7 +278,7 @@ public class VacationAction {
 			@PathVariable("taskId") String taskId,
 			@RequestParam("processInstanceId") String processInstanceId,
 			@RequestParam("reApply") Boolean reApply,
-			HttpSession session) throws Exception{
+			Session session) throws Exception{
 		
 		User user = UserUtil.getUserFromSession(session);
 		Message message = new Message();

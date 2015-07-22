@@ -1,5 +1,6 @@
 package com.zml.oa.action;
 
+import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.authc.ExcessiveAttemptsException;
@@ -23,6 +24,8 @@ public class LoginAction {
             error = "密码错误！";
         } else if(ExcessiveAttemptsException.class.getName().equals(exceptionClassName)) {
         	error = "登录失败次数过多，请稍后再试！";
+        } else if(AuthenticationException.class.getName().equals(exceptionClassName)) {
+        	error = "身份验证失败！";
         } else if("jCaptcha.error".equals(exceptionClassName)) {
         	error = "验证码错误！";
         } else if(exceptionClassName != null) {

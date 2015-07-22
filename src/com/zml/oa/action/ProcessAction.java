@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -29,6 +28,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -190,7 +190,7 @@ public class ProcessAction {
 	@ResponseBody
 	public Datagrid<Object> todoTask(
 			@RequestParam(value = "page", required = false) Integer page,
-		  	@RequestParam(value = "rows", required = false) Integer rows, HttpSession session) throws Exception{
+		  	@RequestParam(value = "rows", required = false) Integer rows, Session session) throws Exception{
 		String userId = UserUtil.getUserFromSession(session).getId().toString();
 		User user = this.userService.getUserById(new Integer(userId));
 		Page<BaseVO> p = new Page<BaseVO>(page, rows);
@@ -241,7 +241,7 @@ public class ProcessAction {
     @ResponseBody
     public Datagrid<Object> findFinishedTaskInstances(
 			@RequestParam(value = "page", required = false) Integer page,
-		  	@RequestParam(value = "rows", required = false) Integer rows, HttpSession session) throws Exception {
+		  	@RequestParam(value = "rows", required = false) Integer rows, Session session) throws Exception {
     	User user = UserUtil.getUserFromSession(session);
     	Page<BaseVO> p = new Page<BaseVO>(page, rows);
     	List<BaseVO> taskList = this.processService.findFinishedTaskInstances(user, p);
@@ -270,7 +270,7 @@ public class ProcessAction {
 	@RequiresPermissions("user:task:claim")
 	@RequestMapping("/claim/{taskId}")
 	@ResponseBody
-	public Message claim(@PathVariable("taskId") String taskId, HttpSession session) {
+	public Message claim(@PathVariable("taskId") String taskId, Session session) {
 		Message message = new Message();
 		try {
 			User user = UserUtil.getUserFromSession(session);
@@ -738,7 +738,7 @@ public class ProcessAction {
     public Datagrid<Object> getRuningProcessInstance(
     		@RequestParam(value = "page", required = false) Integer page,
     		@RequestParam(value = "rows", required = false) Integer rows,
-    		@PathVariable("businessType") String businessType,HttpSession session) throws Exception{
+    		@PathVariable("businessType") String businessType,Session session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	List<BaseVO> baseVO = new ArrayList<BaseVO>();
     	Integer total = 0;

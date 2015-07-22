@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RuntimeService;
@@ -16,17 +13,16 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zml.oa.entity.BaseVO;
@@ -97,7 +93,7 @@ public class ExpenseAction {
 	public Message doAdd(
 			@ModelAttribute("expense") ExpenseAccount expense,
 			RedirectAttributes redirectAttributes, 
-			HttpSession session) throws Exception{
+			Session session) throws Exception{
         User user = UserUtil.getUserFromSession(session);
         
         // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
@@ -175,7 +171,7 @@ public class ExpenseAction {
     public Message complate(
     		@RequestParam("expenseId") Integer expenseId,
     		@PathVariable("taskId") String taskId, 
-    		HttpSession session) throws Exception{
+    		Session session) throws Exception{
     	User user = UserUtil.getUserFromSession(session);
     	Message message = new Message();
 		try {
