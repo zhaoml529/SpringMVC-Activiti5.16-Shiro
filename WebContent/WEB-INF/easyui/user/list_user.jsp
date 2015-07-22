@@ -16,7 +16,11 @@
 	<div class="well well-small" style="margin-left: 5px;margin-top: 5px">
 		<span class="badge">提示</span>
 		<p>
-			在此你可以对<span class="label-info"><strong>用户</strong></span>进行编辑!
+			在此你可以对<span class="label-info"><strong>用户</strong></span>进行管理!<br/><br/>
+			其中<span class="label-info"><strong>同步用户</strong></span>功能是将用户表的数据同步到工作流(Activiti)中的用户表中，具体
+			工作流中的用户表包括： <span class="label-info"><strong>act_id_group</strong></span>、<span class="label-info"><strong>act_id_membership</strong></span>、
+			<span class="label-info"><strong>act_id_user</strong></span>。<br/>
+			同步用户功能并不影响系统的正常使用，
 		</p>
 	</div>
 	
@@ -27,49 +31,12 @@
 					<shiro:hasRole name="admin">
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="showUser();">添加</a>
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit();">编辑</a>
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="del();">删除</a>
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="del();">删除</a>|
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="sync();">同步用户</a>
 					</shiro:hasRole>
-				<!--  	<shiro:hasPermission name="userEndEdit">
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-cancel" plain="true" onclick="endEdit();">结束编辑</a>
-					</shiro:hasPermission>
-					<shiro:hasPermission name="userSave">
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="saveRows();">保存</a>
-					</shiro:hasPermission>-->
-				</td>
-				<!-- <td style="padding-left:2px">
-					<input id="searchbox" type="text"/>
-				</td>
-				<td style="padding-left:2px">
-					<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="userSearch();">高级查询</a>
-				</td> -->
 			</tr>
 		</table>
 	</div>
-	<!-- <div id="mm">
-		<div name="myid">用户编码</div>
-		<div name="account">用户账户</div>
-		<div name="name">用户名</div>
-		<div name="email">邮箱</div>
-		<div name="tel">电话</div>
-		<div name="organizeName">组织</div>
-		<div name="description">描述</div>
-	</div> -->
 	<table id="user_datagrid" title="用户管理"></table>
-	
-<%-- 	<table class="easyui-datagrid" width="100%" border="1"
-			url="${ctx }/userAction/toList"
-			toolbar="#toolbar"
-			pagination="true"
-			rownumbers="true" fitColumns="true" singleSelect="true">
-        <thead>
-          <tr>
-            <th field="name" width="30%">姓名</th>
-            <th field="passwd" width="30%">密码(两次加密)</th>
-            <th field="registerDate" width="20%">注册时间</th>
-            <th field=locked width="10%">状态</th>
-            <th field=group_name width="10%">用户组</th>
-          </tr>
-        </thead>
-    </table> --%>
   </body>
 </html>

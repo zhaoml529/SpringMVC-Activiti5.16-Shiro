@@ -20,7 +20,8 @@
 				<span class="badge" iconCls="icon-save" plain="true" >提示</span>
 				<p>
 					新增菜单功能不属于当前角色，请在<span class="label-info"><strong>菜单权限分派</strong></span>中为该角色进行资源分派！请<span class="label-info"><strong>双击角色</strong></span>查看所属资源！
-					超级管理员默认拥有<span class="label-info"><strong>所有权限！</strong></span>
+					超级管理员默认拥有<span class="label-info"><strong>所有权限！</strong></span><br/>
+					更改相应的组权限后，要点击<span class="label-info"><strong>保存设置</strong></span>来保存更改。
 				</p>
 			</div>
 		</div>
@@ -42,14 +43,19 @@
 				<table id="group" title="用户组"></table>
 			</div>
 			<div data-options="region:'center',border:true">
-				 <div id="tb">
-					<div style="margin:5px 5px 5px 5px;">
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="expandAll();">展开</a>
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="collapseAll();">收缩</a>
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="refresh();">刷新</a>
-					</div>
+				<div id="tb" style="padding:2px 0">
+					<table cellpadding="0" cellspacing="0">
+						<tr>
+							<td style="padding-left:4px;padding-bottom:4px;">
+								<shiro:hasRole name="admin">
+									<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="expandAll();">展开</a>
+									<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="collapseAll();">收缩</a>
+									<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="refresh();">刷新</a>
+								</shiro:hasRole>
+							</td>
+						</tr>
+					</table>
 				</div>
-				
 				<%-- 列表右键 --%>
 				<div id="resource_datagrid_menu" class="easyui-menu" style="width:120px;display: none;">
 				    <div onclick="showResource();" data-options="iconCls:'icon-add'">新增</div>

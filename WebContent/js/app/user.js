@@ -175,18 +175,12 @@ function del() {
                     success: function (data) {
                         if (data.status) {
                             user_datagrid.datagrid('load');	// reload the user data
-                            $.messager.show({
-            					title : data.title,
-            					msg : data.message,
-            					timeout : 1000 * 2
-            				});
-                        } else {
-                        	$.messager.show({
-            					title : data.title,
-            					msg : data.message,
-            					timeout : 1000 * 2
-            				});
                         }
+                        $.messager.show({
+        					title : data.title,
+        					msg : data.message,
+        					timeout : 1000 * 2
+        				});
                     }
                 });
             }
@@ -194,4 +188,28 @@ function del() {
     } else {
     	$.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
     }
+}
+
+//同步
+function sync(){
+    $.messager.confirm('提示', '重新同步所有用户信息到工作流表,确认？', function (result) {
+        if (result) {
+            $.ajax({
+                url: ctx + '/userAction/syncUserToActiviti',
+                type: 'post',
+                dataType: 'json',
+                data: {},
+                success: function (data) {
+                    if (data.status) {
+                        user_datagrid.datagrid('load');	// reload the user data
+                    }
+                    $.messager.show({
+    					title : data.title,
+    					msg : data.message,
+    					timeout : 1000 * 2
+    				});
+                }
+            });
+        }
+    });
 }

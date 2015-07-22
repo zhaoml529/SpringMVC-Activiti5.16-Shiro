@@ -158,7 +158,16 @@ function getPermission(rowIndex, rowData){
       				});
       			}
             }, 100);
-        }
+        },
+        beforeSend:function(){
+		    $.messager.progress({
+			    title: '提示信息！',
+			    text: '数据处理中，请稍后....'
+		    });
+	    },
+	    complete: function(){
+		    $.messager.progress("close");
+	    }
     });
 } 
 
@@ -188,18 +197,13 @@ function formInit(row) {
             if (json.status) {
                 group_dialog.dialog('destroy');//销毁对话框
                 group_datagrid.datagrid('reload');//重新加载列表数据
-                $.messager.show({
-					title : json.title,
-					msg : json.message,
-					timeout : 1000 * 2
-				});
-            } else {
-				$.messager.show({
-					title :  json.title,
-					msg : json.message,
-					timeout : 1000 * 2
-				});
-            } 
+                
+            }
+            $.messager.show({
+				title : json.title,
+				msg : json.message,
+				timeout : 1000 * 2
+			});
         }
     });
 }
@@ -272,22 +276,26 @@ function delRows() {
                     dataType: 'json',
                     data: {},
                     success: function (data) {
+                    	$.messager.progress("close");
                         if (data.status) {
                             group_datagrid.datagrid('load');	  // reload the group data
                             resource_datagrid.treegrid('reload'); //reload the resource data
-                            $.messager.show({
-            					title : data.title,
-            					msg : data.message,
-            					timeout : 1000 * 2
-            				});
-                        } else {
-                        	$.messager.show({
-            					title : data.title,
-            					msg : data.message,
-            					timeout : 1000 * 2
-            				});
                         }
-                    }
+                        $.messager.show({
+        					title : data.title,
+        					msg : data.message,
+        					timeout : 1000 * 2
+        				});
+                    },
+                    beforeSend:function(){
+    				    $.messager.progress({
+    					    title: '提示信息！',
+    					    text: '数据处理中，请稍后....'
+    				    });
+    			    },
+    			    complete: function(){
+    				    $.messager.progress("close");
+    			    }
                 });
             }
         });
@@ -312,20 +320,23 @@ function savePermission(){
 				dataType: 'json',
 				data: {groupId:selectionGroup.id, resourceIds:checkedIds},
                 success: function (data) {
-                    if (data.status) {
-                        $.messager.show({
-        					title : data.title,
-        					msg : data.message,
-        					timeout : 1000 * 2
-        				});
-                    } else {
-                    	$.messager.show({
-        					title : data.title,
-        					msg : data.message,
-        					timeout : 1000 * 2
-        				});
-                    }
+                	$.messager.progress("close");
+                	resource_datagrid.datagrid("reload");
+                	$.messager.show({
+    					title : data.title,
+    					msg : data.message,
+    					timeout : 1000 * 2
+    				});
                 },
+			    beforeSend:function(){
+				    $.messager.progress({
+					    title: '提示信息！',
+					    text: '数据处理中，请稍后....'
+				    });
+			    },
+			    complete: function(){
+				    $.messager.progress("close");
+			    },
 				error:function(){
 					$.messager.show({
 						title :"提示",
