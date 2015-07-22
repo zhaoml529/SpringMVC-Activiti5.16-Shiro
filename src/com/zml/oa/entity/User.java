@@ -60,9 +60,6 @@ public class User implements Serializable{
 	@Column(name = "USER_SALT")
 	private String salt; // 加密密码的盐
 	
-	@Column(name = "GROUP_NAME")
-	private String group_name; // 配合easyui使用，以后最好还是不用外键了。@JsonIgnore后取不到group信息，但是不加@JsonIgnore还报错。
-	
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
 	@Column(name = "REG_DATE")
@@ -159,12 +156,4 @@ public class User implements Serializable{
         return name + salt;
     }
 
-	public String getGroup_name() {
-		return group_name;
-	}
-
-	public void setGroup_name(String group_name) {
-		this.group_name = group_name;
-	}
-    
 }

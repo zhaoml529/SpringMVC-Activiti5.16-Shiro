@@ -101,11 +101,21 @@ public class UserAction {
 	 */
 	@RequestMapping("/toList")
 	@ResponseBody
-	public Datagrid<User> userList(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+	public Datagrid<Object> userList(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "rows", required = false) Integer rows) throws Exception{
 		Page<User> p = new Page<User>(page, rows);
-		this.userService.getUserList(p);
-		Datagrid<User> dataGrid = new Datagrid<User>(p.getTotal(), p.getResult());
-		return dataGrid;
+		List<User> userList = this.userService.getUserList(p);
+//		Datagrid<User> dataGrid = new Datagrid<User>(p.getTotal(), p.getResult());
+		List<Object> jsonList=new ArrayList<Object>(); 
+		for(User user : userList){
+			Map<String, Object> map=new HashMap<String, Object>();
+			map.put("name", user.getName());
+			map.put("passwd", user.getPasswd());
+			map.put("registerDate", user.getRegisterDate());
+			map.put("locked", user.getLocked());
+			map.put("group_name", user.getGroup().getName());
+			jsonList.add(map);
+		}
+		return new Datagrid<Object>(p.getTotal(), jsonList);
 	}
 	
 	//此方法没用到，用Shiro提供的授权和认证服务
@@ -152,7 +162,7 @@ public class UserAction {
 	}
 	
 	@RequiresPermissions("admin:user:toUpdate")
-	@RequestMapping(value = "/toUpdate/{id}", method = RequestMethod.POST)
+	@RequestMapping(value = "/toUpdate/{id}")
 	public String toUpdate(@PathVariable("id") Integer id,Model model) throws Exception{
 //		List<Group> list = this.groupService.getGroupList();
 		User user = this.userService.getUserById(id);
@@ -171,7 +181,6 @@ public class UserAction {
 		String registerDate = request.getParameter("registerDate");
 		String passwd = request.getParameter("passwd");
 		String groupId = request.getParameter("group.id");
-		String groupName = request.getParameter("group_name");
 		String locked = request.getParameter("locked");
 		Message message = new Message();
 		User user = new User();
@@ -181,7 +190,6 @@ public class UserAction {
 			user.setSalt(salt);
 			user.setPasswd(passwd);
 			user.setLocked(new Integer(locked));
-			user.setGroup_name(groupName);
 			if(StringUtils.isNotEmpty(groupId)){
 				user.setGroup(new Group(new Integer(groupId)));
 			}else{

@@ -71,7 +71,7 @@ $(function() {
 
 	function fixWidth(percent)   
 	{   
-		return parseInt(($(this).width() - 55) * percent);
+		return parseInt(($(this).width() - 60) * percent);
 	}
 	
 
