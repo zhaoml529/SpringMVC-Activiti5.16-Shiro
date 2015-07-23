@@ -7,7 +7,6 @@
  */
 package com.zml.oa.action;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -45,8 +43,6 @@ import com.zml.oa.entity.Group;
 import com.zml.oa.entity.Message;
 import com.zml.oa.entity.User;
 import com.zml.oa.pagination.Page;
-import com.zml.oa.pagination.Pagination;
-import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IGroupService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.shiro.realm.UserRealm;
@@ -156,7 +152,7 @@ public class UserAction {
 		user.setRegisterDate(new Date());
 		//user.setLocked(0);
 		String groupId = user.getGroup().getId().toString();
-		Serializable id = this.userService.doAdd(user, groupId, synToActiviti);
+		this.userService.doAdd(user, groupId, synToActiviti);
 		return new Message(Boolean.TRUE, "添加成功！");
 		
 	}

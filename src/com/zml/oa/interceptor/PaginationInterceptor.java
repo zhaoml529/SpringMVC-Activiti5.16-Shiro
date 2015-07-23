@@ -29,7 +29,6 @@ public class PaginationInterceptor extends HandlerInterceptorAdapter {
 				pagination = new Pagination();
 				PaginationThreadUtils.set(pagination);
 			}
-			@SuppressWarnings("unchecked")
 			Map<String, String[]> params = request.getParameterMap();
 			// 设置要跳转到的页数
 			if (params.get(CURRENT_PAGE) == null) {

@@ -28,7 +28,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -190,8 +189,8 @@ public class ProcessAction {
 	@ResponseBody
 	public Datagrid<Object> todoTask(
 			@RequestParam(value = "page", required = false) Integer page,
-		  	@RequestParam(value = "rows", required = false) Integer rows, Session session) throws Exception{
-		String userId = UserUtil.getUserFromSession(session).getId().toString();
+		  	@RequestParam(value = "rows", required = false) Integer rows) throws Exception{
+		String userId = UserUtil.getUserFromSession().getId().toString();
 		User user = this.userService.getUserById(new Integer(userId));
 		Page<BaseVO> p = new Page<BaseVO>(page, rows);
 		List<BaseVO> taskList = this.processService.findTodoTask(user, p);
@@ -241,8 +240,8 @@ public class ProcessAction {
     @ResponseBody
     public Datagrid<Object> findFinishedTaskInstances(
 			@RequestParam(value = "page", required = false) Integer page,
-		  	@RequestParam(value = "rows", required = false) Integer rows, Session session) throws Exception {
-    	User user = UserUtil.getUserFromSession(session);
+		  	@RequestParam(value = "rows", required = false) Integer rows) throws Exception {
+    	User user = UserUtil.getUserFromSession();
     	Page<BaseVO> p = new Page<BaseVO>(page, rows);
     	List<BaseVO> taskList = this.processService.findFinishedTaskInstances(user, p);
     	List<Object> jsonList=new ArrayList<Object>(); 
@@ -270,10 +269,10 @@ public class ProcessAction {
 	@RequiresPermissions("user:task:claim")
 	@RequestMapping("/claim/{taskId}")
 	@ResponseBody
-	public Message claim(@PathVariable("taskId") String taskId, Session session) {
+	public Message claim(@PathVariable("taskId") String taskId) {
 		Message message = new Message();
 		try {
-			User user = UserUtil.getUserFromSession(session);
+			User user = UserUtil.getUserFromSession();
 			this.processService.doClaim(user, taskId);
 			message.setStatus(Boolean.TRUE);
 			message.setMessage("任务签收成功！");
@@ -738,8 +737,8 @@ public class ProcessAction {
     public Datagrid<Object> getRuningProcessInstance(
     		@RequestParam(value = "page", required = false) Integer page,
     		@RequestParam(value = "rows", required = false) Integer rows,
-    		@PathVariable("businessType") String businessType,Session session) throws Exception{
-    	User user = UserUtil.getUserFromSession(session);
+    		@PathVariable("businessType") String businessType) throws Exception{
+    	User user = UserUtil.getUserFromSession();
     	List<BaseVO> baseVO = new ArrayList<BaseVO>();
     	Integer total = 0;
     	if(BaseVO.VACATION.equals(businessType)){

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zml.oa.dao.IJdbcDao;
-import com.zml.oa.entity.User;
 import com.zml.oa.service.IActivitiBaseService;
 
 @Service

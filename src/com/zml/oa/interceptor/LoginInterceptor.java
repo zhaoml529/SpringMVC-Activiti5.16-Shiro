@@ -3,8 +3,6 @@ package com.zml.oa.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.zml.oa.entity.User;
@@ -15,8 +13,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		Session session = SecurityUtils.getSubject().getSession();
-		User user = UserUtil.getUserFromSession(session);
+		User user = UserUtil.getUserFromSession();
 		if(!BeanUtils.isBlank(user)){
 			return true;
 		}

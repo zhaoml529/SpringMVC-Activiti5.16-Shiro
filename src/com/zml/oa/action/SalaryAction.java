@@ -15,7 +15,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -122,9 +121,8 @@ public class SalaryAction {
 	@RequestMapping(value = "/doAdd", method = RequestMethod.POST)
 	@ResponseBody
 	public Message doAdd(
-			@ModelAttribute("salary") SalaryAdjust salary,
-			Session session) throws Exception{
-        User currentUser = UserUtil.getUserFromSession(session);
+			@ModelAttribute("salary") SalaryAdjust salary) throws Exception{
+        User currentUser = UserUtil.getUserFromSession();
 
         
         // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
@@ -242,9 +240,8 @@ public class SalaryAction {
     		@RequestParam("content") String content,
     		@RequestParam("completeFlag") Boolean completeFlag,
     		@PathVariable("taskId") String taskId, 
-    		RedirectAttributes redirectAttributes,
-    		Session session) throws Exception{
-    	User user = UserUtil.getUserFromSession(session);
+    		RedirectAttributes redirectAttributes) throws Exception{
+    	User user = UserUtil.getUserFromSession();
     	String groupType = user.getGroup().getType();
     	Message message = new Message();
     	try {
@@ -296,10 +293,9 @@ public class SalaryAction {
     public Message modifySalary(
     		@ModelAttribute("salary") SalaryAdjust salary,
 			@PathVariable("taskId") String taskId,
-			@RequestParam("reApply") Boolean reApply,
-			Session session) throws Exception{
+			@RequestParam("reApply") Boolean reApply) throws Exception{
 		
-		User currentUser = UserUtil.getUserFromSession(session);
+		User currentUser = UserUtil.getUserFromSession();
         String userName = salary.getUser_name();
         Message message = new Message();
         try {

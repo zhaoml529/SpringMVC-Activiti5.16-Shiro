@@ -13,7 +13,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -92,9 +91,8 @@ public class ExpenseAction {
 	@ResponseBody
 	public Message doAdd(
 			@ModelAttribute("expense") ExpenseAccount expense,
-			RedirectAttributes redirectAttributes, 
-			Session session) throws Exception{
-        User user = UserUtil.getUserFromSession(session);
+			RedirectAttributes redirectAttributes) throws Exception{
+        User user = UserUtil.getUserFromSession();
         
         // 用户未登录不能操作，实际应用使用权限框架实现，例如Spring Security、Shiro等
 //        if (user == null || user.getId() == null) {
@@ -170,9 +168,8 @@ public class ExpenseAction {
 	@ResponseBody
     public Message complate(
     		@RequestParam("expenseId") Integer expenseId,
-    		@PathVariable("taskId") String taskId, 
-    		Session session) throws Exception{
-    	User user = UserUtil.getUserFromSession(session);
+    		@PathVariable("taskId") String taskId) throws Exception{
+    	User user = UserUtil.getUserFromSession();
     	Message message = new Message();
 		try {
 			ExpenseAccount expense = this.expenseService.findById(expenseId);

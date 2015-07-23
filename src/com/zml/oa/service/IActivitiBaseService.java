@@ -1,6 +1,5 @@
 package com.zml.oa.service;
 
-import com.zml.oa.entity.User;
 
 public interface IActivitiBaseService {
 
