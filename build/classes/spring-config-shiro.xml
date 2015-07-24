@@ -65,13 +65,14 @@
 
     <!-- 会话验证调度器 -->
     <bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler">
-        <property name="sessionValidationInterval" value="1800000"/> <!--设置调度时间间隔 半小时  默认值为1小时-->
+        <property name="sessionValidationInterval" value="60000"/> <!--设置调度时间间隔 半小时  默认值为1小时-->
         <property name="sessionManager" ref="sessionManager"/>
     </bean>
 
     <!-- 会话管理器 -->
     <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-        <property name="globalSessionTimeout" value="1800000"/> <!-- 设置全局会话超时时间 半小时 -->
+        <!-- <property name="globalSessionTimeout" value="1800000"/> 设置全局会话超时时间 半小时 -->
+        <property name="globalSessionTimeout" value="60000"/> <!-- 设置全局会话超时时间 半小时 -->
         <property name="deleteInvalidSessions" value="true"/> <!-- 删除过期的会话 -->
         <property name="sessionValidationSchedulerEnabled" value="true"/> <!-- 是否开启会话验证器 默认开启 -->
         <property name="sessionValidationScheduler" ref="sessionValidationScheduler"/> <!-- 设置会话调度器 -->
@@ -79,6 +80,7 @@
         <!-- 是否启用Session Id Cookie,默认是启动；如果是禁用则默认使用servlet容器的 JSESSIONID -->
         <property name="sessionIdCookieEnabled" value="true"/>
         <property name="sessionIdCookie" ref="sessionIdCookie"/>
+        <!-- <property name="sessionListeners" ref="sessionListener1"/> 删除session清空缓存-->
     </bean>
 
     <!-- 安全管理器 -->
@@ -100,7 +102,7 @@
         <property name="usernameParam" value="name"/>   <!-- 指定登录表单提交的用户名参数名 -->
         <property name="passwordParam" value="passwd"/>   <!-- 指定登录表单提交的密码参数名 -->
         <property name="rememberMeParam" value="rememberMe"/>
-        <!-- <property name="successUrl" value="/"/> 指定登录成功后重定向的默认地址（默认是“/”）（如果有上一个地址会自动重定向带该地址）-->
+        <property name="successUrl" value="/"/> <!--指定登录成功后重定向的默认地址（默认是“/”）（如果有上一个地址会自动重定向到该地址）-->
         <!-- <property name="failureKeyAttribute" value="shiroLoginFailure" />  failureKeyAttribute指定登录失败时的 request属性 key（默认 shiroLoginFailure） -->
         <property name="loginUrl" value="/loginAction/login"/>			<!-- 指定身份验证的登录表单 -->
     </bean>
@@ -148,11 +150,7 @@
         <property name="filterChainDefinitions">
             <value>
                 /loginAction/login = jCaptchaValidate,authc
-                /taglibs.jsp = anon
-                /login_tags.jsp = anon
                 /logout = logout
-                /userAction/toAdd = anon
-                /userAction/doAdd = anon
                 /jcaptcha* = anon
                 /images/**=anon 
              	/js/**=anon

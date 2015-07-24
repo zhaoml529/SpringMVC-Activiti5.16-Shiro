@@ -54,7 +54,7 @@ public class MainController {
     public String nav(HttpSession session, Model model) throws Exception {
     	return "layout/south";
     }
-
+    
     @RequestMapping("/")
     public String index(Model model) throws Exception {
     	String username = (String) SecurityUtils.getSubject().getPrincipal();

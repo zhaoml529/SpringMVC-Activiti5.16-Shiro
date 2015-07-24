@@ -134,6 +134,6 @@
 	
 	<error-page>
 		<error-code>404</error-code>
-		<location>/WEB-INF/jsp/error/404.jsp</location>
+		<location>/WEB-INF/easyui/error/404.jsp</location>
 	</error-page>
 </web-app>

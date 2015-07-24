@@ -31,10 +31,9 @@ public class UserUtil {
      * @return
      */
     public static User getUserFromSession() {
-//        Object attribute = session.getAttribute(Constants.CURRENT_USER);
     	Subject currentUser = SecurityUtils.getSubject();
-		User use = (User) currentUser.getSession().getAttribute(Constants.CURRENT_USER);
-        return use == null ? null : use;
+    	User user = (User) currentUser.getSession().getAttribute(Constants.CURRENT_USER);
+    	return user == null ? null : user;
     }
 
     /**

@@ -7,7 +7,7 @@
 			type : 'POST',
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 				$.messager.progress('close');
-				$.messager.alert('错误', XMLHttpRequest.responseText);
+				$.messager.alert('错误11111', XMLHttpRequest.responseText);
 			}
 		});
 		

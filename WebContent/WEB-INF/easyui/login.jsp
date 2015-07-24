@@ -58,6 +58,10 @@
 	margin-left: 88px;
 	}
 	</style>
+	<script language=”JavaScript”> 
+		if (window != top) 
+		top.location.href = location.href; 
+	</script>
   </head>
   <body>
 	<div id="alertMessage"></div>

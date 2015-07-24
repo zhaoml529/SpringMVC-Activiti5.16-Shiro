@@ -19,7 +19,6 @@
 	}
 	
 	long sysInitTime = Constants.SYSY_INIT_TIME;
-	System.out.println(sysInitTime+"-----"+Constants.SYSY_INIT_TIME);
     //系统启动时间
     request.setAttribute("sysInitTime",sysInitTime);
 %>
@@ -44,6 +43,7 @@
 <script type="text/javascript" charset="utf-8">
     var ctx = "${ctx}";
     var ctxStatic = "${ctxStatic}";
+    //alert(jqueryUtil.getRandTime());
     //var t = new Date().getTime();  
     //alert("sysInitTime: "+"${sysInitTime }"+"script_t: "+t);
 </script>
