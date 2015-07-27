@@ -64,11 +64,11 @@ public class CustomFormAuthenticationFilter extends FormAuthenticationFilter {
     		}
     	}
     	String successUrl = this.getSuccessUrl();
-    	SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(request);
-    	if (savedRequest != null && savedRequest.getMethod().equalsIgnoreCase(AccessControlFilter.GET_METHOD)) {
-            successUrl = savedRequest.getRequestUrl();
-            contextRelative = false;
-        }
+//    	SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(request);
+//    	if (savedRequest != null && savedRequest.getMethod().equalsIgnoreCase(AccessControlFilter.GET_METHOD)) {
+//            successUrl = savedRequest.getRequestUrl();
+//            contextRelative = false;
+//        }
     	
 //    	用sendRedirect直接跳出框架，以免造成js框架重复加载js出错
 //    	  HttpServletRequest httpServletRequest = (HttpServletRequest) request;
