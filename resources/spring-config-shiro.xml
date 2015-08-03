@@ -65,14 +65,13 @@
 
     <!-- 会话验证调度器 -->
     <bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler">
-        <property name="sessionValidationInterval" value="60000"/> <!--设置调度时间间隔 半小时  默认值为1小时-->
+        <property name="sessionValidationInterval" value="1800000"/> <!--设置调度时间间隔 半小时  默认值为1小时-->
         <property name="sessionManager" ref="sessionManager"/>
     </bean>
 
     <!-- 会话管理器 -->
     <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-        <!-- <property name="globalSessionTimeout" value="1800000"/> 设置全局会话超时时间 半小时 -->
-        <property name="globalSessionTimeout" value="60000"/> <!-- 设置全局会话超时时间 半小时 -->
+        <property name="globalSessionTimeout" value="1800000"/> <!-- 设置全局会话超时时间 半小时 -->
         <property name="deleteInvalidSessions" value="true"/> <!-- 删除过期的会话 -->
         <property name="sessionValidationSchedulerEnabled" value="true"/> <!-- 是否开启会话验证器 默认开启 -->
         <property name="sessionValidationScheduler" ref="sessionValidationScheduler"/> <!-- 设置会话调度器 -->
