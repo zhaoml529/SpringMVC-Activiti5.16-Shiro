@@ -64,7 +64,7 @@
 	</script>
   </head>
   <body>
-	<div id="alertMessage"></div>
+	<div id="alertMessage">${msg }</div>
 	<div id="successLogin"></div>
 	<div class="text_success">
 		<img src="../extend/loader_green.gif" alt="Please wait" /> <span>登陆成功!请稍后....</span>
@@ -78,14 +78,14 @@
 			<div class="formLogin">
 				<form name="formLogin" action="" id="formLogin" method="post">
 					<div class="tip">
-						<input class="userName"  type="text" name="name" id="userName" title="用户名" nullmsg="请输入用户名!" iscookie="true" />
+						<input class="userName"  type="text" name="name" id="name" title="用户名" nullmsg="请输入用户名!" iscookie="true" />
 					</div>
 					<div class="tip">
-						<input class="password" name="passwd" type="password" id="password" title="密码" nullmsg="请输入密码!" />
+						<input class="password" name="passwd" type="password" id="passwd" title="密码" nullmsg="请输入密码!" />
 					</div>
 					<div id="cap" class="tip">
 						<c:if test="${jcaptchaEbabled}">
-							<input class="captcha" name="jcaptchaCode" type="text" nullmsg="请输入验证码!" />
+							<input class="captcha" name="jcaptchaCode" id="jcaptchaCode" type="text" nullmsg="请输入验证码!" />
 							<img style="width:85px;height:35px;margin-top: -10px;" align="absmiddle" id="jcaptcha" src="${ctx }/jcaptcha.jpg"/>
 						</c:if>
 					</div>
@@ -125,6 +125,10 @@
 	        $("#jcaptcha").click(function() {
 	            $("#jcaptcha").attr("src", '${ctx}/jcaptcha.jpg?'+new Date().getTime());
 	        });
+	        var msg = $("#alertMessage").html();
+	        if(msg != ''){
+		        showError(msg);
+	        }
 	    });
 	</script>
 </body>

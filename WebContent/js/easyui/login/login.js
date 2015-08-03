@@ -26,7 +26,6 @@ $(document).ready(function() {
 		});
 	});
 
-
 $('.userload').click(function(e) {
 	$('.formLogin').animate({
 		opacity : 1,
@@ -61,7 +60,7 @@ function submit()
 	var submit = true;
 	$("input[nullmsg]").each(function() {
 		if ($("#" + this.name).val() == "") {
-			showError($("#" + this.name).attr("nullmsg"), 500);
+			showError($("#" + this.name).attr("nullmsg"));
 			jrumble();
 			setTimeout('hideTop()', 1000);
 			submit = false;
@@ -80,7 +79,33 @@ function submit()
 function Login() {
 	setCookie();
 	var actionurl=$('form').attr('action');//提交路径
+	var formData = new Object();
+	var data=$(":input").each(function() {
+		 formData[this.name] =$("#"+this.name ).val();
+	});
+	
 	document.getElementById("formLogin").submit();
+//	$.ajax({
+//		async : false,
+//		cache : false,
+//		type : 'POST',
+//		url : actionurl,// 请求的action路径
+//		data : formData,
+//		error : function() {// 请求失败处理函数
+//			alert("error!!!!!!!!!!!");
+//		},
+//		success : function(d) {
+//			//var d = $.parseJSON(data);
+//			//var d=eval('('+data+')');
+//			alert(d.message);
+//			if (d.status) {
+//				loginsuccess();
+//				setTimeout("window.location.href='/'", 1000);
+//			} else {
+//				showError(d.message);
+//			}
+//		}
+//	});
 }
 //设置cookie
 function setCookie()
@@ -123,7 +148,7 @@ function showError(str) {
 	$('#alertMessage').addClass('error').html(str).stop(true, true).show().animate({
 		opacity : 1,
 		right : '0'
-	}, 500);
+	}, 1000);
 
 }
 //验证通过加载动画
@@ -154,7 +179,7 @@ function showSuccess(str) {
 	$('#alertMessage').removeClass('error').html(str).stop(true, true).show().animate({
 		opacity : 1,
 		right : '0'
-	}, 500);
+	}, 2000);
 }
 
 function onfocus() {

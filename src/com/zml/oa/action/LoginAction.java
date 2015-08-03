@@ -1,7 +1,11 @@
 package com.zml.oa.action;
 
+import java.io.IOException;
+
 import javax.naming.AuthenticationException;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -9,13 +13,16 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.zml.oa.entity.Message;
 
 @Controller
 @RequestMapping("/loginAction")
 public class LoginAction {
 
 	@RequestMapping(value = "/login")
-    public String showLoginForm(HttpServletRequest req, Model model) {
+    public String showLoginForm(HttpServletRequest req, Model model) throws ServletException, IOException {
         String exceptionClassName = (String) req.getAttribute("shiroLoginFailure");
         String error = null;
         if(UnknownAccountException.class.getName().equals(exceptionClassName)) {
@@ -40,5 +47,4 @@ public class LoginAction {
         }
         return "login";
     }
-	
 }
