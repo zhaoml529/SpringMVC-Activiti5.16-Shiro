@@ -136,9 +136,9 @@
 	 	<property name="maxInMemorySize">
 			<value>104857600</value><!-- 最大10M -->
 		</property>
-		<property name="uploadTempDir">
+<!-- 		<property name="uploadTempDir">
 			<value>UploadFile</value>
-		</property>
+		</property> -->
 		<property name="defaultEncoding">
 			<value>UTF-8</value>
 		</property>

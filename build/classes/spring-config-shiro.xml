@@ -65,14 +65,13 @@
 
     <!-- 会话验证调度器 -->
     <bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler">
-        <property name="sessionValidationInterval" value="60000"/> <!--设置调度时间间隔 半小时  默认值为1小时-->
+        <property name="sessionValidationInterval" value="1800000"/> <!--设置调度时间间隔 半小时  默认值为1小时-->
         <property name="sessionManager" ref="sessionManager"/>
     </bean>
 
     <!-- 会话管理器 -->
     <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-        <!-- <property name="globalSessionTimeout" value="1800000"/> 设置全局会话超时时间 半小时 -->
-        <property name="globalSessionTimeout" value="60000"/> <!-- 设置全局会话超时时间 半小时 -->
+        <property name="globalSessionTimeout" value="1800000"/> <!-- 设置全局会话超时时间 半小时 -->
         <property name="deleteInvalidSessions" value="true"/> <!-- 删除过期的会话 -->
         <property name="sessionValidationSchedulerEnabled" value="true"/> <!-- 是否开启会话验证器 默认开启 -->
         <property name="sessionValidationScheduler" ref="sessionValidationScheduler"/> <!-- 设置会话调度器 -->
@@ -105,6 +104,7 @@
         <property name="successUrl" value="/"/> <!--指定登录成功后重定向的默认地址（默认是“/”）（如果有上一个地址会自动重定向到该地址）-->
         <!-- <property name="failureKeyAttribute" value="shiroLoginFailure" />  failureKeyAttribute指定登录失败时的 request属性 key（默认 shiroLoginFailure） -->
         <property name="loginUrl" value="/loginAction/login"/>			<!-- 指定身份验证的登录表单 -->
+        <!-- <property name="loginUrl" value="/loginAction/toLogin"/> -->			<!-- 指定身份验证的登录表单 -->
     </bean>
     
 	<!-- 验证码 -->
@@ -128,6 +128,7 @@
     <!-- Shiro的Web过滤器 -->
     <!-- 
    	   <value>
+   	   /loginAction/login = authc
            /login = authc			authc拦截器表示需要通过身份验证才能登录,anon为不需要登录即可访问
            /logout = logout			指定退出地址是/logout，其会自动委托给 SecurityManager.logout方法退出
            /authenticated = authc   访问authenticated这个url时要先通过身份验证
@@ -139,6 +140,7 @@
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
         <property name="loginUrl" value="/loginAction/login"/>
+        <!-- <property name="loginUrl" value="/loginAction/toLogin"/> -->
         <property name="filters">
             <util:map>
                 <entry key="authc" value-ref="formAuthenticationFilter"/>

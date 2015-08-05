@@ -39,6 +39,11 @@ public class JdbcDaoImpl implements IJdbcDao {
 	}
 
 	@Override
+	public int getCount(String sql, Map<String, Object> paramMap) {
+		return this.namedParameterJdbcTemplate.queryForObject(sql, paramMap, Integer.class);
+	}
+	
+	@Override
 	public int[] batchExecute(String sql, final List<Object[]> paramList) {
 		return this.jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 			// 返回更新的记录数
@@ -137,11 +142,6 @@ public class JdbcDaoImpl implements IJdbcDao {
 				return map;
 			}
 		});
-	}
-
-	@Override
-	public int getCount(String sql, Map<String, Object> paramMap) {
-		return this.namedParameterJdbcTemplate.queryForObject(sql, paramMap, Integer.class);
 	}
 
 }
