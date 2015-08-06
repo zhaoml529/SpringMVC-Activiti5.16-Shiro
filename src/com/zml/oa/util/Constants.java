@@ -2,12 +2,6 @@ package com.zml.oa.util;
 
 import java.util.Date;
 
-
-/**
- * <p>User: Zhang Kaitao
- * <p>Date: 14-2-15
- * <p>Version: 1.0
- */
 public class Constants {
 	
 	/***************** system *****************/
