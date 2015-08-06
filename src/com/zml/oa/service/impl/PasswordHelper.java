@@ -9,11 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.zml.oa.entity.User;
 
-/**
- * <p>User: Zhang Kaitao
- * <p>Date: 14-1-28
- * <p>Version: 1.0
- */
 @Service
 public class PasswordHelper {
 
