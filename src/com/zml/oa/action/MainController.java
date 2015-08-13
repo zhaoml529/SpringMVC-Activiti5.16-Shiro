@@ -2,8 +2,6 @@ package com.zml.oa.action;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,7 +49,7 @@ public class MainController {
     }
     
     @RequestMapping(value = "/south")
-    public String nav(HttpSession session, Model model) throws Exception {
+    public String nav() throws Exception {
     	return "layout/south";
     }
     
