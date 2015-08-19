@@ -723,7 +723,7 @@ public class ProcessAction {
     }
     
     /**
-     * 查看请假申请、薪资调整申请、报销申请 - easyui
+     * 用户查看请假申请、薪资调整申请、报销申请 - easyui
      * @param page
      * @param rows
      * @param businessType
