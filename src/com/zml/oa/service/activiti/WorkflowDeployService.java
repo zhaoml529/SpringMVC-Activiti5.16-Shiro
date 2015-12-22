@@ -150,6 +150,7 @@ public class WorkflowDeployService {
 	        	DeploymentBuilder builder = repositoryService.createDeployment();
 //	        	builder.addClasspathResource("bpmn/"+resourceName); 使用addClasspathResource方法将流程描述文件和流程图部署到数据库中
 	        	builder.addInputStream(resourceName, inputStream);
+	        	builder.name(resourceName);
 	        	builder.enableDuplicateFiltering();
 	        	builder.deploy();
 	        }
