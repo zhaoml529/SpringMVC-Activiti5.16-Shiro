@@ -110,6 +110,8 @@ public class WorkflowDeployService {
 	            builder.addZipInputStream(zis);
 	            //该方法仅仅将DeploymentBuilder 的 isDuplicateFilterEnabled 属性设置为true
 	            //目的是过滤重复部署（如果资源没有发生变化则不会重复部署）
+	          //过滤关键是为流程部署起一个名字，没有名字不会过滤,甚至在oracle环境下会报错。
+	            builder.name(processKey.substring(0, processKey.indexOf('.')));
 	            builder.enableDuplicateFiltering();
 	            Deployment deployment = builder.deploy();
 	            
@@ -148,6 +150,7 @@ public class WorkflowDeployService {
 	        	DeploymentBuilder builder = repositoryService.createDeployment();
 //	        	builder.addClasspathResource("bpmn/"+resourceName); 使用addClasspathResource方法将流程描述文件和流程图部署到数据库中
 	        	builder.addInputStream(resourceName, inputStream);
+	        	builder.name(resourceName);
 	        	builder.enableDuplicateFiltering();
 	        	builder.deploy();
 	        }

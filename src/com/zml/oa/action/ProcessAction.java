@@ -772,7 +772,6 @@ public class ProcessAction {
     		map.put("businessKey", base.getBusinessKey());
     		jsonList.add(map);
     	}
-    	
     	return new Datagrid<Object>(total, jsonList);
     }
     
