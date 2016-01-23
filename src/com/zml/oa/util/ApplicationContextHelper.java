@@ -49,7 +49,8 @@ public class ApplicationContextHelper implements ApplicationContextAware {
      *            String
      * @return T
      */
-    public static <T> T getBean(String id) {
+    @SuppressWarnings("unchecked")
+	public static <T> T getBean(String id) {
         return (T) ApplicationContextHolder.getInstance()
                 .getApplicationContext().getBean(id);
     }

@@ -35,6 +35,7 @@ import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
 import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
+import com.zml.oa.util.BeanUtils;
 import com.zml.oa.util.UserUtil;
 
 /**
@@ -214,30 +215,31 @@ public class VacationAction {
     		@PathVariable("taskId") String taskId, 
     		RedirectAttributes redirectAttributes) throws Exception{
     	User user = UserUtil.getUserFromSession();
-    	String groupType = user.getGroup().getType();
     	Message message = new Message();
     	try {
     		Vacation vacation = this.vacationService.findById(vacationId);
             Vacation baseVacation = (Vacation) this.runtimeService.getVariable(vacation.getProcessInstanceId(), "entity");
     		Map<String, Object> variables = new HashMap<String, Object>();
     		variables.put("isPass", completeFlag);
-    		if(completeFlag){
-    			//由userTask自动分配审批权限
-    			//variables.put("auditGroup", "hr");
-    			
-    			//此处需要修改，不能根据人来判断审批是否结束。应该根据流程实例id(processInstanceId)来判定。
-    			//判断指定ID的实例是否存在，如果结果为空，则代表流程结束，实例已被删除(移到历史库中)
-    			if("hr".equals(groupType)){
-    				vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
-    			}
-    		}else{
+    		if(!completeFlag){
     			baseVacation.setTitle(baseVacation.getUser_name()+" 的请假申请失败,需修改后重新提交！");
     			vacation.setStatus(BaseVO.APPROVAL_FAILED);
     			variables.put("entity", baseVacation);
     		}
-    		this.vacationService.doUpdate(vacation);
     		// 完成任务
     		this.processService.complete(taskId, content, user.getId().toString(), variables);
+    		
+    		if(completeFlag){
+    			//此处需要修改，不能根据人来判断审批是否结束。应该根据流程实例id(processInstanceId)来判定。
+    			//判断指定ID的实例是否存在，如果结果为空，则代表流程结束，实例已被删除(移到历史库中)
+    			ProcessInstance pi = this.runtimeService.createProcessInstanceQuery().processInstanceId(vacation.getProcessInstanceId()).singleResult();
+    			if(BeanUtils.isBlank(pi)){
+    				vacation.setStatus(BaseVO.APPROVAL_SUCCESS);
+    			}
+    		}
+    		
+    		this.vacationService.doUpdate(vacation);
+    		
 			message.setStatus(Boolean.TRUE);
 			message.setMessage("任务办理完成！");
 		} catch (ActivitiObjectNotFoundException e) {
