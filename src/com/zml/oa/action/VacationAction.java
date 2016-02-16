@@ -33,7 +33,6 @@ import com.zml.oa.entity.Vacation;
 import com.zml.oa.pagination.Pagination;
 import com.zml.oa.pagination.PaginationThreadUtils;
 import com.zml.oa.service.IProcessService;
-import com.zml.oa.service.IUserService;
 import com.zml.oa.service.IVacationService;
 import com.zml.oa.util.BeanUtils;
 import com.zml.oa.util.UserUtil;
@@ -63,9 +62,6 @@ public class VacationAction {
     @Autowired
     protected TaskService taskService;
     
-	@Autowired
-	private IUserService userService;
-	
 	@Autowired
 	private IProcessService processService;
 	
@@ -343,5 +339,5 @@ public class VacationAction {
 		model.addAttribute("vacation", vacation);
 		return "/vacation/details_vacation";
 	}
-
+	
 }

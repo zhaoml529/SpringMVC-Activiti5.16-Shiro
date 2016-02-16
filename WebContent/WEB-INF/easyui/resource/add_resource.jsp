@@ -41,7 +41,7 @@ $(function() {
     <form id="resource_form" method="post" >
         <div class="fitem">
             <label>资源名称:</label>
-            <input id="name" name="name" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="name" name="name" class="easyui-textbox" required="required">
         </div>
         <div class="fitem">
             <label>资源类型:</label>
@@ -56,11 +56,11 @@ $(function() {
         </div>
         <div class="fitem">
             <label>权限字符串:</label>
-            <input id="url" name="permission" class="easyui-textbox easyui-validatebox" required="true">
+            <input id="url" name="permission" class="easyui-textbox" required="required">
         </div>
         <div class="fitem">
             <label>父编号名称:</label>
-            <input name="parentId"  class="easyui-textbox" id="parentId" type="text"/>
+            <input name="parentId"  class="easyui-combotree" id="parentId" type="text"/>
         </div>
         <div class="fitem">
             <label>父编号列表:</label>
