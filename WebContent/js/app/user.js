@@ -166,12 +166,10 @@ function del() {
     if (row) {
         $.messager.confirm('确认提示！', '您确定要删除选中的所有行?', function (result) {
             if (result) {
-                var id = row.id;
                 $.ajax({
-                    url: ctx + '/userAction/delete/'+id,
+                    url: ctx + '/userAction/delete/'+row.id,
                     type: 'post',
                     dataType: 'json',
-                    data: {id: id},
                     success: function (data) {
                         if (data.status) {
                             user_datagrid.datagrid('load');	// reload the user data

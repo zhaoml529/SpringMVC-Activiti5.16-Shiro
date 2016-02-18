@@ -104,6 +104,7 @@ public class UserAction {
 		List<Object> jsonList=new ArrayList<Object>(); 
 		for(User user : userList){
 			Map<String, Object> map=new HashMap<String, Object>();
+			map.put("id", user.getId());
 			map.put("name", user.getName());
 			map.put("passwd", user.getPasswd());
 			map.put("registerDate", user.getRegisterDate());
