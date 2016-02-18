@@ -22,11 +22,11 @@
 	  		    border:false,
 	  		    onSelect:function(title, index){
 	  				if(title == "省政府文件") {
-	  					tunhuo();
+	  					shengzhengfu();
 	  				} else if(title == "国务院文件") {
-	  					buhuo();
+	  					guowuyuan();
 	  				} else if(title == "其他文件") {
-	  					caigoujihua();
+	  					other();
 	  				}
 	  		    }
 	  		});
