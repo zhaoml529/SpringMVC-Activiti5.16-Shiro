@@ -88,7 +88,7 @@
 		        },
 		        onDblClickRow: function(index, row) {
 		        	//双击一行时触发
-		        	productPartDetails(row);
+		        	productPartDetails(row);	//显示详细信息页面
 		        },
 	  	        toolbar: "#toolbar"
 	  	    });
@@ -112,10 +112,6 @@
 					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" onclick="showPro('tunhuo');">查看</a>
 					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true" onclick="edit('tunhuo');">签收</a>
 					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="del();">拒绝</a>
-<!-- 					&nbsp;|&nbsp;
-					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="details('tunhuo');">代签收</a>
-					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="details('tunhuo');">办理中</a>
-					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="details('tunhuo');">已办理</a> -->
 				</td>
 			</tr>
 		</table>
