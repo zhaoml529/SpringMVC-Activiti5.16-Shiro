@@ -42,12 +42,12 @@ public class SuperviseReceive implements Serializable{
 	@Column(name = "NUMBER", length = 50)
 	private String number; 
 	
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "CREATE_DATE")
 	private Date createDate;		//立项日期
 	
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "HANDLE_DATE")
     private Date handleDate;		//交办日期
@@ -55,9 +55,11 @@ public class SuperviseReceive implements Serializable{
 	@Column(name = "FEEDBACK_CYCLE", length = 10)
 	private String feedback_cycle;		//反馈周期 
 	
-	@Column(name = "FEEDBACK_LIMIT", length = 10)
-	private String feedback_limit;		//反馈时限
-
+	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@Column(name = "FEEDBACK_LIMIT")
+	private Date feedback_limit;		//反馈时限
+	
 	public Integer getId() {
 		return id;
 	}
@@ -114,13 +116,13 @@ public class SuperviseReceive implements Serializable{
 		this.feedback_cycle = feedback_cycle;
 	}
 
-	public String getFeedback_limit() {
+	public Date getFeedback_limit() {
 		return feedback_limit;
 	}
 
-	public void setFeedback_limit(String feedback_limit) {
+	public void setFeedback_limit(Date feedback_limit) {
 		this.feedback_limit = feedback_limit;
 	}
-	
+
 	
 }

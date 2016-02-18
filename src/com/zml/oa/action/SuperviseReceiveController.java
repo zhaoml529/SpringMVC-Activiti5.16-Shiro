@@ -1,5 +1,6 @@
 package com.zml.oa.action;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.zml.oa.entity.Datagrid;
 import com.zml.oa.entity.SuperviseReceive;
 import com.zml.oa.pagination.Page;
+import com.zml.oa.service.ISuperviseReceiveService;
 
 /**
  * 督察接收
@@ -19,6 +21,9 @@ import com.zml.oa.pagination.Page;
 @RequestMapping("/superviserReveive")
 public class SuperviseReceiveController {
 
+	@Autowired
+	private ISuperviseReceiveService receiveService;
+	
 	/**
 	 * 跳转到督察接收
 	 * @return
@@ -38,7 +43,7 @@ public class SuperviseReceiveController {
 	public Datagrid<SuperviseReceive> getList(@RequestParam(value = "page", required = false) Integer page, 
 								@RequestParam(value = "rows", required = false) Integer rows) throws Exception{
 		Page<SuperviseReceive> p = new Page<SuperviseReceive>(page, rows);
-		//this.groupService.getGroupListPage(p);
+		this.receiveService.getListPage(p);
 		Datagrid<SuperviseReceive> dataGrid = new Datagrid<SuperviseReceive>(p.getTotal(), p.getResult());
 		return dataGrid;
 	}

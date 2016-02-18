@@ -33,12 +33,22 @@
 	  		
 	  	});
 	  	
+	    //修正宽高
+		function fixHeight(percent)   
+		{   
+			return parseInt($(this).height() * percent);
+		}
+
+		function fixWidth(percent)   
+		{   
+			return parseInt(($(this).width() - 30) * percent);
+		}
+	  	
 	  	function shengzhengfu() {
-	  		debugger;
 	  		s_datagrid = $('#s_datagrid').datagrid({
-	  	        url: ctx+"/superviserReveive/toSuperviseReceive",
+	  	        url: ctx+"/superviserReveive/getList",
 	  	        width: 'auto',
-	  			height: 200,
+	  			height: fixHeight(0.8),
 	  			pagination:true,
 	  			rownumbers:true,
 	  			fitColumns:true,
@@ -49,17 +59,17 @@
 	  			columns: [ 
 	  	            [ 
 					  {field: 'id', title : '#',width : 50, align : 'center',checkbox: true},
-	  	              {field: 'status',title: '状态',align: 'center'},
-	  	              {field: 'title',title: '标题',align: 'center', halign: 'left', sortable: true},
-	  	              {field: 'number',title: '文号',align: 'center', sortable: true},
-	  	              {field: 'createDate',title: '立项时间',align: 'center'},
-	  	              {field: 'handleDate',title: '交办时间',align: 'center'},
-	  	              {field: 'feedback_cycle',title: '反馈周期',align: 'center',
+	  	              {field: 'status',title: '状态',width : fixWidth(0.1),align : 'center'},
+	  	              {field: 'title',title: '标题',width : fixWidth(0.3),align: 'left', halign: 'center', sortable: true},
+	  	              {field: 'number',title: '文号',width : fixWidth(0.1),align: 'center', sortable: true},
+	  	              {field: 'createDate',title: '立项时间',width : fixWidth(0.1),align: 'center'},
+	  	              {field: 'handleDate',title: '交办时间',width : fixWidth(0.1),align: 'center'},
+	  	              {field: 'feedback_cycle',title: '反馈周期',width : fixWidth(0.1),align: 'center',
 	  	            	  formatter:function(value, row){
 	  	            		  return "自定义显示内容 - " + value;
 	  	    			  }
 	  	              },
-	  	              {field : 'feedback_limit',title : '反馈时限',align : 'center',
+	  	              {field : 'feedback_limit',title : '反馈时限',width : fixWidth(0.1),align : 'center',
 	  	            	formatter:function(value, row){
 	  	            		return moment(value).format("YYYY-MM-DD HH:mm:ss"); //格式化时间  moment.js
 	  	  				}
@@ -88,16 +98,24 @@
 
   </head>
   <body>
+  <div class="easyui-layout" data-options="fit:true">
+  <div data-options="region:'west',border:true" style="width: 30px">
+		<a href="javascript:void(0);" class="easyui-linkbutton" style="height: 200px" onclick="details('tunhuo');">代签收</a>
+		<a href="javascript:void(0);" class="easyui-linkbutton" style="height: 200px" onclick="details('tunhuo');">办理中</a>
+		<a href="javascript:void(0);" class="easyui-linkbutton" style="height: 200px" onclick="details('tunhuo');">已办理</a>
+  </div>
+  <div data-options="region:'center',border:true">
 	<div id="toolbar" style="padding:2px 0; display: none;">
 		<table>
 			<tr>
 				<td style="padding-left:2px">
 					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" onclick="showPro('tunhuo');">查看</a>
 					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true" onclick="edit('tunhuo');">签收</a>
-					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="del();">拒绝</a>&nbsp;|&nbsp;
+					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="del();">拒绝</a>
+<!-- 					&nbsp;|&nbsp;
 					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="details('tunhuo');">代签收</a>
 					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="details('tunhuo');">办理中</a>
-					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="details('tunhuo');">已办理</a>
+					<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="details('tunhuo');">已办理</a> -->
 				</td>
 			</tr>
 		</table>
@@ -106,11 +124,20 @@
 	<div id="tabs" class="easyui-tabs">
 		<div title="省政府文件" data-options="selected:true, closable:false" style="padding:5 0 0 0;">
 			<div class="well well-small" style="margin-left: 5px;margin-top: 5px">
-				<span class="badge">提示</span>
-				<p>
-					在此你可以对<span class="label-info"><strong>采购审批表</strong></span>进行管理!<br/>
-					其中<span class="label-info"><strong>补货</strong></span>是对<span class="label-info"><strong>销售订单</strong></span>中的缺货产品或配件进行补仓。
-				</p>
+				<table style="width: 100%; border: dashed; border-color: highlight;">
+					<tr align="center">
+						<td>立项时间：</td>
+						<td><input type="text" class="easyui-datebox" > - <input type="text" class="easyui-datebox" ></td>
+						<td>办结时间：</td>
+						<td><input type="text" class="easyui-datebox" > - <input type="text" class="easyui-datebox" ></td>
+					</tr>
+					<tr align="center">
+						<td colspan="4">
+							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search'" >搜索</a>
+							<a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" >重置</a>
+						</td>
+					</tr>
+				</table>
 			</div>
 			<table id="s_datagrid"></table>
 		</div>
@@ -121,5 +148,7 @@
 			<table id="o_datagrid"></table>
 		</div>
 	</div>
+  </div>
+  </div>
   </body>
 </html>
