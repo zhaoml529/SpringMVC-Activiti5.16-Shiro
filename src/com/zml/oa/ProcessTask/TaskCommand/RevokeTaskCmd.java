@@ -98,7 +98,8 @@ public class RevokeTaskCmd implements Command<Integer> {
         // 删除所有活动中的task
 //        this.deleteActiveTasks(processInstance.getProcessInstanceId());
         Command<Void> cmd = new DeleteActiveTaskCmd((TaskEntity)currentTask, "revoke", true);
-        Context.getCommandContext().getCommand().execute((CommandContext) cmd);
+       //Context.getCommandContext().getCommand().execute((CommandContext) cmd);
+        Context.getProcessEngineConfiguration().getManagementService().executeCommand(cmd);
         
         this.deleteHistoryActivities(this.historyTaskId, this.processInstanceId);
         // 恢复期望撤销的任务和历史
