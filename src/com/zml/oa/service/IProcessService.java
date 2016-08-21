@@ -197,4 +197,11 @@ public interface IProcessService {
      * @throws Exception
      */
     public void suspendProcessInstance(String processInstanceId) throws Exception;
+    
+    /**
+     * 测试 - 动态创建流程信息
+     * @throws Exception
+     */
+    public void addProcessByDynamic() throws Exception;
+
 }

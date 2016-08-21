@@ -796,4 +796,13 @@ public class ProcessAction {
 		}
     	return message;
     }
+    
+    /**
+     * 测试 动态添加流程信息
+     * @throws Exception
+     */
+    @RequestMapping(value = "/addProcessByDynamic")
+    public void addProcessByDynamic() throws Exception {
+    	this.processService.addProcessByDynamic();
+    }
 }
