@@ -89,8 +89,6 @@ public class activitiTest {
 		InputStream processBpmn = this.repositoryService.getResourceAsStream(deployment.getId(), PROCESSID+".bpmn");  
 		FileUtils.copyInputStreamToFile(processBpmn,new File("D:/deployments/"+PROCESSID+".bpmn"));
 		
-		mxEdgeStyle.ElbowConnector.toString();
-		mxEdgeStyle.OrthConnector.toString();
 	}
 	
 	/**
