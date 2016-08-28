@@ -1,10 +1,17 @@
 package test;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.ActivitiListener;
@@ -28,6 +35,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.mxgraph.view.mxEdgeStyle;
+import com.zml.oa.dao.IJdbcDao;
+import com.zml.oa.entity.ProcessDefine;
+import com.zml.oa.entity.ProcessModel;
 
 /**
  * 动态创建流程信息
@@ -45,9 +55,30 @@ public class activitiTest {
 	@Autowired
 	protected RuntimeService runtimeService;
 	
+	@Autowired
+	private IJdbcDao jdbcDao;
+	
 	@Test
-	public void activiti() throws IOException {
-		BpmnModel model = new BpmnModel();
+	public void activiti() throws Exception,IOException {
+		String sql = "select * from t_process_model where id = :id";
+		Map<String, Object> paramMap = new HashMap<String, Object>();  
+	    paramMap.put("id", 1);  
+	    List<Map<String, Object>> list = this.jdbcDao.find(sql, paramMap);
+		for(Map<String, Object> map : list){
+			ProcessModel model = (ProcessModel) this.convertMap(new ProcessModel().getClass(), map);
+			String sql2 = "select * from t_process_define where modelId = :modelId";
+			paramMap.clear();
+			paramMap.put("modelId", model.getId());
+			List<Map<String, Object>> procDeflist = this.jdbcDao.find(sql2, paramMap);
+			for(Map<String, Object> procDefMap : list){
+				ProcessDefine proceDef = (ProcessDefine) this.convertMap(new ProcessDefine().getClass(), procDefMap);
+				
+			}
+			
+		}
+		
+		
+		/*BpmnModel model = new BpmnModel();
 		Process process = new Process();
 		
 		process.setId(PROCESSID);
@@ -68,7 +99,7 @@ public class activitiTest {
 		process.addFlowElement(createSequenceFlow("userTask2", "endEvent", "flow5", "", ""));
 		process.addFlowElement(createSequenceFlow("userTask3", "gateway2", "flow6", "", ""));
 		process.addFlowElement(createSequenceFlow("gateway2", "userTask1", "flow7", "同意", "${reApply}"));
-		process.addFlowElement(createSequenceFlow("getway2", "endEvent", "flow8", "结束", "${!reApply}"));
+		process.addFlowElement(createSequenceFlow("gateway2", "endEvent", "flow8", "结束", "${!reApply}"));
 		
 		model.addProcess(process);
 		
@@ -87,7 +118,7 @@ public class activitiTest {
 		
 		// 导出流程文件(BPMN xml)
 		InputStream processBpmn = this.repositoryService.getResourceAsStream(deployment.getId(), PROCESSID+".bpmn");  
-		FileUtils.copyInputStreamToFile(processBpmn,new File("D:/deployments/"+PROCESSID+".bpmn"));
+		FileUtils.copyInputStreamToFile(processBpmn,new File("D:/deployments/"+PROCESSID+".bpmn"));*/
 		
 	}
 	
@@ -168,4 +199,29 @@ public class activitiTest {
 		gateway.setId(id);
 		return gateway;
 	}
+	
+    public static Object convertMap(Class type, Map map)
+            throws IntrospectionException, IllegalAccessException,
+            InstantiationException, InvocationTargetException {
+        BeanInfo beanInfo = Introspector.getBeanInfo(type); // 获取类属性
+        Object obj = type.newInstance(); // 创建 JavaBean 对象
+
+        // 给 JavaBean 对象的属性赋值
+        PropertyDescriptor[] propertyDescriptors =  beanInfo.getPropertyDescriptors();
+        for (int i = 0; i< propertyDescriptors.length; i++) {
+            PropertyDescriptor descriptor = propertyDescriptors[i];
+            String propertyName = descriptor.getName().toUpperCase();
+
+            if (map.containsKey(propertyName)) {
+                // 下面一句可以 try 起来，这样当一个属性赋值失败的时候就不会影响其他属性赋值。
+                Object value = map.get(propertyName);
+
+                Object[] args = new Object[1];
+                args[0] = value;
+
+                descriptor.getWriteMethod().invoke(obj, args);
+            }
+        }
+        return obj;
+    }
 }
