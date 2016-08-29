@@ -11,11 +11,11 @@ public class ProcessInstance {
 	
 	private Long modelId;
 	
-	private Integer procDefId;
+	private Long procDefId;
 	
-	private Integer operationType;
+	private String operationType;
 	
-	private Integer targetRef;
+	private Long targetRef;
 
 	public Long getId() {
 		return id;
@@ -25,27 +25,27 @@ public class ProcessInstance {
 		this.id = id;
 	}
 
-	public Integer getProcDefId() {
+	public Long getProcDefId() {
 		return procDefId;
 	}
 
-	public void setProcDefId(Integer procDefId) {
+	public void setProcDefId(Long procDefId) {
 		this.procDefId = procDefId;
 	}
 
-	public Integer getOperationType() {
+	public String getOperationType() {
 		return operationType;
 	}
 
-	public void setOperationType(Integer operationType) {
+	public void setOperationType(String operationType) {
 		this.operationType = operationType;
 	}
 
-	public Integer getTargetRef() {
+	public Long getTargetRef() {
 		return targetRef;
 	}
 
-	public void setTargetRef(Integer targetRef) {
+	public void setTargetRef(Long targetRef) {
 		this.targetRef = targetRef;
 	}
 

@@ -7,7 +7,10 @@ import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,14 +30,13 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.StringUtils;
 
-import com.mxgraph.view.mxEdgeStyle;
 import com.zml.oa.dao.IJdbcDao;
 import com.zml.oa.entity.ProcessDefine;
 import com.zml.oa.entity.ProcessModel;
@@ -65,11 +67,11 @@ public class activitiTest {
 		process.addFlowElement(createStartEvent());		// 创建开始节点
 		
 		String sql = "select * from t_process_model where id = :id";
-		Map<String, Object> paramMap = new HashMap<String, Object>();  
+ 		Map<String, Object> paramMap = new HashMap<String, Object>();  
 	    paramMap.put("id", 1);  
 	    List<Map<String, Object>> list = this.jdbcDao.find(sql, paramMap);
 		for(Map<String, Object> map : list) {
-			ProcessModel processModel = (ProcessModel) this.convertMap(new ProcessModel().getClass(), map);
+			ProcessModel processModel = (ProcessModel) this.setValToObj(new ProcessModel(), map);
 			
 			process.setId(PROCESSID);
 			process.setName(processModel.getProcessName());
@@ -82,9 +84,9 @@ public class activitiTest {
 			int i = 1;
 			int sf = 1;
 			for(Map<String, Object> procDefMap : procDeflist) {
-				ProcessDefine proceDef = (ProcessDefine) this.convertMap(new ProcessDefine().getClass(), procDefMap);
+				ProcessDefine proceDef = (ProcessDefine) this.setValToObj(new ProcessDefine(), procDefMap);
 				process.addFlowElement(createUserTask("userTask" + i, proceDef.getTaskName()));		// 创建用户任务
-				if(proceDef.getIsStartEvent() == 1) {
+				if("1".equals(proceDef.getIsStartEvent())) {
 					process.addFlowElement(createSequenceFlow("startEvent", "userTask"+i, "flow"+sf, "", ""));
 				}
 				
@@ -92,7 +94,7 @@ public class activitiTest {
 				process.addFlowElement(createSequenceFlow("userTask"+i, "gateway"+i, "flow"+sf++, "", ""));
 				proceDef.setTaskId("userTask"+i);
 				proceDef.setTargetGateway("gateway"+i++);
-				String upSql = "update t_process_define set (taskId, targetGateway) = (:taskId, :gateway) where id = :id";
+				String upSql = "update t_process_define set taskId=:taskId, targetGateway = :gateway where id = :id";
 				paramMap.clear();
 				paramMap.put("id", proceDef.getId());
 				paramMap.put("taskId", proceDef.getTaskId());
@@ -106,67 +108,58 @@ public class activitiTest {
 			sf = 1;
 			for(ProcessDefine proceDef : defineList) {
 				paramMap.clear();
-				paramMap.put("modelId", processModel.getId());
+ 				paramMap.put("modelId", processModel.getId());
 				paramMap.put("procDefId", proceDef.getId());
 				String sql3 = "select * from t_process_instance where modelId = :modelId and procDefId = :procDefId";
 				List<Map<String, Object>> procInstlist = this.jdbcDao.find(sql3, paramMap);
 				for(Map<String, Object> procInstMap : procInstlist) {
-					com.zml.oa.entity.ProcessInstance processInstance = (com.zml.oa.entity.ProcessInstance) this.convertMap(new com.zml.oa.entity.ProcessInstance().getClass(), procInstMap);
-					String sql5 = "select * from t_process_model where id = :id";
-					paramMap.clear();
-					paramMap.put("id", processInstance.getTargetRef());
-					List<Map<String, Object>> procDeflist2 = this.jdbcDao.find(sql3, paramMap);
-					ProcessDefine proceDef2 = (ProcessDefine) this.convertMap(new ProcessDefine().getClass(), procDeflist2.get(0));
-					
-					switch (processInstance.getOperationType()) {
-						case 1:
+					com.zml.oa.entity.ProcessInstance processInstance = (com.zml.oa.entity.ProcessInstance) this.setValToObj(new com.zml.oa.entity.ProcessInstance(), procInstMap);
+					if(processInstance.getTargetRef() == 0) {	// endEvent节点
+						process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), "endEvent", "flow0", "", ""));
+					} else {
+						String sql5 = "select * from t_process_define where id = :id";
+						paramMap.clear();
+						paramMap.put("id", processInstance.getTargetRef());
+						List<Map<String, Object>> procDeflist2 = this.jdbcDao.find(sql5, paramMap);
+						ProcessDefine proceDef2 = (ProcessDefine) this.setValToObj(new ProcessDefine(), procDeflist2.get(0));
+						
+						switch (processInstance.getOperationType()) {
+						case "1":
 							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "同意", "${isPass}"));
 							break;
-						case 2:
+						case "2":
 							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "不同意", "${!isPass}"));
 							break;
-						case 3:
+						case "3":
 							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "重新申请", "${reApply}"));
 							break;
-						case 4:
+						case "4":
 							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "取消申请", "${reApply}"));
 							break;
 						default:
 							break;
+						}
 					}
 				}
-			}
-			
-			
-			/*String sql3 = "select procDefId from t_process_instance where modelId = :modelId group by procDefId"; 
-			paramMap.clear();
-			paramMap.put("modelId", processModel.getId());
-			List<Map<String, Object>> procInstlist = this.jdbcDao.find(sql3, paramMap);
-			i = 1;
-			for(Map<String, Object> procInstMap : procInstlist) {
-				com.zml.oa.entity.ProcessInstance processInstance = (com.zml.oa.entity.ProcessInstance) this.convertMap(new com.zml.oa.entity.ProcessInstance().getClass(), procInstMap);
-				process.addFlowElement(createExclusiveGateway("gateway" + i));
-				
-				paramMap.clear();
-				paramMap.put("modelId", processModel.getId());
-				paramMap.put("procDefId", processInstance.getProcDefId());
-				String sql4 = "select * from t_process_instance where modelId = :modelId and procDefId = :procDefId";
-				List<Map<String, Object>> procInstlist2 = this.jdbcDao.find(sql4, paramMap);
-				for(Map<String, Object> procInstMap2 : procInstlist) {
-					com.zml.oa.entity.ProcessInstance processInstance2 = (com.zml.oa.entity.ProcessInstance) this.convertMap(new com.zml.oa.entity.ProcessInstance().getClass(), procInstMap2);
-					switch (processInstance2.getOperationType()) {
-						case 1:
-							process.addFlowElement(createSequenceFlow("gateway"+i, "userTask2", "flow3", "同意", "${isPass}"));
-							break;
-	
-						default:
-							break;
-					}
-				}
-				i++;
-			}*/
+			}	
 		}
+		model.addProcess(process);
+		// 生成流程图片信息
+		BpmnAutoLayout bpmnAutoLayout = new BpmnAutoLayout(model);
+		bpmnAutoLayout.execute();
+		// 部署流程
+		Deployment deployment = this.repositoryService.createDeployment().addBpmnModel("processTest.bpmn", model).name("动态流程测试test").deploy();
 		
+		// 启动流程
+		ProcessInstance processInstance = this.runtimeService.startProcessInstanceByKey(PROCESSID); 
+		
+		// 导出流程图片
+		InputStream processDiagram = this.repositoryService.getProcessDiagram(processInstance.getProcessDefinitionId());  
+		FileUtils.copyInputStreamToFile(processDiagram, new File("D:/deployments/"+PROCESSID+".png"));  
+		
+		// 导出流程文件(BPMN xml)
+		InputStream processBpmn = this.repositoryService.getResourceAsStream(deployment.getId(), PROCESSID+".bpmn");  
+		FileUtils.copyInputStreamToFile(processBpmn,new File("D:/deployments/"+PROCESSID+".bpmn"));
 		
 		/*BpmnModel model = new BpmnModel();
 		Process process = new Process();
@@ -273,7 +266,7 @@ public class activitiTest {
 		flow.setName(name);
 		flow.setSourceRef(from);
 		flow.setTargetRef(to);
-		if(StringUtils.isNotBlank(conditionExpression)) {
+		if(org.apache.commons.lang3.StringUtils.isNotBlank(conditionExpression)) {
 			flow.setConditionExpression(conditionExpression);
 		}
 		return flow;
@@ -314,4 +307,66 @@ public class activitiTest {
         }
         return obj;
     }
+    
+	/**
+	 * @param 把参数封装成一个对象
+	 * @param para
+	 * @return
+	 */
+	public  Object setValToObj(Object entityName, Map<String, Object> para){  
+	    try {  
+	        Class c = entityName.getClass();  
+	        // 获得对象属性     
+	        Field field[] = c.getDeclaredFields();  
+	        for (Field f : field) {   
+	            try {  
+	                PropertyDescriptor pd = new PropertyDescriptor(f.getName(), c);    
+	                Method writeMethod = pd.getWriteMethod();  
+	                if(null != para.get(f.getName().toUpperCase()))  
+	                    writeMethod.invoke(entityName, ConvertType(f.getType().toString(),para.get(f.getName().toUpperCase())));  
+	            } catch (Exception e) {  
+	            	e.printStackTrace();
+	            }  
+	        }  
+	    } catch (Exception e) {  
+	    	e.printStackTrace();
+	    }  
+	    return entityName;
+	}  
+	
+	/**
+	 * 描述   类型转换
+	 * @param type
+	 * @param value
+	 * @return
+	 */
+	public Object ConvertType(String type,Object value){
+		if(type.endsWith("int") || type.endsWith("Integer")){
+			if(StringUtils.isEmpty(value)){
+				return 0;
+			}else{
+				return Integer.valueOf(value.toString());
+			}
+		}else if(type.endsWith("long") ||type.endsWith("Long")){
+			if(StringUtils.isEmpty(value)){
+				return 0l;
+			}else{
+				return Long.valueOf(value.toString());
+			}
+			
+		}else if(type.endsWith("BigDecimal")){
+			if(StringUtils.isEmpty(value)){
+				return new BigDecimal(0.00);
+			}else{
+				return new BigDecimal(value.toString());
+			}
+			
+		}else{
+			if(value != null) {
+				return value.toString();
+			} else {
+				return null; 
+			}
+		}
+	}
 }
