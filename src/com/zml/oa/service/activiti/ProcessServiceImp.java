@@ -643,23 +643,20 @@ public class ProcessServiceImp implements IProcessService{
 		
 		process.addFlowElement(createStartEvent());
 		process.addFlowElement(createUserTask("userTask1", "用户任务1"));
-		//process.addFlowElement(createExclusiveGateway("gateway1"));
-		//process.addFlowElement(createUserTask("userTask2", "用户任务2"));
-		//process.addFlowElement(createExclusiveGateway("gateway2"));
-		//process.addFlowElement(createUserTask("userTask3", "用户任务3"));
+		process.addFlowElement(createExclusiveGateway("gateway1"));
+		process.addFlowElement(createUserTask("userTask2", "用户任务2"));
+		process.addFlowElement(createExclusiveGateway("gateway2"));
+		process.addFlowElement(createUserTask("userTask3", "用户任务3"));
 		process.addFlowElement(createEndEvent());
 		
 		process.addFlowElement(createSequenceFlow("startEvent", "userTask1", "flow1", "", ""));
-		process.addFlowElement(createSequenceFlow("userTask1", "endEvent", "flow2", "", ""));
-		
-		/*process.addFlowElement(createSequenceFlow("startEvent", "userTask1", "flow1", "", ""));
 		process.addFlowElement(createSequenceFlow("userTask1", "gateway1", "flow2", "", ""));
 		process.addFlowElement(createSequenceFlow("gateway1", "userTask2", "flow3", "同意", "${isPass}"));
 		process.addFlowElement(createSequenceFlow("gateway1", "userTask3", "flow4", "不同意", "${!isPass}"));
 		process.addFlowElement(createSequenceFlow("userTask2", "endEvent", "flow5", "", ""));
 		process.addFlowElement(createSequenceFlow("userTask3", "gateway2", "flow6", "", ""));
 		process.addFlowElement(createSequenceFlow("gateway2", "userTask1", "flow7", "同意", "${reApply}"));
-		process.addFlowElement(createSequenceFlow("getway2", "endEvent", "flow8", "结束", "${!reApply}"));*/
+		process.addFlowElement(createSequenceFlow("gateway2", "endEvent", "flow8", "结束", "${!reApply}"));
 		
 		model.addProcess(process);
 		
