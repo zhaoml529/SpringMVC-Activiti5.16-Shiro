@@ -60,21 +60,111 @@ public class activitiTest {
 	
 	@Test
 	public void activiti() throws Exception,IOException {
+		BpmnModel model = new BpmnModel();
+		Process process = new Process();
+		process.addFlowElement(createStartEvent());		// 创建开始节点
+		
 		String sql = "select * from t_process_model where id = :id";
 		Map<String, Object> paramMap = new HashMap<String, Object>();  
 	    paramMap.put("id", 1);  
 	    List<Map<String, Object>> list = this.jdbcDao.find(sql, paramMap);
-		for(Map<String, Object> map : list){
-			ProcessModel model = (ProcessModel) this.convertMap(new ProcessModel().getClass(), map);
+		for(Map<String, Object> map : list) {
+			ProcessModel processModel = (ProcessModel) this.convertMap(new ProcessModel().getClass(), map);
+			
+			process.setId(PROCESSID);
+			process.setName(processModel.getProcessName());
+			
 			String sql2 = "select * from t_process_define where modelId = :modelId";
 			paramMap.clear();
-			paramMap.put("modelId", model.getId());
+			paramMap.put("modelId", processModel.getId());
 			List<Map<String, Object>> procDeflist = this.jdbcDao.find(sql2, paramMap);
-			for(Map<String, Object> procDefMap : list){
+			List<ProcessDefine> defineList = new ArrayList<ProcessDefine>();
+			int i = 1;
+			int sf = 1;
+			for(Map<String, Object> procDefMap : procDeflist) {
 				ProcessDefine proceDef = (ProcessDefine) this.convertMap(new ProcessDefine().getClass(), procDefMap);
+				process.addFlowElement(createUserTask("userTask" + i, proceDef.getTaskName()));		// 创建用户任务
+				if(proceDef.getIsStartEvent() == 1) {
+					process.addFlowElement(createSequenceFlow("startEvent", "userTask"+i, "flow"+sf, "", ""));
+				}
 				
+				process.addFlowElement(createExclusiveGateway("gateway" + i));
+				process.addFlowElement(createSequenceFlow("userTask"+i, "gateway"+i, "flow"+sf++, "", ""));
+				proceDef.setTaskId("userTask"+i);
+				proceDef.setTargetGateway("gateway"+i++);
+				String upSql = "update t_process_define set (taskId, targetGateway) = (:taskId, :gateway) where id = :id";
+				paramMap.clear();
+				paramMap.put("id", proceDef.getId());
+				paramMap.put("taskId", proceDef.getTaskId());
+				paramMap.put("gateway", proceDef.getTargetGateway());
+				this.jdbcDao.saveOrUpdate(upSql, paramMap);
+				
+				defineList.add(proceDef);
 			}
 			
+			i = 1;
+			sf = 1;
+			for(ProcessDefine proceDef : defineList) {
+				paramMap.clear();
+				paramMap.put("modelId", processModel.getId());
+				paramMap.put("procDefId", proceDef.getId());
+				String sql3 = "select * from t_process_instance where modelId = :modelId and procDefId = :procDefId";
+				List<Map<String, Object>> procInstlist = this.jdbcDao.find(sql3, paramMap);
+				for(Map<String, Object> procInstMap : procInstlist) {
+					com.zml.oa.entity.ProcessInstance processInstance = (com.zml.oa.entity.ProcessInstance) this.convertMap(new com.zml.oa.entity.ProcessInstance().getClass(), procInstMap);
+					String sql5 = "select * from t_process_model where id = :id";
+					paramMap.clear();
+					paramMap.put("id", processInstance.getTargetRef());
+					List<Map<String, Object>> procDeflist2 = this.jdbcDao.find(sql3, paramMap);
+					ProcessDefine proceDef2 = (ProcessDefine) this.convertMap(new ProcessDefine().getClass(), procDeflist2.get(0));
+					
+					switch (processInstance.getOperationType()) {
+						case 1:
+							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "同意", "${isPass}"));
+							break;
+						case 2:
+							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "不同意", "${!isPass}"));
+							break;
+						case 3:
+							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "重新申请", "${reApply}"));
+							break;
+						case 4:
+							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "取消申请", "${reApply}"));
+							break;
+						default:
+							break;
+					}
+				}
+			}
+			
+			
+			/*String sql3 = "select procDefId from t_process_instance where modelId = :modelId group by procDefId"; 
+			paramMap.clear();
+			paramMap.put("modelId", processModel.getId());
+			List<Map<String, Object>> procInstlist = this.jdbcDao.find(sql3, paramMap);
+			i = 1;
+			for(Map<String, Object> procInstMap : procInstlist) {
+				com.zml.oa.entity.ProcessInstance processInstance = (com.zml.oa.entity.ProcessInstance) this.convertMap(new com.zml.oa.entity.ProcessInstance().getClass(), procInstMap);
+				process.addFlowElement(createExclusiveGateway("gateway" + i));
+				
+				paramMap.clear();
+				paramMap.put("modelId", processModel.getId());
+				paramMap.put("procDefId", processInstance.getProcDefId());
+				String sql4 = "select * from t_process_instance where modelId = :modelId and procDefId = :procDefId";
+				List<Map<String, Object>> procInstlist2 = this.jdbcDao.find(sql4, paramMap);
+				for(Map<String, Object> procInstMap2 : procInstlist) {
+					com.zml.oa.entity.ProcessInstance processInstance2 = (com.zml.oa.entity.ProcessInstance) this.convertMap(new com.zml.oa.entity.ProcessInstance().getClass(), procInstMap2);
+					switch (processInstance2.getOperationType()) {
+						case 1:
+							process.addFlowElement(createSequenceFlow("gateway"+i, "userTask2", "flow3", "同意", "${isPass}"));
+							break;
+	
+						default:
+							break;
+					}
+				}
+				i++;
+			}*/
 		}
 		
 		

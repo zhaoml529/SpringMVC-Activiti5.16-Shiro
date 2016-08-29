@@ -11,6 +11,8 @@ public class ProcessDefine {
 	
 	private Long modelId;	// 外键
 	
+	private String taskId;	// 节点id，页面不用填写
+	
 	private String taskName;
 	
 	private Integer candidateType;
@@ -18,6 +20,8 @@ public class ProcessDefine {
 	private String candidates;
 	
 	private Integer isStartEvent;
+	
+	private String targetGateway;	// 指向的关口，页面不用选
 	
 	private String remark;
 
@@ -75,6 +79,22 @@ public class ProcessDefine {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public String getTargetGateway() {
+		return targetGateway;
+	}
+
+	public void setTargetGateway(String targetGateway) {
+		this.targetGateway = targetGateway;
+	}
+
+	public String getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(String taskId) {
+		this.taskId = taskId;
 	}
 	
 }

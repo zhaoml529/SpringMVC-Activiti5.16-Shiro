@@ -631,8 +631,8 @@ public class ProcessServiceImp implements IProcessService{
 
 	@Override
 	public void addProcessByDynamic() throws Exception {
-		// this.repositoryService.deleteDeployment("12", true);
-		// this.repositoryService.deleteDeployment("21", true);
+		 /*this.repositoryService.deleteDeployment("5003", true);
+		 this.repositoryService.deleteDeployment("5007", true);*/
 		
 		final String PROCESSID ="process_test_1";
 		BpmnModel model = new BpmnModel();
@@ -657,7 +657,7 @@ public class ProcessServiceImp implements IProcessService{
 		process.addFlowElement(createSequenceFlow("userTask3", "gateway2", "flow6", "", ""));
 		process.addFlowElement(createSequenceFlow("gateway2", "userTask1", "flow7", "同意", "${reApply}"));
 		process.addFlowElement(createSequenceFlow("gateway2", "endEvent", "flow8", "结束", "${!reApply}"));
-		
+				
 		model.addProcess(process);
 		
 		// 生成流程图片信息

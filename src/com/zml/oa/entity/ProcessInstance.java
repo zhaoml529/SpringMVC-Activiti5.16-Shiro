@@ -1,13 +1,15 @@
 package com.zml.oa.entity;
 
 /**
- * 流程
+ * 流程实例 - 测试
  * @author zhao
  *
  */
 public class ProcessInstance {
 
 	private Long id;
+	
+	private Long modelId;
 	
 	private Integer procDefId;
 	
@@ -45,6 +47,14 @@ public class ProcessInstance {
 
 	public void setTargetRef(Integer targetRef) {
 		this.targetRef = targetRef;
+	}
+
+	public Long getModelId() {
+		return modelId;
+	}
+
+	public void setModelId(Long modelId) {
+		this.modelId = modelId;
 	}
 	
 }
