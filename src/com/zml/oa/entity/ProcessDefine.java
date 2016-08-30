@@ -17,9 +17,11 @@ public class ProcessDefine {
 	
 	private Integer candidateType;
 	
-	private String candidates;
+	private String candidateIds;
 	
 	private Integer isStartEvent;
+	
+	private Integer isInitiator;
 	
 	private String targetGateway;	// 指向的关口，页面不用选
 	
@@ -57,12 +59,12 @@ public class ProcessDefine {
 		this.candidateType = candidateType;
 	}
 
-	public String getCandidates() {
-		return candidates;
+	public String getCandidateIds() {
+		return candidateIds;
 	}
 
-	public void setCandidates(String candidates) {
-		this.candidates = candidates;
+	public void setCandidateIds(String candidateIds) {
+		this.candidateIds = candidateIds;
 	}
 
 	public Integer getIsStartEvent() {
@@ -95,6 +97,14 @@ public class ProcessDefine {
 
 	public void setTaskId(String taskId) {
 		this.taskId = taskId;
+	}
+
+	public Integer getIsInitiator() {
+		return isInitiator;
+	}
+
+	public void setIsInitiator(Integer isInitiator) {
+		this.isInitiator = isInitiator;
 	}
 	
 }

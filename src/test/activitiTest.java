@@ -30,6 +30,8 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.PropertyConfigurator;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,9 @@ import com.zml.oa.entity.ProcessModel;
 @ContextConfiguration(locations = {"classpath*:/applicationContext.xml", "classpath*:/springMVC.xml" })
 public class activitiTest {
 	public static String PROCESSID = "process_test_1";
+	
+	public static Integer flowSeq = 1;
+	public static Integer flowSeq2 = 1;
 
     @Autowired
     protected RepositoryService repositoryService;
@@ -60,11 +65,18 @@ public class activitiTest {
 	@Autowired
 	private IJdbcDao jdbcDao;
 	
+	@Before  
+    public void setUp() throws Exception {  
+		//PropertyConfigurator.configure(Test.class.getClassLoader().getResource("log4j.properties"));
+		System.out.println("START!!!!");
+    }  
+	
 	@Test
 	public void activiti() throws Exception,IOException {
 		BpmnModel model = new BpmnModel();
 		Process process = new Process();
 		process.addFlowElement(createStartEvent());		// 创建开始节点
+		process.addFlowElement(createEndEvent());
 		
 		String sql = "select * from t_process_model where id = :id";
  		Map<String, Object> paramMap = new HashMap<String, Object>();  
@@ -86,14 +98,17 @@ public class activitiTest {
 			for(Map<String, Object> procDefMap : procDeflist) {
 				ProcessDefine proceDef = (ProcessDefine) this.setValToObj(new ProcessDefine(), procDefMap);
 				process.addFlowElement(createUserTask("userTask" + i, proceDef.getTaskName()));		// 创建用户任务
-				if("1".equals(proceDef.getIsStartEvent())) {
+				if(proceDef.getIsStartEvent() == 1) {
 					process.addFlowElement(createSequenceFlow("startEvent", "userTask"+i, "flow"+sf, "", ""));
+					System.out.println("startEvent ---> userTask"+i+" flow"+flowSeq2++);
 				}
 				
 				process.addFlowElement(createExclusiveGateway("gateway" + i));
-				process.addFlowElement(createSequenceFlow("userTask"+i, "gateway"+i, "flow"+sf++, "", ""));
+				process.addFlowElement(createSequenceFlow("userTask"+i, "gateway"+i, "flow"+sf, "", ""));
 				proceDef.setTaskId("userTask"+i);
-				proceDef.setTargetGateway("gateway"+i++);
+				proceDef.setTargetGateway("gateway"+i);
+				System.out.println(proceDef.getTaskId()+" ---> "+proceDef.getTargetGateway()+" flow"+flowSeq2++);
+				
 				String upSql = "update t_process_define set taskId=:taskId, targetGateway = :gateway where id = :id";
 				paramMap.clear();
 				paramMap.put("id", proceDef.getId());
@@ -102,9 +117,10 @@ public class activitiTest {
 				this.jdbcDao.saveOrUpdate(upSql, paramMap);
 				
 				defineList.add(proceDef);
+				sf++;
+				i++;
 			}
 			
-			i = 1;
 			sf = 1;
 			for(ProcessDefine proceDef : defineList) {
 				paramMap.clear();
@@ -116,6 +132,7 @@ public class activitiTest {
 					com.zml.oa.entity.ProcessInstance processInstance = (com.zml.oa.entity.ProcessInstance) this.setValToObj(new com.zml.oa.entity.ProcessInstance(), procInstMap);
 					if(processInstance.getTargetRef() == 0) {	// endEvent节点
 						process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), "endEvent", "flow0", "", ""));
+						System.out.println(proceDef.getTargetGateway()+" ---同意---> endEvent"+" flow"+flowSeq2++);
 					} else {
 						String sql5 = "select * from t_process_define where id = :id";
 						paramMap.clear();
@@ -126,20 +143,25 @@ public class activitiTest {
 						switch (processInstance.getOperationType()) {
 						case "1":
 							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "同意", "${isPass}"));
+							System.out.println(proceDef.getTargetGateway()+" ---同意---> "+proceDef2.getTaskId()+" flow"+flowSeq2++);
 							break;
 						case "2":
 							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "不同意", "${!isPass}"));
+							System.out.println(proceDef.getTargetGateway()+" ---不同意---> "+proceDef2.getTaskId()+" flow"+flowSeq2++);
 							break;
 						case "3":
 							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "重新申请", "${reApply}"));
+							System.out.println(proceDef.getTargetGateway()+" ---重新申请---> "+proceDef2.getTaskId()+" flow"+flowSeq2++);
 							break;
 						case "4":
-							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "取消申请", "${reApply}"));
+							process.addFlowElement(createSequenceFlow(proceDef.getTargetGateway(), proceDef2.getTaskId(), "flow"+sf, "取消申请", "${!reApply}"));
+							System.out.println(proceDef.getTargetGateway()+" ---取消申请---> "+proceDef2.getTaskId()+" flow"+flowSeq2++);
 							break;
 						default:
 							break;
 						}
 					}
+					sf++;
 				}
 			}	
 		}
@@ -168,21 +190,24 @@ public class activitiTest {
 		process.setName("动态流程测试");
 		
 		process.addFlowElement(createStartEvent());
-		process.addFlowElement(createUserTask("userTask1", "用户任务1"));
+		process.addFlowElement(createUserTask("userTask1", "一级审批"));
 		process.addFlowElement(createExclusiveGateway("gateway1"));
-		process.addFlowElement(createUserTask("userTask2", "用户任务2"));
+		process.addFlowElement(createUserTask("userTask2", "二级审批"));
 		process.addFlowElement(createExclusiveGateway("gateway2"));
-		process.addFlowElement(createUserTask("userTask3", "用户任务3"));
+		process.addFlowElement(createUserTask("userTask3", "修改申请"));
+		process.addFlowElement(createExclusiveGateway("gateway3"));
 		process.addFlowElement(createEndEvent());
 		
 		process.addFlowElement(createSequenceFlow("startEvent", "userTask1", "flow1", "", ""));
 		process.addFlowElement(createSequenceFlow("userTask1", "gateway1", "flow2", "", ""));
 		process.addFlowElement(createSequenceFlow("gateway1", "userTask2", "flow3", "同意", "${isPass}"));
 		process.addFlowElement(createSequenceFlow("gateway1", "userTask3", "flow4", "不同意", "${!isPass}"));
-		process.addFlowElement(createSequenceFlow("userTask2", "endEvent", "flow5", "", ""));
-		process.addFlowElement(createSequenceFlow("userTask3", "gateway2", "flow6", "", ""));
-		process.addFlowElement(createSequenceFlow("gateway2", "userTask1", "flow7", "同意", "${reApply}"));
-		process.addFlowElement(createSequenceFlow("gateway2", "endEvent", "flow8", "结束", "${!reApply}"));
+		process.addFlowElement(createSequenceFlow("userTask2", "gateway2", "flow5", "", ""));
+		process.addFlowElement(createSequenceFlow("gateway2", "endEvent", "flow6", "同意", "${isPass}"));
+		process.addFlowElement(createSequenceFlow("gateway2", "userTask3", "flow7", "不同意", "${!isPass}"));
+		process.addFlowElement(createSequenceFlow("userTask3", "gateway3", "flow8", "", ""));
+		process.addFlowElement(createSequenceFlow("gateway3", "userTask1", "flow9", "重新申请", "${reApply}"));
+		process.addFlowElement(createSequenceFlow("gateway3", "endEvent", "flow10", "取消申请", "${!reApply}"));
 		
 		model.addProcess(process);
 		
@@ -262,7 +287,7 @@ public class activitiTest {
 	 */
 	protected static SequenceFlow createSequenceFlow(String from, String to,String id,String name,String conditionExpression) {
 		SequenceFlow flow = new SequenceFlow();
-		flow.setId(id);
+		flow.setId("flow"+flowSeq++);
 		flow.setName(name);
 		flow.setSourceRef(from);
 		flow.setTargetRef(to);
