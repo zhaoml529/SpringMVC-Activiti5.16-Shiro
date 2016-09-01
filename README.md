@@ -2,7 +2,7 @@ SpringOA简介
 ========
 
 基于SpringMVC+Shiro+Activiti 5.16 的简单OA，可以快速入门Activiti学习用。<br>
-推荐Fork本项目的 [EasyUI分支](https://github.com/zhaoml529/SpringOA/tree/EasyUI "推荐Fork此分支项目")！
+推荐Fork本项目的 [EasyUI分支](https://github.com/zhaoml529/Spring-Activiti5.16-Shiro/tree/EasyUI "推荐Fork此分支项目")！
 
 框架简介
 --------
