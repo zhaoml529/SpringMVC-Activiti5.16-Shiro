@@ -37,7 +37,7 @@ Shiro实现登录认证和权限控制，结合Ehcache缓存权限列表，毕�
 --------
 1.加入安全框架Shiro. ---已实现<br>
 2.加入缓存 ehcache. --已实现<br>
-3.前端页面 EasyUI，请查看EasyUI分支:https://github.com/zhaoml529/SpringOA/tree/EasyUI<br>
+3.前端页面 EasyUI，请查看EasyUI分支:https://github.com/zhaoml529/Spring-Activiti5.16-Shiro/tree/EasyUI<br>
 
 首页
 --------
