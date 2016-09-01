@@ -5,7 +5,7 @@ SpringOA简介
 
 框架简介
 --------
-由于最近在学习Activit本项目参考Workflow讲义上的实战项目，并且加入了自己的东西，并不是照搬过来。<br>
+通过本项目系统的学习了Activiti的相关功能。<br>
 框架以Spring Framework为核心、Spring MVC作为模型视图控制器、Shiro作为权限框架、Hibernate作为数据库操作层。<br>
 本项目也可以为学习SpringMVC的同学提供帮助。<br>
 本项目以查询待办任务、查待受理任务、查看运行中的流程以及流程控制中的一些问题为基础入门Activiti。<br>
