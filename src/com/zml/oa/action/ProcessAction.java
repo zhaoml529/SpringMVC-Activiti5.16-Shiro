@@ -495,7 +495,7 @@ public class ProcessAction {
 	
 	
     /**
-     * 激活、挂起流程实例-根据processDefinitionId
+     * 激活、挂起流程定义-根据processDefinitionId
      * @param status
      * @param processInstanceId
      * @param redirectAttributes
