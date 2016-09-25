@@ -14,7 +14,7 @@
 			<h1 style="font-size:30px;"><strong>欢迎使用OA系统</strong></h1>
 			<span class="badge" iconCls="icon-save" plain="true" >系统初始化</span>
 			<p>
-				
+				不同角色拥有不同的功能菜单，可通过 <span class="label-info"><strong>用户组管理</strong></span>进行权限控制。<br/>
 				用admin(所有用户密码默认都为123)进入系统后：<br/><br/>
 				1、在<span class="label-info"><strong>用户管理</strong></span>界面点击<span class="label-info"><strong>同步用户</strong></span>按钮，把系统用户和组关系同步到activiti默认的用户表和组表中。<br/><br/>
 				

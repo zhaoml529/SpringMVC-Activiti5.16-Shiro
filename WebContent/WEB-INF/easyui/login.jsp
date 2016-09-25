@@ -78,10 +78,10 @@
 			<div class="formLogin">
 				<form name="formLogin" action="" id="formLogin" method="post">
 					<div class="tip">
-						<input class="userName"  type="text" name="name" id="name" title="用户名" nullmsg="请输入用户名!" iscookie="true" />
+						<input class="userName" type="text" name="name" id="name" value="admin" title="用户名" nullmsg="请输入用户名!" iscookie="true" />
 					</div>
 					<div class="tip">
-						<input class="password" name="passwd" type="password" id="passwd" title="密码" nullmsg="请输入密码!" />
+						<input class="password" name="passwd" type="password" id="passwd" value="123" title="密码" nullmsg="请输入密码!" />
 					</div>
 					<div id="cap" class="tip">
 						<c:if test="${jcaptchaEbabled}">
@@ -103,7 +103,7 @@
 								</ul>
 							</div>
 							<div style="float: left; margin-left: 30px;">
-								<a href="javascript:void(0);"><span class="f_help">是否初始化admin的密码</span></a>
+								<a href="javascript:void(0);" onclick=""><span class="f_help">是否初始化admin的密码</span></a>
 							</div>
 						</div>
 						<div class="clear"></div>
