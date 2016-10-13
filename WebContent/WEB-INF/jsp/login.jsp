@@ -67,12 +67,12 @@
 			<div style="margin: auto auto auto 40%; text-align: left;">
 				<div class="textDiv">
 					<span style="width: 300px; margin-right: 20px;">用户名: </span>
-					<input type="text" name="name" value="<shiro:principal/>"/>
+					<input type="text" name="name" value="admin"/>
 				
 				</div>
 				<div class="textDiv">
 					<span style="width: 300px; margin-right: 40px;">密码:</span> 
-					<input type="password" name="passwd"/>
+					<input type="password" name="passwd" value="123"/>
 				</div>
 				<div class="textDiv">
 				<c:if test="${jcaptchaEbabled}"> 
