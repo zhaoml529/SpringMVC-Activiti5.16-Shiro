@@ -16,6 +16,7 @@
 <script type="text/javascript" src="${ctx }/js/easyui/login/jquery.tipsy.js"></script>
 <script type="text/javascript" src="${ctx }/js/easyui/login/login.js"></script>
 <script type="text/javascript">
+	var ctx = "${ctx}";
 	if(top!=self){
 		if(top.location != self.location)
 		 top.location=self.location; 

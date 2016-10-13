@@ -229,3 +229,19 @@ function jrumble() {
 	$('.inner').trigger('startRumble');
 	setTimeout('$(".inner").trigger("stopRumble")', 500);
 }
+
+function initAdminPasswd() {
+	 $.ajax({
+         url: ctx + '/user/initPassword',
+         type: 'post',
+         dataType: 'json',
+         data: "userId=14",
+ 		 success: function (data) {
+ 			$.messager.show({
+ 				title : data.title,
+ 				msg : data.message,
+ 				timeout : 1000 * 2
+ 			});
+ 		 }
+     });
+}
