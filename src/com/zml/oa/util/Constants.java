@@ -5,8 +5,8 @@ import java.util.Date;
 public class Constants {
 	
 	/***************** system *****************/
-	public static String DB_NAME = "mysql";
-	public static String MESSAGE = "message";
+	public static final String DB_NAME = "mysql";
+	public static final String MESSAGE = "message";
 	
 	/***************** session key *****************/
     public static final String CURRENT_USER = "user";
