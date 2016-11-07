@@ -13,8 +13,6 @@ import java.util.Date;
  *
  */
 public class DateUtil {
-	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	
 	public static Date StringToDate(String dateString,String formatString){
 		try {
 			DateFormat fm = new SimpleDateFormat(formatString);
@@ -168,6 +166,7 @@ public class DateUtil {
 	
 	public static String getTodayString() {
 		Date d = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		return sdf.format(d);
 	}
 }
