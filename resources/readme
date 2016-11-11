@@ -21,7 +21,7 @@
 	  一、在classpath:/bpmn/ 下有了流程描述文件和图片，为什么还要用classpath:/deploy/ 下的压缩包？
 	       1.因为在部署流程文件时，直接部署.bpmn后引擎会自动生成流程图，在Activiti Designer里面设计与自动生成的流程图坐标不一致。
 	         会产生乱码、连线错乱或坐标错位 等问题。
-	         解决乱码问题可以在引擎配置中添加：
+	         解决乱码问题可以在引擎配置中添加(仅在windows环境下可直接用，linux中需要添加宋体字体此配置才生效)：
 	       		<property name="activityFontName" value="宋体"/>
 				<property name="labelFontName" value="宋体"/>
 	       
