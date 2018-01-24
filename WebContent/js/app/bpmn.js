@@ -60,6 +60,29 @@ function fixWidth(percent)
 	return parseInt(($(this).width() - 50) * percent);
 }
 
+//加载
+function loadBpmn() {
+    var row = bpmn_datagrid.datagrid('getSelected');
+    if (row) {
+        $.ajax({
+            type: "POST",
+            url: ctx+"/permissionAction/loadSingleBpmn",
+            data: {processDefinitionId: row.id},
+            success: function (data) {
+                if (data.status) {
+                    bpmn_datagrid.datagrid('load');	// reload the data
+                }
+                $.messager.show({
+                    title : data.title,
+                    msg : data.message,
+                    timeout : 1000 * 2
+                });
+            }
+        });
+    } else {
+        $.messager.alert("提示", "您未选择任何操作对象，请选择一行数据！");
+    }
+}
 
 //初始化所有
 function initialization(){

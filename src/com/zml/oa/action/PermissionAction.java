@@ -119,13 +119,27 @@ public class PermissionAction {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/loadSingleBpmn")
-	public String loadSingleBpmn(@RequestParam("processDefinitionId") String processDefinitionId,
-								RedirectAttributes redirectAttributes) throws Exception{
-		ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
-		//读取节点信息保存到usertask表
-		setSingleActivitiInfo(processDefinition);
-		redirectAttributes.addFlashAttribute("message", "加载成功！");
-		return "redirect:/permissionAction/loadBpmn_page";
+	@ResponseBody
+	public Message loadSingleBpmn(@RequestParam("processDefinitionId") String processDefinitionId,
+								  RedirectAttributes redirectAttributes) throws Exception{
+		Message message = new Message();
+		try {
+			ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
+			if(processDefinition == null) {
+				message.setMessage("初始化失败！");
+				message.setStatus(Boolean.FALSE);
+				return message;
+			}
+			//读取节点信息保存到usertask表
+			setSingleActivitiInfo(processDefinition);
+			message.setMessage("初始化成功！");
+			message.setStatus(Boolean.TRUE);
+			return message;
+		} catch (Exception e) {
+			message.setMessage("初始化失败！");
+			message.setStatus(Boolean.FALSE);
+			throw e;
+		}
 	}
 
 	

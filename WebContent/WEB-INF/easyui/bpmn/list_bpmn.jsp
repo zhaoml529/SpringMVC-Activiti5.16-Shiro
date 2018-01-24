@@ -30,7 +30,7 @@
 				<tr>
 					<td style="padding-left:2px">
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="setAuthor();">设定人员</a>
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="expandAll();">加载</a>
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-redo" plain="true" onclick="loadBpmn();">加载</a>
 						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="initialization();">初始化所有</a>
 					</td>
 				</tr>
